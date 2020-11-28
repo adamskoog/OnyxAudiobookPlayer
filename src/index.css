@@ -39,6 +39,9 @@ body {
     color: rgba(255,255,255,.5);
     background-color: #343a40!important;
 }
+.dropdown-menu.show div.dropdown-item {
+    cursor: pointer;
+}
 
 .dropdown-menu.show div.item-separator {
     background-color: hsla(0,0%,78.4%,.15);

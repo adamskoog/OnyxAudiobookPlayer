@@ -22,8 +22,12 @@ class NowPlaying extends Component {
     }
 
     updatePlayInfo = (baseUrl, userInfo, playInfo) => {
-        console.log("playInfo", playInfo);
-        this.setState({ baseUrl: baseUrl, userInfo: userInfo, playInfo: playInfo });
+        this.setState({ baseUrl: baseUrl, userInfo: userInfo, playInfo: playInfo }, () => {
+            if (playInfo) {
+                let offset = (playInfo && playInfo.viewOffset) ? TimeUtils.convertMsToSeconds(playInfo.viewOffset) : 0;
+                this.player.currentTime = offset;
+            }
+        });
     }
 
     componentDidMount() {
@@ -104,12 +108,16 @@ class NowPlaying extends Component {
     }
 
     updateTimeline = (state) => {
+        // we need a way to update the album info if the user is looking at the album
+        // page, It should keep the on deck updated.
+        // Should this be done while playing, or only when user pauses/kills the stream.
         let args = {
             ratingKey: this.state.playInfo.ratingKey,
             key: this.state.playInfo.key,
             state: state,
-            time: this.state.currentTime,
-            duration: this.state.duration,
+            time: TimeUtils.convertSecondsToMs(this.state.currentTime),
+            playbackTime: TimeUtils.convertSecondsToMs(this.state.currentTime),
+            duration: TimeUtils.convertSecondsToMs(this.state.duration),
             "X-Plex-Token": this.state.userInfo.authToken
         };
         PlexRequest.updateTimeline(this.state.baseUrl, args)

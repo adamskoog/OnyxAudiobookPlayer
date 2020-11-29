@@ -5,6 +5,16 @@ class TimeUtils
         return ('00' + n).slice(-z);
     }
 
+    static convertSecondsToMs(s) {
+        if (!s) return 0;
+        return Math.round(s * 1000);
+    }
+
+    static convertMsToSeconds(ms) {
+        if (!ms) return 0;
+        return Math.round(ms / 1000);
+    }
+
     static convertFromMs(s) {
         let ms = s % 1000;
         s = (s - ms) / 1000;

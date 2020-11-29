@@ -80,6 +80,17 @@
     display: inline-block;
 }
 
+.btn.btn-play-on-deck {
+    font-size: 2em;
+    padding: 0;
+}
+.on-deck-title {
+    padding-left: 15px;
+    display: inline-block;
+    line-height: 3;
+    vertical-align: middle;
+}
+
 .expand-btn-container {
     text-align: center;
 }

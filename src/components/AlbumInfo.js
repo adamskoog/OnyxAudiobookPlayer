@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import AlbumTrack from './AlbumTrack';
 import PlexRequest from '../plex/PlexRequest';
+import AlbumHelpers from '../plex/AlbumHelpers';
 import { Redirect } from 'react-router-dom';
 
 class AlbumInfo extends Component {
@@ -10,7 +11,8 @@ class AlbumInfo extends Component {
         baseUrl: this.props.baseUrl,
         userInfo: this.props.userInfo,
         ratingKey: this.props.ratingKey,
-        album: { Metadata: [] }
+        album: { Metadata: [] },
+        onDeck: null
     }
 
     expandSummary = () => {
@@ -31,8 +33,13 @@ class AlbumInfo extends Component {
         return "";
     }
 
-    plexSelectedTrack = (trackInfo) => {
-        // Check for played track, if it is current on deck (tbd)
+    playOnDeckTrack = (trackInfo) => {
+        console.log("on deck played", trackInfo);
+        this.props.playTrack(trackInfo);
+    }
+
+    playSelectedTrack = (trackInfo) => {
+            // Check for played track, if it is current on deck (tbd)
         // then we need to tell user they are changing played track
         // progress
 
@@ -45,16 +52,17 @@ class AlbumInfo extends Component {
 
     componentDidMount ()  {
         if (this.state.userInfo) {
-        PlexRequest.getAlbumMetadata(this.state.baseUrl, this.state.ratingKey, { "X-Plex-Token": this.state.userInfo.authToken })
-            .then(data => {
-                if (data.MediaContainer)
-                    this.setState({ album: data.MediaContainer });
-            });
+            PlexRequest.getAlbumMetadata(this.state.baseUrl, this.state.ratingKey, { "X-Plex-Token": this.state.userInfo.authToken })
+                .then(data => {
+                    if (data.MediaContainer) {
+                        let onDeck = AlbumHelpers.findOnDeck(data.MediaContainer);
+                        this.setState({ album: data.MediaContainer, onDeck: onDeck });
+                    }
+                });
         }
     }
 
     render() {
-        //console.log("album", this.state.em);
         return (
             <React.Fragment>
             {!this.props.userInfo && (<Redirect to="/" />)}
@@ -65,6 +73,17 @@ class AlbumInfo extends Component {
                     <div className="mt-1 album-title">{this.state.album.parentTitle}</div>
                     <div className="mt-1 album-artist">{this.state.album.grandparentTitle}</div>
                     <div className="album-year">{this.state.album.parentYear}</div>
+                    {this.state.onDeck && (
+                    <div className="on-deck">
+                        <button className="btn btn-play-on-deck" type="button" onClick={() => this.playOnDeckTrack(this.state.onDeck)}>
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path fillRule="evenodd" d="m 12.654334,8.697 -6.3630006,3.692 c -0.54,0.313 -1.233,-0.066 -1.233,-0.697 V 4.308 c 0,-0.63 0.692,-1.01 1.233,-0.696 l 6.3630006,3.692 a 0.802,0.802 0 0 1 0,1.393 z"/>
+                            </svg>
+                        </button>
+                        <div className="on-deck-title">{this.state.onDeck.title}</div>
+                    </div>
+                    )}
                 </div>
                 <div className="mt-3 album-summary-container" ref={ref => this.summary = ref}>
                     <div className="album-summary" dangerouslySetInnerHTML={{__html: this.formatSummary(this.state.album.summary)}}></div>
@@ -78,7 +97,7 @@ class AlbumInfo extends Component {
                     <table>
                         <tbody>
                             {this.state.album.Metadata.map((track) => (
-                                <AlbumTrack key={track.key} trackInfo={track} plexSelectedTrack={this.plexSelectedTrack} />
+                                <AlbumTrack key={track.key} trackInfo={track} playSelectedTrack={this.playSelectedTrack} />
                             ))}
                         </tbody>
                     </table>

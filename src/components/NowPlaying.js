@@ -149,7 +149,7 @@ class NowPlaying extends Component {
                                 </button>
                             </div>
                         )}
-                        <div className="range-container"><input type="range" className="form-control-range" ref={ref => this.playerRange = ref} min={0} max={this.state.duration} value={this.state.currentTime} onChange={() => this.playerRangeChanged()} /></div>
+                        <div className="range-container"><input type="range" className="form-control-range" ref={ref => this.playerRange = ref} min={0} max={((this.state.duration) ? this.state.duration : 0)} value={this.state.currentTime} onChange={() => this.playerRangeChanged()} /></div>
                         {(this.state.player === "playing" || this.state.player === "paused")  && (
                             <div className="ml-auto">
                                 <button className="btn btn-player-stop" type="button" onClick={() => this.stopTrack()}>

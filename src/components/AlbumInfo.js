@@ -34,8 +34,9 @@ class AlbumInfo extends Component {
     }
 
     playOnDeckTrack = (trackInfo) => {
-        console.log("on deck played", trackInfo);
-        this.props.playTrack(trackInfo);
+
+        let playQueue = AlbumHelpers.getAlbumQueue(trackInfo, this.state.album);
+        this.props.playQueue(playQueue);
     }
 
     playSelectedTrack = (trackInfo) => {
@@ -43,11 +44,15 @@ class AlbumInfo extends Component {
         // then we need to tell user they are changing played track
         // progress
 
+        // TODO: testing of marking track played.
+            //console.log("marking track played", trackInfo);
+            //AlbumHelpers.markTrackPlayed(trackInfo , this.state.baseUrl, this.state.userInfo.authToken);
+            
         // If they are playing a track out of order, we need to update all
         // tracks to make sure previous are played and remaining are unplayed.
         // This will likely require timeline updates to be sent for all tracks <-- TODO: is this a bad idea???
-        console.log("track played", trackInfo, this.state.album);
-        this.props.playTrack(trackInfo);
+        let playQueue = AlbumHelpers.getAlbumQueue(trackInfo, this.state.album);
+        this.props.playQueue(playQueue);
     }
 
     componentDidMount ()  {
@@ -75,6 +80,7 @@ class AlbumInfo extends Component {
                     <div className="album-year">{this.state.album.parentYear}</div>
                     {this.state.onDeck && (
                     <div className="on-deck">
+                        {console.log("on deck", this.state.onDeck)}
                         <button className="btn btn-play-on-deck" type="button" onClick={() => this.playOnDeckTrack(this.state.onDeck)}>
                             <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                 <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
@@ -112,7 +118,8 @@ class AlbumInfo extends Component {
 AlbumInfo.propTypes = {
     baseUrl: PropTypes.string.isRequired,
     userInfo: PropTypes.object.isRequired,
-    ratingKey: PropTypes.string.isRequired
+    ratingKey: PropTypes.string.isRequired,
+    playQueue: PropTypes.func.isRequired
 }
 
 export default AlbumInfo;

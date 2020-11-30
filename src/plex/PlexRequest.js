@@ -173,7 +173,7 @@ class PlexRequest
         // - X-Plex-Session-Identifier=8lq3f8kkqi58si6u1d0waehf
     
         const localParams = { 
-            hasMDE: 1,
+            hasMDE: 0,
             "X-Plex-Text-Format": "plain"
         };
 

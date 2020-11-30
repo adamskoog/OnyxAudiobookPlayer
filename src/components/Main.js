@@ -15,16 +15,16 @@ import AlbumInfo from './AlbumInfo';
 class Main extends Component {
 
     state = {
-        baseUrl: null,
+        baseUrl: "",
         appState: "loading",
         userInfo: null,
-        nowPlaying: null,
+        playQueue: [],
         serverIdentifier: null,
         librarySection: null
     }
 
-    playTrack = (trackInfo) => {
-        this.setState({ nowPlaying: trackInfo })
+    playQueue = (playQueue) => {
+        this.setState({ playQueue: playQueue })
     }
 
     updateAuthState = (userInfo, appState) => {
@@ -64,8 +64,8 @@ class Main extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.nowPlaying && this.state.baseUrl && this.state.userInfo) {
-            this.nowPlaying.updatePlayInfo(this.state.baseUrl, this.state.userInfo, this.state.nowPlaying);
+        if (this.player && this.state.baseUrl && this.state.userInfo) {
+            this.player.updatePlayInfo(this.state.baseUrl, this.state.userInfo, this.state.playQueue);
         }
     }
 
@@ -79,7 +79,7 @@ class Main extends Component {
                                 <Redirect to="/login" />
                             )}
                             {<Header userInfo={this.state.userInfo} updateAuthState={this.updateAuthState} />}
-                            <NowPlaying ref={nowPlaying => {this.nowPlaying = nowPlaying}} baseUrl={ this.state.baseUrl} userInfo={this.state.userInfo} />
+                            <NowPlaying ref={player => {this.player = player}} baseUrl={ this.state.baseUrl} userInfo={this.state.userInfo} />
                             <main role="main" className="container">
                                 <Switch>
                                     {this.state.userInfo && (
@@ -88,7 +88,7 @@ class Main extends Component {
                                     {!this.state.userInfo && (
                                     <Route exact path="/" component={() => <div>Empty</div> } />
                                     )}
-                                    <Route exact path="/album/:ratingKey" component={(props) => <AlbumInfo baseUrl={this.state.baseUrl} userInfo={this.state.userInfo} key={props.match.params.ratingKey} ratingKey={props.match.params.ratingKey} playTrack={this.playTrack} />} />
+                                    <Route exact path="/album/:ratingKey" component={(props) => <AlbumInfo baseUrl={this.state.baseUrl} userInfo={this.state.userInfo} key={props.match.params.ratingKey} ratingKey={props.match.params.ratingKey} playQueue={this.playQueue} />} />
                                     <Route exact path="/settings" component={(props) => <Settings userInfo={this.state.userInfo} updateSettingsState={this.updateSettingsState} /> } />
                                     <Route exact path="/login" component={(props) => <LoginForm userInfo={this.state.userInfo} processLogin={this.processLogin} updateAuthState={this.updateAuthState} /> } />
                                 </Switch>

@@ -93,12 +93,19 @@
 }
 
 .album-summary-container {
-    max-height: 110px;
+    max-height: 120px;
     overflow: hidden;
 }
 .album-summary-container.expand {
     max-height: none;
     overflow: hidden;
+}
+.no-expand .album-summary-container {
+    overflow: auto;
+    max-height: 300px;
+}
+.no-expand .expand-btn-container {
+    display: none;
 }
 
 .album-summary {
@@ -155,7 +162,8 @@
 }
 
 .col-track-index, 
-.col-track-play {
+.col-track-play,
+.col-track-options {
     width: 30px;
 }
 .col-track-duration {

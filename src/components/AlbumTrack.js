@@ -22,6 +22,14 @@ class AlbumTrack extends Component {
         return output.join(" ");
     }
 
+    markPlayed = (trackInfo) => {
+        AlbumHelpers.markTrackPlayed(trackInfo , this.props.baseUrl, this.props.userInfo.authToken);
+    }
+ 
+    markUnplayed = (trackInfo) => {
+        AlbumHelpers.markTrackUnplayed(trackInfo , this.props.baseUrl, this.props.userInfo.authToken);
+    }
+
     render() {
         //console.log("Track Render", this.props.trackInfo);
         return (
@@ -37,8 +45,21 @@ class AlbumTrack extends Component {
                 <td className="col-track-index">
                     <div className="album-track-index">{this.props.trackInfo.index}</div>
                 </td>
-                <td>{this.props.trackInfo.title}</td>
+                <td className="col-track-title">{this.props.trackInfo.title}</td>
                 <td className="col-track-duration">{TimeUtils.formatTrackDisplay(this.props.trackInfo.duration)}</td>
+                <td className="col-track-options">
+                    <div className="dropdown">
+                        <button className="btn" type="button" id={`trackOptions${this.props.trackInfo.ratingKey}`} data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-three-dots-vertical" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fillRule="evenodd" d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                            </svg>
+                        </button>
+                        <div className="dropdown-menu" aria-labelledby={`trackOptions${this.props.trackInfo.ratingKey}`}>
+                            <button className="dropdown-item" type="button" onClick={() => this.markPlayed(this.props.trackInfo)}>Mark as Played</button>
+                            <button className="dropdown-item" type="button" onClick={() => this.markUnplayed(this.props.trackInfo)}>Mark as Unplayed</button>
+                        </div>
+                    </div>
+                </td>
             </tr>
         ); 
     }

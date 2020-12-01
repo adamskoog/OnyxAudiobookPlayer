@@ -67,6 +67,17 @@ class AlbumInfo extends Component {
         }
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.album && this.state.album.summary) {
+            var splitted = this.state.album.summary.split("\n");
+            if (splitted.length <= 1)
+                this.expandContainer.classList.add('no-expand');
+            else
+                this.expandContainer.classList.remove('no-expand');
+        } else
+            this.expandContainer.classList.remove('no-expand');
+    }
+
     render() {
         return (
             <React.Fragment>
@@ -80,7 +91,6 @@ class AlbumInfo extends Component {
                     <div className="album-year">{this.state.album.parentYear}</div>
                     {this.state.onDeck && (
                     <div className="on-deck">
-                        {console.log("on deck", this.state.onDeck)}
                         <button className="btn btn-play-on-deck" type="button" onClick={() => this.playOnDeckTrack(this.state.onDeck)}>
                             <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                 <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
@@ -91,19 +101,21 @@ class AlbumInfo extends Component {
                     </div>
                     )}
                 </div>
-                <div className="mt-3 album-summary-container" ref={ref => this.summary = ref}>
-                    <div className="album-summary" dangerouslySetInnerHTML={{__html: this.formatSummary(this.state.album.summary)}}></div>
-                </div>
-                <div className="expand-btn-container">
-                    <div className="separator"></div>
-                    <button className="btn btn-dark" type="button" ref={ref => this.expandBtn = ref} onClick={() => this.expandSummary()}>Expand</button>
+                <div className="no-expand" ref={el => this.expandContainer = el}>
+                    <div className="mt-3 album-summary-container" ref={ref => this.summary = ref}>
+                        <div className="album-summary" dangerouslySetInnerHTML={{__html: this.formatSummary(this.state.album.summary)}}></div>
+                    </div>
+                    <div className="expand-btn-container">
+                        <div className="separator"></div>
+                        <button className="btn btn-dark" type="button" ref={ref => this.expandBtn = ref} onClick={() => this.expandSummary()}>Expand</button>
+                    </div>
                 </div>
                 <div className="track-container">
                     <div className="mb-2 track-header">{this.state.album.size} Track{(this.state.album.size > 1) ? "s" : ""}</div>
                     <table>
                         <tbody>
                             {this.state.album.Metadata.map((track) => (
-                                <AlbumTrack key={track.key} trackInfo={track} playSelectedTrack={this.playSelectedTrack} />
+                                <AlbumTrack key={track.key} trackInfo={track} baseUrl={this.state.baseUrl} userInfo={this.state.userInfo} playSelectedTrack={this.playSelectedTrack} />
                             ))}
                         </tbody>
                     </table>

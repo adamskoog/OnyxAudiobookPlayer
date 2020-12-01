@@ -51,7 +51,7 @@ class PlexRequest
         });
     }
 
-    static signIn(user, pass) {
+    static signIn() {
         return new Promise((resolve, reject) => {
             const localParams = {
                 strong: true
@@ -162,6 +162,60 @@ class PlexRequest
             .then((response) => {
                 return response.json();
         });
+    }
+
+    static scrobble(baseUrl, key, token) {
+        const localParams = { 
+            key: key,                                   // ratingKey
+            "X-Plex-Token": token,
+            identifier: "com.plexapp.plugins.library"
+        };
+
+        // Using unscrobble to not add to play count - scrobble endpoint takes same
+        // params and does effectively the same thing however.
+        const params = Object.assign({}, PlexRequest.baseParams, localParams);
+        let url = PlexRequest.formatUrl(`${baseUrl}/:/scrobble`, params);
+
+        return fetch(url, PlexRequest.getArgs)
+            .then((response) => {
+                return response.json();
+            }).catch((err) => {
+                console.log("swallow");
+            });
+    }
+
+    static unscrobble(baseUrl, key, token) {
+        const localParams = { 
+            key: key,                                   // ratingKey
+            "X-Plex-Token": token,
+            identifier: "com.plexapp.plugins.library"
+        };
+
+        const params = Object.assign({}, PlexRequest.baseParams, localParams);
+        let url = PlexRequest.formatUrl(`${baseUrl}/:/unscrobble`, params);
+
+        return fetch(url, PlexRequest.getArgs)
+            .then((response) => {
+                return response.json();
+            }).catch((err) => {
+                console.log("swallow");
+            });
+    }
+
+    static progress(baseUrl, args) {
+        const localParams = { 
+            identifier: "com.plexapp.plugins.library"
+        };
+
+        const params = Object.assign({}, PlexRequest.baseParams, localParams, args);
+        let url = PlexRequest.formatUrl(`${baseUrl}/:/progress`, params);
+
+        return fetch(url, PlexRequest.getArgs)
+            .then((response) => {
+                return response.json();
+            }).catch((err) => {
+                console.log("swallow");
+            });
     }
 
     static updateTimeline(baseUrl, args) {

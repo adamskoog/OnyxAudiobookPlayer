@@ -11,9 +11,9 @@ class LoginForm extends Component {
 
             // We need to clear the id and process the auth redirection.
             PlexRequest.validatePin(authId)
-                .then(authInfo => {
-                    localStorage.setItem("authToken", authInfo.authToken);
-                    resolve({});
+                .then(regInfo => {
+                    localStorage.setItem("authToken", regInfo.authToken);
+                    resolve(regInfo);
                 });
         });
     }
@@ -21,13 +21,19 @@ class LoginForm extends Component {
     checkLoginRedirect = () => {
         // check if we have an authId stored.
         var authId = localStorage.getItem("login_redirect_id");
-        if (authId) {
-            this.validateAuthId(authId)
-                .then(data => {
+         if (authId) {
+             this.validateAuthId(authId)
+                 .then(regInfo => { 
+                    console.log("regInfo", regInfo);
                     this.props.processLogin();
-                });
+                 });
         } else {
-            this.props.processLogin();
+            PlexRequest.signIn()
+                .then(redirectInfo => {
+                    console.log("store redirect", redirectInfo);
+                    localStorage.setItem("login_redirect_id", redirectInfo.id);
+                    window.location.href = redirectInfo.redirectUrl;
+                });
         }
     }
 

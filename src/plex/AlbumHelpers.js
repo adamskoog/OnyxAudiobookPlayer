@@ -33,35 +33,25 @@ class AlbumHelpers
     }
 
     static markTrackPlayed(trackInfo, baseUrl, token) {
-        let testDuration = AlbumHelpers.timelineTrackDurationFlex(trackInfo.duration);
-        let testTime = testDuration * 0.96;
-        console.log("test", testDuration, testTime);
+
+        let doneTime = Math.round(trackInfo.duration * 0.96);
 
         let args = {
-            ratingKey: trackInfo.ratingKey,
-            key: trackInfo.key,
-            state: "playing",
-            time: testTime,                     //TimeUtils.convertSecondsToMs(trackInfo.duration - 1),
-            playbackTime: testTime,             //TimeUtils.convertSecondsToMs(trackInfo.duration - 1),
-            duration: testDuration,             //AlbumHelpers.timelineTrackDurationFlex(TimeUtils.convertSecondsToMs(trackInfo.duration)),
+            key: trackInfo.ratingKey,
+            time: doneTime, 
             "X-Plex-Token": token
         };
-        PlexRequest.updateTimeline(baseUrl, args)
+        PlexRequest.progress(baseUrl, args)
             .then(data => { 
-                console.log("set playing?", data);
-                let args = {
-                    ratingKey: trackInfo.ratingKey,
-                    key: trackInfo.key,
-                    state: "stopped",
-                    time: testTime,                     //TimeUtils.convertSecondsToMs(trackInfo.duration - 1),
-                    playbackTime: testTime,             //TimeUtils.convertSecondsToMs(trackInfo.duration - 1),
-                    duration: testDuration,             //AlbumHelpers.timelineTrackDurationFlex(TimeUtils.convertSecondsToMs(trackInfo.duration)),
-                    "X-Plex-Token": token
-                };
-                PlexRequest.updateTimeline(baseUrl, args)
-                    .then(data => { 
-                        console.log("set stopped?", data);
-                     });
+                //console.log("");
+            });
+    }
+
+    static markTrackUnplayed(trackInfo, baseUrl, token) {
+
+        PlexRequest.unscrobble(baseUrl, trackInfo.ratingKey, token)
+             .then(data => { 
+                 //console.log("");
              });
     }
 

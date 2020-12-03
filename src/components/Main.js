@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect  } from 'react-router-dom';
 
 import PlexRequest from '../plex/PlexRequest';
@@ -6,102 +6,93 @@ import SettingsUtils from '../utility/settings';
 
 import Header from './Header';
 import LoginForm from './LoginForm';
-import Loading from './Loading';
 import NowPlaying from './NowPlaying';
 import Settings from './Settings';
 import Library from './Library';
 import AlbumInfo from './AlbumInfo';
 
-class Main extends Component {
+import { v4 as uuidv4 } from 'uuid';
 
-    state = {
-        baseUrl: "",
-        appState: "loading",
-        userInfo: null,
-        playQueue: [],
-        serverIdentifier: null,
-        librarySection: null
-    }
+function Main() {
 
-    playQueue = (playQueue) => {
-        this.setState({ playQueue: playQueue })
-    }
+    const [appStatus, setAppStatus] = useState("loading");
+    const [userInfo, setUserInfo] = useState(null);
+    const [baseUrl, setBaseUrl] = useState("https://208-107-58-144.a49c08a1422249e48cdc302b1536312d.plex.direct:52113")
+    const [playQueue, setPlayQueue] = useState({ id: "", queue: [] });
+    const [settings, setSettings] = useState({serverIdentifier: null, librarySection: null});
 
-    updateAuthState = (userInfo, appState) => {
-        this.setState({ userInfo: userInfo, appState: appState });
-    }
+    const updatePlayQueue = (newPlayQueue) => {
+        setPlayQueue({ id: uuidv4(), queue: newPlayQueue });
+    };
 
-    updateSettingsState = (settings) => {
-        this.setState(settings);
-    }
+    const updateAuthState = (newUserInfo, newAppState) => {
+        setUserInfo(newUserInfo);
+        setAppStatus(newAppState);
+    };
 
-    processLogin = () => {
+    const updateSettingsState = (settings) => {
+        setSettings({ serverIdentifier: settings.serverIdentifier, librarySection: settings.librarySection });
+    };
+
+    const processLogin = () => {
        // check if we have an authToken on initialization.
        let token = localStorage.getItem("authToken");
        if (token && token !== "") {
            // we have a token, we need to redirect to the login to authorize.
            PlexRequest.checkToken(token)
-               .then(userInfo => {
-                   if (userInfo.message) {
-                       // redirect to login prompt, is there a better way to handle this redirection?
+               .then(newUserInfo => {
+                   if (newUserInfo.message) {
+                       // Error: render to main screen to allow user to hit login.
                        // clear authtoken from storage and update appState.
                        localStorage.removeItem("authToken");
-                       this.setState({ userInfo: null, appState: "loggedout" });
+
+                       setUserInfo(newUserInfo);
+                       setAppStatus("loggedout");
                    } else {
                         let settings = SettingsUtils.loadSettingsFromStorage();
-                        this.setState({ userInfo: userInfo, librarySection: settings.librarySection, serverIdentifier: settings.serverIdentifier, appState: "ready" });
+                        setSettings({ serverIdentifier: settings.serverIdentifier, librarySection: settings.librarySection });
+
+                        setUserInfo(newUserInfo);
+                        setAppStatus("ready");
                    }
            });
 
        } else {
            // render to main screen to allow user to hit login.
-           this.setState({ appState: "loggedout" });
+           setUserInfo(null);
+           setAppStatus("loggedout");
        }
-    }
+    };
 
-    componentDidMount() {
-        this.processLogin();
-    }
+    useEffect(() => {
+        if (!userInfo)
+            processLogin();
+    }, [userInfo]);
 
-    componentDidUpdate(prevProps, prevState) {
-        if (this.player && this.state.baseUrl && this.state.userInfo) {
-            this.player.updatePlayInfo(this.state.baseUrl, this.state.userInfo, this.state.playQueue);
-        }
-    }
-
-    render() {
-        return (
-            <React.Fragment>
-                {(this.state.appState === "ready" || this.state.appState === "login" || this.state.appState === "loggedout") && (
-                    <React.Fragment>
-                        <Router>
-                            {this.state.appState === "login" && (
-                                <Redirect to="/login" />
-                            )}
-                            {<Header userInfo={this.state.userInfo} updateAuthState={this.updateAuthState} />}
-                            <NowPlaying ref={player => {this.player = player}} baseUrl={ this.state.baseUrl} userInfo={this.state.userInfo} />
-                            <main role="main" className="container">
-                                <Switch>
-                                    {this.state.userInfo && (
-                                    <Route exact path="/" component={() => <Library baseUrl={ this.state.baseUrl} userInfo={this.state.userInfo} section={this.state.librarySection} />} />
-                                    )}
-                                    {!this.state.userInfo && (
-                                    <Route exact path="/" component={() => <div>Empty</div> } />
-                                    )}
-                                    <Route exact path="/album/:ratingKey" component={(props) => <AlbumInfo baseUrl={this.state.baseUrl} userInfo={this.state.userInfo} key={props.match.params.ratingKey} ratingKey={props.match.params.ratingKey} playQueue={this.playQueue} />} />
-                                    <Route exact path="/settings" component={(props) => <Settings userInfo={this.state.userInfo} updateSettingsState={this.updateSettingsState} /> } />
-                                    <Route exact path="/login" component={(props) => <LoginForm userInfo={this.state.userInfo} processLogin={this.processLogin} updateAuthState={this.updateAuthState} /> } />
-                                </Switch>
-                            </main>
-                        </Router>
-                    </React.Fragment>
+    return (
+        <React.Fragment>
+            <Router>
+                {appStatus === "login" && (
+                    <Redirect to="/login" />
                 )}
-                {this.state.appState === "loading" && (
-                    <Loading />
-                )}
-            </React.Fragment>
-        ); 
-    }
+                {<Header userInfo={userInfo} updateAuthState={updateAuthState} />}
+                <NowPlaying baseUrl={ baseUrl} userInfo={userInfo} playQueue={playQueue} />
+                <main role="main" className="container">
+                    <Switch>
+                        {userInfo && (
+                        <Route exact path="/" component={() => <Library baseUrl={baseUrl} userInfo={userInfo} section={settings.librarySection} />} />
+                        )}
+                        {!userInfo && (
+                        <Route exact path="/" component={() => <div></div> } />
+                        )}
+                        <Route exact path="/album/:ratingKey" component={(props) => <AlbumInfo baseUrl={baseUrl} userInfo={userInfo} key={props.match.params.ratingKey} ratingKey={props.match.params.ratingKey} playQueue={updatePlayQueue} />} />
+                        <Route exact path="/settings" component={(props) => <Settings userInfo={userInfo} settings={settings} updateSettingsState={updateSettingsState} /> } />
+                        <Route exact path="/login" component={(props) => <LoginForm userInfo={userInfo} processLogin={processLogin} updateAuthState={updateAuthState} /> } />
+                    </Switch>
+                </main>
+            </Router>
+        </React.Fragment>
+    ); 
 }
 
 export default Main;

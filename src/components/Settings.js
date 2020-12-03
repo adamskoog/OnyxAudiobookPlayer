@@ -1,57 +1,45 @@
-import { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PlexRequest from '../plex/PlexRequest';
 import SettingsUtils from '../utility/settings';
 
-class Settings extends Component {
-    state = {
-        userInfo: this.props.userInfo,
-        serverIdentifier: "",
-        librarySection: "",
-        resources: []
+function Settings(props) {
+  
+    const [resources, setResources] = useState([]);
+    const [sections, setSections] = useState([]);
+    const [settingServer, setSettingServer] = useState("");
+    const [settingLibrary, setSettingLibrary] = useState("");
+
+    const serverChanged = (e) => {
+        setSettingServer(e.target.value);
+        setSettingLibrary("");
+
+        loadLibraries(e.target.value);
     }
 
-    serverChanged = (e) => {
-        // call code to update library items.
-        this.loadLibraries(e.target.value);
-
-        // call default submit handle to update state.
-        this.handleChange(e);
+    const libraryChanged = (e) => {
+        setSettingLibrary(e.target.value);
     }
 
-    handleSubmit = (e) => {
+    const saveSettings = (e) => {
         e.preventDefault();
         
-        let settings = { serverIdentifier: this.state.serverIdentifier, librarySection: this.state.librarySection };
+        let settings = { serverIdentifier: settingServer, librarySection: settingLibrary };
         SettingsUtils.saveSettingsToStorage(settings);
 
-        this.props.updateSettingsState(settings);
+        props.updateSettingsState(settings);
     }
 
-    handleChange = (e) => {
-        const {id , value} = e.target;
-        this.setState(prevState => ({
-            ...prevState,
-            [id] : value
-        }))
-    }
-
-    clearList = (ctrl) => {
-        var i, L = ctrl.options.length - 1;
-        for(i = L; i >= 0; i--) {
-            ctrl.remove(i);
-        }
-    }
-
-    loadLibraries = (serverIdentifier) => {
-        this.clearList(this.librarySelect);
-
+    const loadLibraries = (currentServer) => {
+        // Find the server resource, can bypass this by just storing the entire
         let resource = null;
-        for (let i = 0; i < this.state.resources.length; i++) {
-            if (serverIdentifier === this.state.resources[i].clientIdentifier) {
-                resource = this.state.resources[i];
+        for (let i = 0; i < resources.length; i++) {
+            if (currentServer === resources[i].clientIdentifier) {
+                resource = resources[i];
                 break;
             }
         }
+
+        if (!resource) return;
 
         let connection = null;
         for (let j = 0; j < resource.connections.length; j++) {
@@ -65,69 +53,61 @@ class Settings extends Component {
             .then(mediaContainer => {
                 let sections = mediaContainer.MediaContainer.Directory;
                 
-                for (let i = 0; i < sections.length; i++) {
-                    if (sections[i].type === "artist") {
-                        let opt = new Option(sections[i].title, sections[i].key);
-                        if (this.state.librarySection && this.state.librarySection === sections[i].key) {
-                            opt.selected = true;
-                        }
-                        this.librarySelect.appendChild(opt);
-                    }
-                }
+                sections.unshift({ title: "", key: "" });
+                // set the resources to the state.
+                setSections(sections);
             });
     }
 
-    loadServers = () => {
-        PlexRequest.getResources(this.state.userInfo.authToken)
-            .then(resources => {
-                //console.log("resources", resources);
-                // Get currently saved server id if available to set in the list.
-                // If not set, default to empty string to match empty item in drop down.
-                let serverIdentifier = (this.state.serverIdentifier) ? this.state.serverIdentifier : "";
+    const loadServers = () => {
+        return new Promise((resolve, reject) => {
+        PlexRequest.getResources(props.userInfo.authToken)
+            .then(newResources => {
 
                 // Filter for only media servers.
-                let servers = resources.filter((resource) => {
+                let servers = newResources.filter((resource) => {
                     return resource.provides === "server";
                 });
+                servers.unshift({ name: "", clientIdentifier: "" });
 
-                // Create option items, including empty option.
-                if (serverIdentifier === "") {
-                    let opt = new Option("", "");
-                    this.serverSelect.appendChild(opt);
-                }
+                // set the resources to the state.
+                setResources(servers);
 
-                for (let i = 0; i < servers.length; i++) {
-                    let opt = new Option(servers[i].name, servers[i].clientIdentifier);
-                    if (serverIdentifier && serverIdentifier === servers[i].clientIdentifier) {
-                        opt.selected = true;
-                    }
-                    this.serverSelect.appendChild(opt);
-                }
-
-                // Load found resources into state to avoid more calls.
-                this.setState({ resources: resources }, () => {
-                    if (serverIdentifier !== "")
-                        this.loadLibraries(serverIdentifier);
-                });
+                resolve();
             });
-    }
-
-    componentDidMount() {       
-        let settings = SettingsUtils.loadSettingsFromStorage();
-        this.setState(settings, () => { 
-            this.loadServers();
         });
     }
 
-    render = () =>{
-        return (
-            <div>
-                <select id="serverIdentifier" ref={ref => this.serverSelect = ref} className="form-control mb-2" value={this.state.serverIdentifier} onChange={this.serverChanged}></select>
-                <select id="librarySection" ref={ref => this.librarySelect = ref} className="form-control mb-2" value={this.state.librarySection} onChange={this.handleChange}></select>
-                <button className="btn btn-primary" type="submit" onClick={this.handleSubmit}>Save</button>
-            </div>
-        );
-    }
+    useEffect(() => {
+        if (!props.userInfo) return;
+
+        setSettingServer(props.settings.serverIdentifier);
+        setSettingLibrary(props.settings.librarySection);
+
+        loadServers();
+    }, [props.userInfo]);
+
+
+    useEffect(() => {
+        if (settingServer !== "")
+            loadLibraries(props.settings.serverIdentifier);
+    }, [resources]);
+
+    return (
+        <div>
+            <select id="serverIdentifier" className="form-control mb-2" value={settingServer} onChange={serverChanged}>
+            {(resources.map((resource) => (
+                <option key={resource.clientIdentifier} value={resource.clientIdentifier}>{resource.name}</option>
+            )))}
+            </select>
+            <select id="librarySection" className="form-control mb-2" value={settingLibrary} onChange={libraryChanged}>
+            {(sections.map((section) => (
+                <option key={section.key} value={section.key}>{section.title}</option>
+            )))}
+            </select>
+            <button className="btn btn-primary" type="submit" onClick={saveSettings}>Save</button>
+        </div>
+    );
 }
 
 export default Settings;

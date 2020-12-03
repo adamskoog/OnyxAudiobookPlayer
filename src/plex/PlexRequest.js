@@ -180,7 +180,7 @@ class PlexRequest
             .then((response) => {
                 return response.json();
             }).catch((err) => {
-                console.log("swallow");
+                //console.log("swallow");
             });
     }
 
@@ -198,7 +198,7 @@ class PlexRequest
             .then((response) => {
                 return response.json();
             }).catch((err) => {
-                console.log("swallow");
+                //console.log("swallow");
             });
     }
 
@@ -214,7 +214,7 @@ class PlexRequest
             .then((response) => {
                 return response.json();
             }).catch((err) => {
-                console.log("swallow");
+                //console.log("swallow");
             });
     }
 

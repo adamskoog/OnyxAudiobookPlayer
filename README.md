@@ -10,6 +10,12 @@ This is my feeble attempt to learn both ReactJS as well as better understand the
 * I'm sure there is much more as well...
 
 ## Patch Notes
+### Version: 0.2.2
+* Better handling of play queue and properly clear when play is stopped.
+* Lazy load images on Album list.
+* Transcode images to lower resolution for better load speeds.
+* Huge rework to the player itself to avoid some really annoying edge case issues.
+
 ### Version: 0.2.1
 * Large refactor - change from React Components to React Hooks
 

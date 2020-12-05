@@ -44,15 +44,20 @@ function Main() {
                     return resource.clientIdentifier === settings.serverIdentifier;
                 });
 
-                // TODO: This is just getting the local connection.
-                //  Should we be storing all the connections in the state?
-                //  What is the best way to determine if we are internal/external to choose the connection?
-                const localConnection = server[0].connections.filter((connection) => {
-                    return connection.local === true;
-                });
-
-                setBaseUrl(localConnection[0].uri);
-                setAppStatus("ready");
+                if (!server || server.length === 0) {
+                    // TODO: This error state is currently not handled.
+                    setBaseUrl(null);
+                    setAppStatus("error");
+                } else {
+                    PlexRequest.serverConnectionTest(server[0].connections, userInfo.authToken)
+                        .then((response) => {
+                            setBaseUrl(response.uri);
+                            setAppStatus("ready");
+                        }).catch((error) => {
+                            setBaseUrl(null);
+                            setAppStatus("error");
+                        });
+                }
             });
     };
 
@@ -105,7 +110,20 @@ function Main() {
                 <NowPlaying baseUrl={ baseUrl} userInfo={userInfo} playQueue={playQueue} updatePlayQueue={updatePlayQueue} />
                 <main role="main" className="container">
                     <Switch>
-                        <Route exact path="/" component={() => <Library baseUrl={baseUrl} userInfo={userInfo} section={settings.librarySection} />} />
+                        <Route exact path="/" component={() => 
+                            <React.Fragment>
+                                {appStatus === "ready" && (
+                                    <Redirect to="/library" />
+                                )}
+                                {appStatus === "error" && (
+                                    <div>Error Occurred - TODO: I need to be handled.</div> 
+                                )}
+                                {(appStatus !== "ready" || appStatus !== "error") && (
+                                    <div></div> 
+                                )}
+                            </React.Fragment>
+                        } />
+                        <Route exact path="/library" component={() => <Library baseUrl={baseUrl} userInfo={userInfo} section={settings.librarySection} />} />
                         <Route exact path="/album/:ratingKey" component={(props) => <AlbumInfo baseUrl={baseUrl} userInfo={userInfo} key={props.match.params.ratingKey} ratingKey={props.match.params.ratingKey} playQueue={updatePlayQueue} />} />
                         <Route exact path="/settings" component={(props) => <Settings userInfo={userInfo} settings={settings} updateSettingsState={updateSettingsState} /> } />
                         <Route exact path="/login" component={(props) => <LoginForm userInfo={userInfo} processLogin={processLogin} updateAuthState={updateAuthState} /> } />

@@ -31,7 +31,12 @@ class PlexRequest
         return url;
     }
 
-    //https://forums.plex.tv/t/authenticating-with-plex/609370
+    // https://forums.plex.tv/t/authenticating-with-plex/609370
+    // We can also getting setting information - libraries
+    // https://plex.tv/api/v2/user?includeSubscriptions=1&includeProviders=1&includeSettings=1&includeSharedSettings=1&X-Plex-Product=Plex%20Web&X-Plex-Version=4.48.1&X-Plex-Client-Identifier=0bkgja3athsl27xtz5mh7m49&X-Plex-Platform=Microsoft%20Edge&X-Plex-Platform-Version=87.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=hosted&X-Plex-Device=Windows&X-Plex-Device-Name=Microsoft%20Edge&X-Plex-Device-Screen-Resolution=1500x858%2C1500x1000&X-Plex-Language=en&X-Plex-Token=mnjYNhmCzSzYxmazHtoj
+    // Get home users?
+    // https://plex.tv/api/home/users?X-Plex-Product=Plex%20Web&X-Plex-Version=4.48.1&X-Plex-Client-Identifier=0bkgja3athsl27xtz5mh7m49&X-Plex-Platform=Microsoft%20Edge&X-Plex-Platform-Version=87.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=hosted&X-Plex-Device=Windows&X-Plex-Device-Name=Microsoft%20Edge&X-Plex-Device-Screen-Resolution=1500x858%2C1500x1000&X-Plex-Token=mnjYNhmCzSzYxmazHtoj&X-Plex-Language=en
+    // https://plex.tv/api/users?X-Plex-Product=Plex%20Web&X-Plex-Version=4.48.1&X-Plex-Client-Identifier=0bkgja3athsl27xtz5mh7m49&X-Plex-Platform=Microsoft%20Edge&X-Plex-Platform-Version=87.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=hosted&X-Plex-Device=Windows&X-Plex-Device-Name=Microsoft%20Edge&X-Plex-Device-Screen-Resolution=1500x858%2C1500x1000&X-Plex-Token=mnjYNhmCzSzYxmazHtoj&X-Plex-Language=en
     static checkToken(token) {
         return new Promise((resolve, reject) => {
 
@@ -110,6 +115,42 @@ class PlexRequest
         return fetch(url, PlexRequest.getArgs)
             .then((response) => {
                 return response.json();
+        });
+    }
+
+    static serverConnectionTest(connections, token) {
+        return new Promise((resolve, reject) => {
+            const localParams = {}
+            const params = Object.assign({}, PlexRequest.baseParams, localParams, { "X-Plex-Token": token });
+
+            // TODO: There might be a better endpoint, but the payload on this is relatively small.
+            const connectionPromises =connections.map((connection) => {
+                return PlexRequest.formatUrl(`${connection.uri}/library/sections`, params);
+            });
+
+            // TODO: This might need better logic, from my (very limited) use of the 
+            // connections that Plex returns, it seems to return the array in order of
+            // local -> remote -> relay, so simply returning the first connection that
+            // works, "should" be the correct connection assuming the above holds true.
+            // TODO: This might be a bad way to do it since we need to way for all....
+            Promise.allSettled(connectionPromises).then((values) => {
+                let preferredConnection = null;
+                for (let i = 0; i < connections.length; i++) {
+                    for (let j = 0; j < values.length; j++) {
+                        if (values[i].status === "fulfilled" && values[i].value.includes(connections[j].uri)) {
+                            preferredConnection = connections[j].uri;
+                            break;
+                        }
+                    }
+                    if (preferredConnection) break;
+                }
+
+                if (preferredConnection)
+                    resolve({ uri: preferredConnection });
+                reject({ message: "Failed to resolve connection to server." });
+            }).catch((error) => {
+                reject({ message: "Failed to resolve connection to server." });
+            });
         });
     }
 

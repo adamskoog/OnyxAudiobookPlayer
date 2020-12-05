@@ -8,9 +8,19 @@ import './index.css';
 
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import allReducers from './context/reducers';
+import { Provider } from 'react-redux';
+import { composeWithDevTools } from "redux-devtools-extension";
+
+const store = createStore(allReducers, composeWithDevTools(applyMiddleware(thunk)));
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

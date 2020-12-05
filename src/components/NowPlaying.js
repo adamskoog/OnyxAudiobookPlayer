@@ -3,6 +3,9 @@ import PlexRequest from '../plex/PlexRequest';
 import throttle from 'lodash/throttle';
 import TimeUtils from '../utility/time';
 import { Link } from 'react-router-dom';
+import PlayerTime from './player/PlayerTime';
+import PlayerRangeControl from './player/PlayerRangeControl';
+
 import AlbumHelpers from '../plex/AlbumHelpers';
 //https://stackoverflow.com/questions/46983876/pass-argument-to-lodash-throttles-callback
 
@@ -22,7 +25,7 @@ function NowPlaying(props) {
     }
 
     const [playerTimeState, setPlayerTimeState] = useState({ currentTime: 0, duration: 0 });   
-    const [queueIndex, setQueueIndex] = useState(-1);
+    const [queueIndex, setQueueIndex] = useState(0);
     const [playState, setPlayState] = useState("stopped");
     const [currentTimeDisplay, setCurrentTimeDisplay] = useState(defaultTimeDisplay);
 
@@ -32,7 +35,9 @@ function NowPlaying(props) {
     function hasTrackChanged() {
         // we need to do something here to check if the
         // track has been changed.
+        console.log("check playQueue", prevQueue.id, props.playQueue.id);
         if (prevQueue && prevQueue.id !== props.playQueue.id) return true;
+        console.log("check Index", queueIndex, prevIndex);
         if (queueIndex !== prevIndex) return true;
         return false;
     };
@@ -102,10 +107,12 @@ function NowPlaying(props) {
 
     useEffect(() => {
         // No media to play
+        console.log("props", props);
         if (queueIndex < 0 || props.playQueue.queue.length === 0) return;
 
         //console.log("Track has changed", hasTrackChanged());
         if (hasTrackChanged()) {
+            console.log("track changed");
             const playInfo = props.playQueue.queue[queueIndex];
             const currentTrack = playInfo.Media[0];
 
@@ -216,6 +223,7 @@ function NowPlaying(props) {
     // entire now playing component everytime the time updates, this should be pushed as a prop
     // so we (hopefully) only re-render that item.
     function getThumbnailUrl() {
+        console.log("thumbnail get");
         if (!props.playQueue || !props.playQueue.queue || !props.playQueue.queue[queueIndex]) return "";    //TODO: We need a generic not found image.
         return PlexRequest.getThumbnailUrl(props.baseUrl, props.playQueue.queue[queueIndex].thumb, { "X-Plex-Token": props.userInfo.authToken })
     };
@@ -234,10 +242,10 @@ function NowPlaying(props) {
                     <div className="track-title">{getPlayInfoAttr("title")}</div>
                     <div className="album-title"><Link to={`/album/${getPlayInfoAttr("parentRatingKey")}`}>{getPlayInfoAttr("parentTitle")}</Link></div>
                     <div className="artist-name">{getPlayInfoAttr("grandparentTitle")}</div>
-                    <div className="player-timer">{currentTimeDisplay}</div>
+                    <PlayerTime currentTimeDisplay={currentTimeDisplay} />
                 </div>
                 <div className="player-controls">
-                    <div className="range-container"><input id="playerTimeRange" type="range" className="form-control-range" min={0} max={((playerTimeState.duration) ? playerTimeState.duration : 0)} value={playerTimeState.currentTime} onChange={() => playerRangeChanged()} /></div>
+                    <PlayerRangeControl currentTime={playerTimeState.currentTime} duration={((playerTimeState.duration) ? playerTimeState.duration : 0)} onChange={playerRangeChanged} />
                     <div>
                     {(playState === "playing" || playState === "paused") && (
                         <button className="btn btn-player-previous-track" type="button" disabled={!hasPreviousTrack()}  onClick={() => previousTrack()}>

@@ -22,7 +22,9 @@ function Main() {
     const [settings, setSettings] = useState({serverIdentifier: null, librarySection: null});
 
     const updatePlayQueue = (newPlayQueue) => {
-        setPlayQueue({ id: uuidv4(), queue: newPlayQueue });
+        let newQueue = { id: uuidv4(), queue: newPlayQueue };
+        console.log("new queue", newQueue);
+        setPlayQueue(newQueue);
     };
 
     const updateAuthState = (newUserInfo, newAppState) => {

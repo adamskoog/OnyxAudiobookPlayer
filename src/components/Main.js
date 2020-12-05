@@ -105,12 +105,7 @@ function Main() {
                 <NowPlaying baseUrl={ baseUrl} userInfo={userInfo} playQueue={playQueue} updatePlayQueue={updatePlayQueue} />
                 <main role="main" className="container">
                     <Switch>
-                        {userInfo && (
                         <Route exact path="/" component={() => <Library baseUrl={baseUrl} userInfo={userInfo} section={settings.librarySection} />} />
-                        )}
-                        {!userInfo && (
-                        <Route exact path="/" component={() => <div></div> } />
-                        )}
                         <Route exact path="/album/:ratingKey" component={(props) => <AlbumInfo baseUrl={baseUrl} userInfo={userInfo} key={props.match.params.ratingKey} ratingKey={props.match.params.ratingKey} playQueue={updatePlayQueue} />} />
                         <Route exact path="/settings" component={(props) => <Settings userInfo={userInfo} settings={settings} updateSettingsState={updateSettingsState} /> } />
                         <Route exact path="/login" component={(props) => <LoginForm userInfo={userInfo} processLogin={processLogin} updateAuthState={updateAuthState} /> } />

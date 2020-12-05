@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row } from 'react-bootstrap';
 import AlbumItem from './AlbumListItem';
 import PlexRequest from '../plex/PlexRequest';
@@ -9,11 +9,18 @@ function Library(props) {
  
     const [libraryItems, setLibraryItems] = useState([]);
 
+    // This ref is to determine if the component is mounted. When getting
+    // the library items, the aync was not returning before the component was
+    // updated again, this avoids trying to write to the state when not mounted.
+    // TODO: it would probably be better to cancel this request when we unmount - but how??
+    const isMountedRef = useRef(true)
+    useEffect(() => () => { isMountedRef.current = false }, [])
+
     useEffect(() => {
         if (props.userInfo && props.baseUrl && props.section) {
             PlexRequest.getLibraryItems(props.baseUrl, props.section, { "X-Plex-Token": props.userInfo.authToken })
                 .then(data => {
-                    if (data.MediaContainer.Metadata)
+                    if (data.MediaContainer.Metadata && isMountedRef.current)
                         setLibraryItems(data.MediaContainer.Metadata);
                 });
         } else 
@@ -23,7 +30,7 @@ function Library(props) {
     return (
         <React.Fragment>
         {!props.userInfo && (
-            <Redirect to="/" />
+            <div>Must login to view library.</div>
         )}
         {(!props.baseUrl || !props.section) && (
             <div>Failed to load library, please update your settings.</div>

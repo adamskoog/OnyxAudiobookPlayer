@@ -303,7 +303,7 @@ function NowPlaying(props) {
             </div>
         </React.Fragment>
         )}
-        <audio id="appPlayer" onTimeUpdate={timeUpdated} ended={audioPlayerEnded} />
+        <audio id="appPlayer" onTimeUpdate={timeUpdated} onEnded={audioPlayerEnded} />
     </React.Fragment>
     );
 }

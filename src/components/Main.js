@@ -17,13 +17,12 @@ function Main() {
 
     const [appStatus, setAppStatus] = useState("loading");
     const [userInfo, setUserInfo] = useState(null);
-    const [baseUrl, setBaseUrl] = useState("https://208-107-58-144.a49c08a1422249e48cdc302b1536312d.plex.direct:52113")
+    const [baseUrl, setBaseUrl] = useState("")
     const [playQueue, setPlayQueue] = useState({ id: "", queue: [] });
     const [settings, setSettings] = useState({serverIdentifier: null, librarySection: null});
 
     const updatePlayQueue = (newPlayQueue) => {
         let newQueue = { id: uuidv4(), queue: newPlayQueue };
-        console.log("new queue", newQueue);
         setPlayQueue(newQueue);
     };
 
@@ -34,6 +33,32 @@ function Main() {
 
     const updateSettingsState = (settings) => {
         setSettings({ serverIdentifier: settings.serverIdentifier, librarySection: settings.librarySection });
+    };
+
+    const determineServerUrl = () => {
+        PlexRequest.getResources(userInfo.authToken)
+            .then(newResources => {
+
+                // Filter for only media servers.
+                const server = newResources.filter((resource) => {
+                    return resource.clientIdentifier === settings.serverIdentifier;
+                });
+
+                if (!server || server.length === 0) {
+                    // TODO: This error state is currently not handled.
+                    setBaseUrl(null);
+                    setAppStatus("error");
+                } else {
+                    PlexRequest.serverConnectionTest(server[0].connections, userInfo.authToken)
+                        .then((response) => {
+                            setBaseUrl(response.uri);
+                            setAppStatus("ready");
+                        }).catch((error) => {
+                            setBaseUrl(null);
+                            setAppStatus("error");
+                        });
+                }
+            });
     };
 
     const processLogin = () => {
@@ -55,7 +80,6 @@ function Main() {
                         setSettings({ serverIdentifier: settings.serverIdentifier, librarySection: settings.librarySection });
 
                         setUserInfo(newUserInfo);
-                        setAppStatus("ready");
                    }
            });
 
@@ -69,6 +93,11 @@ function Main() {
     useEffect(() => {
         if (!userInfo)
             processLogin();
+        else {
+            // We need a user loggged in to be able to 
+            // determine server access.
+            determineServerUrl();
+        }
     }, [userInfo]);
 
     return (
@@ -78,15 +107,23 @@ function Main() {
                     <Redirect to="/login" />
                 )}
                 {<Header userInfo={userInfo} updateAuthState={updateAuthState} />}
-                <NowPlaying baseUrl={ baseUrl} userInfo={userInfo} playQueue={playQueue} />
+                <NowPlaying baseUrl={ baseUrl} userInfo={userInfo} playQueue={playQueue} updatePlayQueue={updatePlayQueue} />
                 <main role="main" className="container">
                     <Switch>
-                        {userInfo && (
-                        <Route exact path="/" component={() => <Library baseUrl={baseUrl} userInfo={userInfo} section={settings.librarySection} />} />
-                        )}
-                        {!userInfo && (
-                        <Route exact path="/" component={() => <div></div> } />
-                        )}
+                        <Route exact path="/" component={() => 
+                            <React.Fragment>
+                                {appStatus === "ready" && (
+                                    <Redirect to="/library" />
+                                )}
+                                {appStatus === "error" && (
+                                    <div>Error Occurred - TODO: I need to be handled.</div> 
+                                )}
+                                {(appStatus !== "ready" || appStatus !== "error") && (
+                                    <div></div> 
+                                )}
+                            </React.Fragment>
+                        } />
+                        <Route exact path="/library" component={() => <Library baseUrl={baseUrl} userInfo={userInfo} section={settings.librarySection} />} />
                         <Route exact path="/album/:ratingKey" component={(props) => <AlbumInfo baseUrl={baseUrl} userInfo={userInfo} key={props.match.params.ratingKey} ratingKey={props.match.params.ratingKey} playQueue={updatePlayQueue} />} />
                         <Route exact path="/settings" component={(props) => <Settings userInfo={userInfo} settings={settings} updateSettingsState={updateSettingsState} /> } />
                         <Route exact path="/login" component={(props) => <LoginForm userInfo={userInfo} processLogin={processLogin} updateAuthState={updateAuthState} /> } />

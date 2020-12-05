@@ -119,6 +119,12 @@ function NowPlaying(props) {
                 // get the reference to the audio tag.
                 let appPlayer = document.getElementById("appPlayer");
                 appPlayer.src = src;
+
+                appPlayer.currentTime = 0;
+                if (playInfo.viewOffset) {
+                    // Check if we have a viewOffset, if so set the offset to the players time.
+                    appPlayer.currentTime = TimeUtils.convertMsToSeconds(playInfo.viewOffset);
+                }
                 playTrack();
             }
         }
@@ -214,7 +220,6 @@ function NowPlaying(props) {
     // entire now playing component everytime the time updates, this should be pushed as a prop
     // so we (hopefully) only re-render that item.
     function getThumbnailUrl() {
-        console.log("thumbnail get");
         if (!props.playQueue || !props.playQueue.queue || !props.playQueue.queue[queueIndex]) return "";    //TODO: We need a generic not found image.
         return PlexRequest.getThumbnailTranscodeUrl(100, 100, props.baseUrl, props.playQueue.queue[queueIndex].thumb, props.userInfo.authToken);
     };

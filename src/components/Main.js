@@ -23,7 +23,6 @@ function Main() {
 
     const updatePlayQueue = (newPlayQueue) => {
         let newQueue = { id: uuidv4(), queue: newPlayQueue };
-        console.log("new queue", newQueue);
         setPlayQueue(newQueue);
     };
 
@@ -78,7 +77,7 @@ function Main() {
                     <Redirect to="/login" />
                 )}
                 {<Header userInfo={userInfo} updateAuthState={updateAuthState} />}
-                <NowPlaying baseUrl={ baseUrl} userInfo={userInfo} playQueue={playQueue} />
+                <NowPlaying baseUrl={ baseUrl} userInfo={userInfo} playQueue={playQueue} updatePlayQueue={updatePlayQueue} />
                 <main role="main" className="container">
                     <Switch>
                         {userInfo && (

@@ -35,9 +35,7 @@ function NowPlaying(props) {
     function hasTrackChanged() {
         // we need to do something here to check if the
         // track has been changed.
-        console.log("check playQueue", prevQueue.id, props.playQueue.id);
         if (prevQueue && prevQueue.id !== props.playQueue.id) return true;
-        console.log("check Index", queueIndex, prevIndex);
         if (queueIndex !== prevIndex) return true;
         return false;
     };
@@ -60,21 +58,11 @@ function NowPlaying(props) {
     }
 
     // Event Handlers
-    const throttleTimeline = throttle(() => {
-        let appPlayer = document.getElementById("appPlayer");
-        if (!appPlayer.paused) {
-            updateTimeline(props.playQueue.queue[queueIndex], "playing", appPlayer.currentTime, appPlayer.duration);
-            setPlayerTimeState({
-                currentTime: appPlayer.currentTime,
-                duration: appPlayer.duration
-            });
-        }
-    }, 4000, {trailing: false});
-
-    const updateTimeDisplay = useCallback((event) => {
-        let currentTimeDisplay = TimeUtils.formatPlayerDisplay(event.target.currentTime, event.target.duration);
+    const timeUpdated = (event) => {
+        let appPlayer = event.target;
+        let currentTimeDisplay = TimeUtils.formatPlayerDisplay(appPlayer.currentTime, appPlayer.duration);
         setCurrentTimeDisplay(currentTimeDisplay);
-    });
+    }
 
     const audioPlayerEnded = useCallback((event) => {
         let nextIndex = queueIndex++;
@@ -86,13 +74,17 @@ function NowPlaying(props) {
         }
     });
 
-    // Effects
-    useEffect(() => {
+    const throttleTimeline = throttle(() => {
         let appPlayer = document.getElementById("appPlayer");
-        appPlayer.addEventListener("timeupdate", updateTimeDisplay);
-        return () => appPlayer.removeEventListener("timeupdate", updateTimeDisplay);
-    }, [updateTimeDisplay]);
-
+        if (!appPlayer.paused) {
+            updateTimeline(props.playQueue.queue[queueIndex], "playing", appPlayer.currentTime, appPlayer.duration);
+            setPlayerTimeState({
+                currentTime: appPlayer.currentTime,
+                duration: appPlayer.duration
+            });
+        }
+    }, 4000, {trailing: false});
+    
     useEffect(() => {
         let appPlayer = document.getElementById("appPlayer");
         appPlayer.addEventListener("timeupdate", throttleTimeline);
@@ -100,19 +92,11 @@ function NowPlaying(props) {
     }, [props.playQueue]);
 
     useEffect(() => {
-        let appPlayer = document.getElementById("appPlayer");
-        appPlayer.addEventListener("ended", audioPlayerEnded);
-        return () => appPlayer.removeEventListener("ended", audioPlayerEnded);
-    }, [props.playQueue, audioPlayerEnded]);
-
-    useEffect(() => {
         // No media to play
-        console.log("props", props);
         if (queueIndex < 0 || props.playQueue.queue.length === 0) return;
 
         //console.log("Track has changed", hasTrackChanged());
         if (hasTrackChanged()) {
-            console.log("track changed");
             const playInfo = props.playQueue.queue[queueIndex];
             const currentTrack = playInfo.Media[0];
 
@@ -138,8 +122,7 @@ function NowPlaying(props) {
 
     const playerRangeChanged = (evt) => {
         let appPlayer = document.getElementById("appPlayer");
-        let range = document.getElementById("playerTimeRange");
-        appPlayer.currentTime = range.value;
+        appPlayer.currentTime = evt.target.value;
     };
 
     const playTrack = () => {
@@ -159,9 +142,13 @@ function NowPlaying(props) {
         let appPlayer = document.getElementById("appPlayer");
         appPlayer.pause();
         appPlayer.src = "";
+
         updateTimeline(props.playQueue.queue[queueIndex], "stopped", appPlayer.currentTime, appPlayer.duration);
+        
+        // set player to default state and clear the play queue;
         setPlayState("stopped"); 
-        setQueueIndex(-1);
+        setQueueIndex(0);
+        props.updatePlayQueue([]);
     };
 
     const skipForward = () => {
@@ -312,7 +299,7 @@ function NowPlaying(props) {
             </div>
         </React.Fragment>
         )}
-        <audio id="appPlayer" />
+        <audio id="appPlayer" onTimeUpdate={timeUpdated} ended={audioPlayerEnded} />
     </React.Fragment>
     );
 }

@@ -2,6 +2,10 @@ import React from 'react';
 
 function PlayerRangeControl(props) {
 
+    const playerRangeChanged = (evt) => {
+        props.onChange(evt);
+    };
+
     return (
         <div className="range-container">
             <input id="playerTimeRange" 
@@ -10,7 +14,7 @@ function PlayerRangeControl(props) {
                 min={0} 
                 max={props.duration} 
                 value={props.currentTime} 
-                onChange={() => props.onChange()} 
+                onChange={playerRangeChanged} 
                 />
         </div>
     ); 

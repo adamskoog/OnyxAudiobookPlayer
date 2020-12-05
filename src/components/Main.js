@@ -17,7 +17,7 @@ function Main() {
 
     const [appStatus, setAppStatus] = useState("loading");
     const [userInfo, setUserInfo] = useState(null);
-    const [baseUrl, setBaseUrl] = useState("https://208-107-58-144.a49c08a1422249e48cdc302b1536312d.plex.direct:52113")
+    const [baseUrl, setBaseUrl] = useState("")
     const [playQueue, setPlayQueue] = useState({ id: "", queue: [] });
     const [settings, setSettings] = useState({serverIdentifier: null, librarySection: null});
 
@@ -33,6 +33,27 @@ function Main() {
 
     const updateSettingsState = (settings) => {
         setSettings({ serverIdentifier: settings.serverIdentifier, librarySection: settings.librarySection });
+    };
+
+    const determineServerUrl = () => {
+        PlexRequest.getResources(userInfo.authToken)
+            .then(newResources => {
+
+                // Filter for only media servers.
+                const server = newResources.filter((resource) => {
+                    return resource.clientIdentifier === settings.serverIdentifier;
+                });
+
+                // TODO: This is just getting the local connection.
+                //  Should we be storing all the connections in the state?
+                //  What is the best way to determine if we are internal/external to choose the connection?
+                const localConnection = server[0].connections.filter((connection) => {
+                    return connection.local === true;
+                });
+
+                setBaseUrl(localConnection[0].uri);
+                setAppStatus("ready");
+            });
     };
 
     const processLogin = () => {
@@ -54,7 +75,6 @@ function Main() {
                         setSettings({ serverIdentifier: settings.serverIdentifier, librarySection: settings.librarySection });
 
                         setUserInfo(newUserInfo);
-                        setAppStatus("ready");
                    }
            });
 
@@ -68,6 +88,11 @@ function Main() {
     useEffect(() => {
         if (!userInfo)
             processLogin();
+        else {
+            // We need a user loggged in to be able to 
+            // determine server access.
+            determineServerUrl();
+        }
     }, [userInfo]);
 
     return (

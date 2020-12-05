@@ -69,7 +69,7 @@ function NowPlaying(props) {
     };
 
     const audioPlayerEnded = useCallback((event) => {
-        let nextIndex = queueIndex++;
+        let nextIndex = queueIndex + 1;
         if (props.playQueue && props.playQueue.queue && props.playQueue.queue[queueIndex]) {
             setQueueIndex(nextIndex);
         } else {
@@ -216,7 +216,7 @@ function NowPlaying(props) {
     function getThumbnailUrl() {
         console.log("thumbnail get");
         if (!props.playQueue || !props.playQueue.queue || !props.playQueue.queue[queueIndex]) return "";    //TODO: We need a generic not found image.
-        return PlexRequest.getThumbnailUrl(props.baseUrl, props.playQueue.queue[queueIndex].thumb, { "X-Plex-Token": props.userInfo.authToken })
+        return PlexRequest.getThumbnailTranscodeUrl(100, 100, props.baseUrl, props.playQueue.queue[queueIndex].thumb, props.userInfo.authToken);
     };
     function getPlayInfoAttr(attr) {
         if (!props.playQueue || !props.playQueue.queue || !props.playQueue.queue[queueIndex]) return "";

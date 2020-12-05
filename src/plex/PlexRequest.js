@@ -171,6 +171,19 @@ class PlexRequest
         return PlexRequest.formatUrl(`${baseUrl}${thumb}`, args);
     }
 
+    static getThumbnailTranscodeUrl(h, w, baseUrl, thumb, token) {
+        let params = {
+            width: w,
+            height: h,
+            minSize: 1,
+            upscale: 1,
+            url: `${thumb}?X-Plex-Token=${token}`,
+            "X-Plex-Token": token
+        };
+
+        return PlexRequest.formatUrl(`${baseUrl}/photo/:/transcode`, params);
+    }
+
     static getLibraryItems(baseUrl, section, args) {
 
         const localParams = {

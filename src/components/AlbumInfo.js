@@ -81,7 +81,7 @@ function AlbumInfo(props) {
         {!props.userInfo && (<Redirect to="/" />)}
         {props.userInfo && (
         <div className="album-info-container">
-            <img className="album-cover mr-4" src={PlexRequest.getThumbnailUrl(props.baseUrl, album.thumb, { "X-Plex-Token": props.userInfo.authToken })} alt="Album Cover" />
+            <img className="album-cover mr-4" src={PlexRequest.getThumbnailTranscodeUrl(200, 200, props.baseUrl, album.thumb, props.userInfo.authToken)} alt="Album Cover" />
             <div className="album-info">
                 <div className="mt-1 album-title">{album.parentTitle}</div>
                 <div className="mt-1 album-artist">{album.grandparentTitle}</div>

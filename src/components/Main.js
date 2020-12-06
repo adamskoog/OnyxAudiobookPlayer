@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux'
 import { BrowserRouter as Router, Switch, Route, Redirect  } from 'react-router-dom';
 
 import PlexRequest from '../plex/PlexRequest';
 import SettingsUtils from '../utility/settings';
 
+import * as actionTypes from "../context/actions/actionTypes";
+import * as userActions from "../context/actions/actions";
 import Header from './Header';
 import LoginForm from './LoginForm';
 import NowPlaying from './NowPlaying';
@@ -14,6 +17,8 @@ import AlbumInfo from './AlbumInfo';
 import { v4 as uuidv4 } from 'uuid';
 
 function Main() {
+
+    const dispatch = useDispatch()
 
     const [appStatus, setAppStatus] = useState("loading");
     const [userInfo, setUserInfo] = useState(null);
@@ -91,13 +96,14 @@ function Main() {
     };
 
     useEffect(() => {
-        if (!userInfo)
-            processLogin();
-        else {
-            // We need a user loggged in to be able to 
-            // determine server access.
-            determineServerUrl();
-        }
+        if (!userInfo) {
+             //processLogin();
+             dispatch(userActions.getToken(0));
+        } else {
+             // We need a user loggged in to be able to 
+             // determine server access.
+             //determineServerUrl();
+         }
     }, [userInfo]);
 
     return (

@@ -3,12 +3,15 @@ import PlexAuthentication from "../../plex/Authentication";
 
 export const getToken = () => {
     
-    var token = PlexAuthentication.getAuthTokenFromStorage();
-    return {
-        type: actionTypes.GET_TOKEN,
-        payload: {
-            authToken: token
-        }
+    return (dispatch, getState) => {
+        var token = PlexAuthentication.getAuthTokenFromStorage() ?? null;
+        console.log("finding token??", token);
+        dispatch({         
+            type: actionTypes.GET_TOKEN,
+            payload: {
+                authToken: token
+            }
+        });
     };
 }
 

@@ -4,7 +4,9 @@ import { BrowserRouter as Router, Switch, Route, Redirect  } from 'react-router-
 
 import PlexRequest from '../plex/PlexRequest';
 
-import * as userActions from "../context/actions/actions";
+import * as appActions from "../context/actions/appStateActions";
+import * as settingsActions from "../context/actions/settingsActions";
+
 import Header from './Header';
 import NowPlaying from './NowPlaying';
 import Settings from './Settings';
@@ -23,7 +25,7 @@ const mapStateToProps = state => {
         authToken: state.application.authToken,
         authId: state.application.authId,
         baseUrl: state.application.baseUrl,
-        settings: state.application.settings
+        settings: state.settings
     };
   };
 
@@ -47,13 +49,13 @@ function ConnectedMain(reduxprops) {
                 });
                 if (!server || server.length === 0) {
                     // TODO: This error state is currently not handled.
-                    dispatch(userActions.setApplicationState("error"));
+                    dispatch(appActions.setApplicationState("error"));
                 } else {
                     PlexRequest.serverConnectionTest(server[0].connections, reduxprops.authToken)
                         .then((response) => {
-                            dispatch(userActions.setServerInfo(response.uri));
+                            dispatch(appActions.setServerInfo(response.uri));
                         }).catch((error) => {
-                            dispatch(userActions.setApplicationState("error"));
+                            dispatch(appActions.setApplicationState("error"));
                         });
                 }
             });
@@ -67,7 +69,7 @@ function ConnectedMain(reduxprops) {
     };
 
     const doUserLogout = () => {
-        dispatch(userActions.logout());
+        dispatch(appActions.logout());
     };
 
     useEffect(() => {
@@ -79,18 +81,18 @@ function ConnectedMain(reduxprops) {
     useEffect(() => {    
         if (!reduxprops.user) {
              // We have no user logged in, check for tokens.
-             dispatch(userActions.getToken());
+             dispatch(appActions.getToken());
         } else
-            dispatch(userActions.loadSettingsValues());
+            dispatch(settingsActions.loadSettingsValues());
     }, [reduxprops.user, dispatch]);
 
     useEffect(() => {
         if (reduxprops.authToken) {
             // We have a token stored, attempt to authenticate.
-             dispatch(userActions.checkToken(reduxprops.authToken));
+             dispatch(appActions.checkToken(reduxprops.authToken));
         } else if (reduxprops.authId) {
             // We have been redirected and now have an authorization id to handle.
-            dispatch(userActions.checkAuthId(reduxprops.authId));
+            dispatch(appActions.checkAuthId(reduxprops.authId));
         }
     }, [reduxprops.authToken, reduxprops.authId, dispatch]);
 

@@ -2,13 +2,12 @@ import * as actionTypes from "../actions/actionTypes";
 
 /*
 state: {
+    isLoading: boolean - indicate application loading (show spinner).
     applicationState: string - the current app state, value = ['ready', 'loggedout', 'loading'],
     userInfo: object - user information obtained from plex.tv),
     authToken: string - the users token - get's stored to localStorage when changed.
     authId: string - we are doing the plex.tv authentication and need to validate login
     baseUrl: string - the users server base connection url
-    libraryId: string - the id of the users library
-    settings: object - temporary, need storage of settings information.
 }
 */
 
@@ -18,11 +17,7 @@ const defaultState = {
     user: null, 
     authToken: null,
     authId: null,
-    baseUrl: null,
-    settings: {
-        serverIdentifier: null,
-        librarySection: null
-    }
+    baseUrl: null
 };
 
 const appStateReducer = (state = defaultState, action) => {
@@ -47,10 +42,6 @@ const appStateReducer = (state = defaultState, action) => {
             return Object.assign({}, state, { applicationState: "loggedout", authId: null, isLoading: false });
         case actionTypes.USER_LOGGED_OUT:
             return Object.assign({}, state, { applicationState: "loggedout", authId: null, user: null, isLoading: false });
-        case actionTypes.LOAD_SETTINGS:
-        case actionTypes.SAVE_SETTING_SERVER:
-        case actionTypes.SAVE_SETTING_LIBRARY:
-            return Object.assign({}, state, { settings: action.payload.settings });
         default:
             return state;
     };

@@ -1,6 +1,5 @@
 import * as actionTypes from "./actionTypes";
 import PlexAuthentication from "../../plex/Authentication";
-import SettingsUtils from "../../utility/settings";
 
 export const setApplicationState = (applicationState) => {
     return {
@@ -80,35 +79,3 @@ export const logout = () => {
     };
 }
 
-export const loadSettingsValues = () => {
-    const settings = SettingsUtils.loadSettingsFromStorage();
-
-    return {
-        type: actionTypes.LOAD_SETTINGS,
-        payload: {
-            settings: settings
-        }
-    };
-}
-
-export const setSettingServer = (identifier) => {
-    SettingsUtils.saveSettingToStorage("settings_serverIdentifier", identifier);
-    const settings = SettingsUtils.loadSettingsFromStorage();
-    return {
-        type: actionTypes.SAVE_SETTING_SERVER,
-        payload: {
-            settings: settings
-        }
-    };
-}
-
-export const setSettingLibrary = (libraryId) => {
-    SettingsUtils.saveSettingToStorage("settings_library", libraryId);
-    const settings = SettingsUtils.loadSettingsFromStorage();
-    return {
-        type: actionTypes.SAVE_SETTING_LIBRARY,
-        payload: {
-            settings: settings
-        }
-    };
-}

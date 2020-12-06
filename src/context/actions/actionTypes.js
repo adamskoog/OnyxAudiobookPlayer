@@ -28,3 +28,8 @@ export const USER_LOGGED_OUT = "userLoggedOut";
 
 // Get the current auth token of the user.
 export const GET_TOKEN = "getUserAuthToken";
+
+
+export const LOAD_SETTINGS = "loadSettings";
+export const SAVE_SETTING_SERVER = "updateSettingServer";
+export const SAVE_SETTING_LIBRARY = "updateSettingLibrary";

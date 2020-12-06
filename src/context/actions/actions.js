@@ -25,15 +25,12 @@ export const getToken = () => {
     return (dispatch, getState) => {
         const token = PlexAuthentication.getAuthTokenFromStorage();
         const authId = PlexAuthentication.getAuthenticationId();
-        const settings = SettingsUtils.loadSettingsFromStorage();
 
         dispatch({         
             type: actionTypes.GET_TOKEN,
             payload: {
                 authToken: token,
-                authId: authId,
-                serverIdentifier: settings.serverIdentifier,              // TODO: This is probably a temporary spot.
-                librarySection: settings.librarySection 
+                authId: authId
             }
         });
     };
@@ -80,5 +77,38 @@ export const logout = () => {
             type: actionTypes.USER_LOGGED_OUT,
             payload: null
         });
+    };
+}
+
+export const loadSettingsValues = () => {
+    const settings = SettingsUtils.loadSettingsFromStorage();
+
+    return {
+        type: actionTypes.LOAD_SETTINGS,
+        payload: {
+            settings: settings
+        }
+    };
+}
+
+export const setSettingServer = (identifier) => {
+    SettingsUtils.saveSettingToStorage("settings_serverIdentifier", identifier);
+    const settings = SettingsUtils.loadSettingsFromStorage();
+    return {
+        type: actionTypes.SAVE_SETTING_SERVER,
+        payload: {
+            settings: settings
+        }
+    };
+}
+
+export const setSettingLibrary = (libraryId) => {
+    SettingsUtils.saveSettingToStorage("settings_library", libraryId);
+    const settings = SettingsUtils.loadSettingsFromStorage();
+    return {
+        type: actionTypes.SAVE_SETTING_LIBRARY,
+        payload: {
+            settings: settings
+        }
     };
 }

@@ -1,33 +1,45 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { connect , useDispatch } from 'react-redux'
 import PlexRequest from '../plex/PlexRequest';
 import SettingsUtils from '../utility/settings';
+import * as appActions from "../context/actions/actions";
 
-function Settings(props) {
+const mapStateToProps = state => {
+    return { 
+        user: state.application.user, 
+        authToken: state.application.authToken,
+        baseUrl: state.application.baseUrl,
+        settings: state.application.settings
+    };
+  };
+
+function ConnectedSettings(reduxprops) {
   
+    const dispatch = useDispatch();
+
     const [resources, setResources] = useState([]);
     const [sections, setSections] = useState([]);
     const [settingServer, setSettingServer] = useState("");
     const [settingLibrary, setSettingLibrary] = useState("");
 
     const serverChanged = (e) => {
-        setSettingServer(e.target.value);
-        setSettingLibrary("");
+        dispatch(appActions.setSettingServer(e.target.value));
+        dispatch(appActions.setSettingLibrary(""));
 
         loadLibraries(e.target.value);
     }
 
     const libraryChanged = (e) => {
-        setSettingLibrary(e.target.value);
+        console.log("test", e);
+        dispatch(appActions.setSettingLibrary(e.target.value));
     }
 
-    const saveSettings = (e) => {
-        e.preventDefault();
+    // const saveSettings = (e) => {
+    //     e.preventDefault();
         
-        let settings = { serverIdentifier: settingServer, librarySection: settingLibrary };
-        SettingsUtils.saveSettingsToStorage(settings);
-
-        props.updateSettingsState(settings);
-    }
+    //     let settings = { serverIdentifier: settingServer, librarySection: settingLibrary };
+    //     dispatch(appActions.setSettingsValues(settings));
+    // }
 
     const loadLibraries = (currentServer) => {
         // Find the server resource, can bypass this by just storing the entire
@@ -61,7 +73,7 @@ function Settings(props) {
 
     const loadServers = () => {
         return new Promise((resolve, reject) => {
-        PlexRequest.getResources(props.userInfo.authToken)
+        PlexRequest.getResources(reduxprops.authToken)
             .then(newResources => {
 
                 // Filter for only media servers.
@@ -79,35 +91,34 @@ function Settings(props) {
     }
 
     useEffect(() => {
-        if (!props.userInfo) return;
-
-        setSettingServer(props.settings.serverIdentifier);
-        setSettingLibrary(props.settings.librarySection);
+        if (!reduxprops.user) return;
 
         loadServers();
-    }, [props.userInfo]);
+    }, [reduxprops.user]);
 
 
     useEffect(() => {
-        if (settingServer !== "")
-            loadLibraries(props.settings.serverIdentifier);
+        if (reduxprops.settings.serverIdentifier !== "")
+            loadLibraries(reduxprops.settings.serverIdentifier);
     }, [resources]);
 
     return (
         <div>
-            <select id="serverIdentifier" className="form-control mb-2" value={settingServer} onChange={serverChanged}>
+            <select id="serverIdentifier" className="form-control mb-2" value={reduxprops.settings.serverIdentifier} onChange={serverChanged}>
             {(resources.map((resource) => (
                 <option key={resource.clientIdentifier} value={resource.clientIdentifier}>{resource.name}</option>
             )))}
             </select>
-            <select id="librarySection" className="form-control mb-2" value={settingLibrary} onChange={libraryChanged}>
+            <select id="librarySection" className="form-control mb-2" value={reduxprops.settings.librarySection} onChange={libraryChanged}>
             {(sections.map((section) => (
                 <option key={section.key} value={section.key}>{section.title}</option>
             )))}
             </select>
-            <button className="btn btn-primary" type="submit" onClick={saveSettings}>Save</button>
+            {/* <button className="btn btn-primary" type="submit" onClick={saveSettings}>Save</button> */}
         </div>
     );
 }
+
+const Settings = connect(mapStateToProps)(ConnectedSettings);
 
 export default Settings;

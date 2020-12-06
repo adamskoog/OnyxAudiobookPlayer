@@ -3,12 +3,11 @@ import { connect , useDispatch } from 'react-redux'
 import { BrowserRouter as Router, Switch, Route, Redirect  } from 'react-router-dom';
 
 import PlexRequest from '../plex/PlexRequest';
-//import SettingsUtils from '../utility/settings';
 
 import * as userActions from "../context/actions/actions";
 import Header from './Header';
 import NowPlaying from './NowPlaying';
-//import Settings from './Settings';
+import Settings from './Settings';
 import Library from './Library';
 import AlbumInfo from './AlbumInfo';
 
@@ -24,14 +23,13 @@ const mapStateToProps = state => {
         authToken: state.application.authToken,
         authId: state.application.authId,
         baseUrl: state.application.baseUrl,
-        serverIdentifier: state.application.serverIdentifier,
-        librarySection: state.application.librarySection
+        settings: state.application.settings
     };
   };
 
 function ConnectedMain(reduxprops) {
 
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
 
     const [playQueue, setPlayQueue] = useState({ id: "", queue: [] });
 
@@ -40,16 +38,12 @@ function ConnectedMain(reduxprops) {
         setPlayQueue(newQueue);
     };
 
-    //const updateSettingsState = (settings) => {
-    //    setSettings({ serverIdentifier: settings.serverIdentifier, librarySection: settings.librarySection });
-    //};
-
     const determineServerUrl = () => {
         PlexRequest.getResources(reduxprops.authToken)
             .then(newResources => {
                 // Filter for only media servers.
                 const server = newResources.filter((resource) => {
-                    return resource.clientIdentifier === reduxprops.serverIdentifier;
+                    return resource.clientIdentifier === reduxprops.settings.serverIdentifier;
                 });
                 if (!server || server.length === 0) {
                     // TODO: This error state is currently not handled.
@@ -76,12 +70,18 @@ function ConnectedMain(reduxprops) {
         dispatch(userActions.logout());
     };
 
+    useEffect(() => {
+        if (reduxprops.authToken && reduxprops.settings && reduxprops.settings.serverIdentifier) {
+            determineServerUrl();
+        }
+    }, [reduxprops.authToken, reduxprops.settings, dispatch]);
+
     useEffect(() => {    
         if (!reduxprops.user) {
              // We have no user logged in, check for tokens.
              dispatch(userActions.getToken());
         } else
-            determineServerUrl();
+            dispatch(userActions.loadSettingsValues());
     }, [reduxprops.user, dispatch]);
 
     useEffect(() => {
@@ -117,9 +117,9 @@ function ConnectedMain(reduxprops) {
                                 )}
                             </React.Fragment>
                         } />
-                        <Route exact path="/library" component={() => <Library baseUrl={reduxprops.baseUrl} userInfo={reduxprops.user} section={reduxprops.librarySection} />} />
-                        <Route exact path="/album/:ratingKey" component={(props) => <AlbumInfo baseUrl={props.baseUrl} userInfo={reduxprops.user} key={props.match.params.ratingKey} ratingKey={props.match.params.ratingKey} playQueue={updatePlayQueue} />} />
-                        {/* <Route exact path="/settings" component={(props) => <Settings userInfo={reduxprops.user} settings={settings} updateSettingsState={updateSettingsState} /> } /> */}
+                        <Route exact path="/library" component={() => <Library baseUrl={reduxprops.baseUrl} userInfo={reduxprops.user} section={reduxprops.settings.librarySection} />} />
+                        <Route exact path="/album/:ratingKey" component={(props) => <AlbumInfo baseUrl={reduxprops.baseUrl} userInfo={reduxprops.user} key={props.match.params.ratingKey} ratingKey={props.match.params.ratingKey} playQueue={updatePlayQueue} />} />
+                        <Route exact path="/settings" component={(props) => <Settings /> } />
                     </Switch>
                 </main>
             </Router>

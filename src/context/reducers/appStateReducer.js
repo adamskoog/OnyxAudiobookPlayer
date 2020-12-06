@@ -19,18 +19,20 @@ const defaultState = {
     authToken: null,
     authId: null,
     baseUrl: null,
-    serverIdentifier: null,
-    librarySection: null
+    settings: {
+        serverIdentifier: null,
+        librarySection: null
+    }
 };
 
-const userInfoReducer = (state = defaultState, action) => {
+const appStateReducer = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.CHANGE_APP_STATE:
             return Object.assign({}, state, { applicationState: action.payload.applicationState });
         case actionTypes.SET_SERVER:
             return Object.assign({}, state, { baseUrl: action.payload.baseUrl, applicationState: "ready" });
         case actionTypes.GET_TOKEN:
-            return Object.assign({}, state, { authToken: action.payload.authToken, authId: action.payload.authId, serverIdentifier: action.payload.serverIdentifier, librarySection: action.payload.librarySection });
+            return Object.assign({}, state, { authToken: action.payload.authToken, authId: action.payload.authId, settings: action.payload.settings });
         case actionTypes.CHECK_TOKEN:
             return Object.assign({}, state, { isLoading: true });
         case actionTypes.TOKEN_VALID:
@@ -45,8 +47,12 @@ const userInfoReducer = (state = defaultState, action) => {
             return Object.assign({}, state, { applicationState: "loggedout", authId: null, isLoading: false });
         case actionTypes.USER_LOGGED_OUT:
             return Object.assign({}, state, { applicationState: "loggedout", authId: null, user: null, isLoading: false });
+        case actionTypes.LOAD_SETTINGS:
+        case actionTypes.SAVE_SETTING_SERVER:
+        case actionTypes.SAVE_SETTING_LIBRARY:
+            return Object.assign({}, state, { settings: action.payload.settings });
         default:
             return state;
     };
 }
-export default userInfoReducer;
+export default appStateReducer;

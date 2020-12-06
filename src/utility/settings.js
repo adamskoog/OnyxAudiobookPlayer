@@ -13,6 +13,10 @@ class SettingsUtils
         localStorage.setItem("settings_serverIdentifier", settings.serverIdentifier);
         localStorage.setItem("settings_library", settings.librarySection);        
     }
+
+    static saveSettingToStorage(key, value) {
+        localStorage.setItem(key, value);    
+    }
 }
 
 export default SettingsUtils;

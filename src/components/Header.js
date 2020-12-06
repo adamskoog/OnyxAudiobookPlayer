@@ -3,12 +3,6 @@ import { Link } from 'react-router-dom';
 
 function Header(props) {
 
-    const logout = () => {
-        // sign out should clear all application stored settings.
-        localStorage.removeItem("authToken");
-        props.updateAuthState(null, "loggedout");
-    }
-
     return (
         <nav className="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
             <Link className="navbar-brand" to={`/`}>Onyx Player</Link>
@@ -32,7 +26,7 @@ function Header(props) {
                             <Link className="dropdown-item" to={`/settings`}>Account</Link>
                             <Link className="dropdown-item" to={`/settings`}>Settings</Link>
                             <div className="item-separator"></div>
-                            <div className="dropdown-item" onClick={() => logout()}>Sign Out</div>
+                            <div className="dropdown-item" onClick={props.doUserLogout}>Sign Out</div>
                         </div>
                     </li>
                 </ul>
@@ -40,7 +34,7 @@ function Header(props) {
                 {props.userInfo === null && (
                 <ul className="navbar-nav ml-auto">
                     <li className="nav-item float-right">
-                        <Link className="nav-link" to={`/login`}>Sign In with Plex</Link>
+                        <button className="btn nav-link" onClick={props.doUserLogin}>Sign In with Plex</button>
                     </li>
                 </ul>                   
                 )}

@@ -17,7 +17,7 @@ class PlexAuthentication
         return new Promise((resolve, reject) => {
             PlexRequest.checkToken(token)
                 .then(userInfo => {
-                    if (newUserInfo.message) {
+                    if (userInfo.message) {
                         // Remove the token from storage.
                         localStorage.removeItem("authToken");
 
@@ -40,25 +40,32 @@ class PlexAuthentication
     }
 
     static prepareLoginRequest = () => {
-        PlexRequest.signIn()
-            .then(redirectInfo => {
-                localStorage.setItem("login_redirect_id", redirectInfo.id);
-                resolve({ url: redirectInfo.authAppUrl });
-            });
+        return new Promise((resolve, reject) => {
+            PlexRequest.signIn()
+                .then(redirectInfo => {
+                    localStorage.setItem("login_redirect_id", redirectInfo.id);
+                    resolve({ url: redirectInfo.redirectUrl });
+                });
+        });
     };
 
     static validateAuthId(authId) {
         return new Promise((resolve, reject) => {
-            localStorage.removeItem("login_redirect_id");
 
             // We need to clear the id and process the auth redirection.
             PlexRequest.validatePin(authId)
                 .then(regInfo => {
+                    localStorage.removeItem("login_redirect_id");
                     localStorage.setItem("authToken", regInfo.authToken);
                     resolve({ token: regInfo.authToken });
                 });
         });
     };
+
+    static logout() {
+        // Might need to do more here, clear settings??
+        localStorage.removeItem("authToken");
+    }
 }
 
 export default PlexAuthentication;

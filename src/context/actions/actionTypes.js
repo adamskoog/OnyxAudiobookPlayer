@@ -1,3 +1,7 @@
+export const CHANGE_APP_STATE = "changeApplicationState";
+
+export const SET_SERVER = "setServerInformation";
+
 // Main.js -> processLogin
 // User has token, we need to begin the async check
 export const CHECK_TOKEN = "checkUserToken";
@@ -10,14 +14,6 @@ export const TOKEN_INVALID = "tokenIsInvalid";
 // LoginForm -> checkLoginRedirect
 // User has requested login
 export const LOGIN_REQUEST = "userLoginRequest";
-// We have generated the pin request
-export const LOGIN_REQUEST_COMPLETE = "userLoginRequestComplete";
-// Error case for pin request
-export const LOGIN_REQUEST_ERROR = "userLoginRequestError";
-
-
-// LoginForm -> validateAuthId
-export const VALIDATE_LOGIN_REQUEST = "validateLoginRequest";
 // We have validated the users login, we have a token
 export const LOGIN_REQUEST_VALIDATED = "loginRequestValidated";
 // We could not validate the login request, error state?

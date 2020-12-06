@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row } from 'react-bootstrap';
 import AlbumItem from './AlbumListItem';
 import PlexRequest from '../plex/PlexRequest';
-import { Redirect } from 'react-router-dom';
 
 //https://reactgo.com/javascript-get-data-from-api/
 function Library(props) {

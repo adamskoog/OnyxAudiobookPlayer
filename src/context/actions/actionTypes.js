@@ -30,6 +30,16 @@ export const USER_LOGGED_OUT = "userLoggedOut";
 export const GET_TOKEN = "getUserAuthToken";
 
 
+export const UPDATE_SELECTED_SERVER = "updateSelectedServer";
+
 export const LOAD_SETTINGS = "loadSettings";
 export const SAVE_SETTING_SERVER = "updateSettingServer";
 export const SAVE_SETTING_LIBRARY = "updateSettingLibrary";
+
+export const LOAD_SERVER_LIST = "loadServerList";
+export const LOAD_SERVER_LIST_COMPLETE = "loadServerListComplete";
+export const LOAD_SERVER_LIST_ERROR = "loadServerListError";
+
+export const LOAD_LIBRARY_LIST = "loadLibraryList";
+export const LOAD_LIBRARY_LIST_COMPLETE = "loadLibraryListComplete";
+export const LOAD_LIBRARY_LIST_ERROR = "loadLibraryListError";

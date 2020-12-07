@@ -13,13 +13,19 @@ export const loadSettingsValues = () => {
     };
 }
 
-export const setSettingServer = (identifier) => {
-    SettingsUtils.saveSettingToStorage("settings_serverIdentifier", identifier);
-    return {
-        type: actionTypes.SAVE_SETTING_SERVER,
-        payload: {
-            serverIdentifier: identifier
+export const setSettingServer = (serverId) => {
+    return (dispatch, getState) => {
+        let state = getState();
+
+        let resource = null;
+        const servers = state.settings.servers;
+        if (servers && servers.length !== 0 ) {
+            resource = SettingsUtils.findResourceMatch(serverId, servers);
+            dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: resource });
         }
+
+        SettingsUtils.saveSettingToStorage("settings_serverIdentifier", serverId);
+        dispatch({ type: actionTypes.SAVE_SETTING_SERVER, payload: { serverIdentifier: serverId } });
     };
 }
 
@@ -29,6 +35,68 @@ export const setSettingLibrary = (libraryId) => {
         type: actionTypes.SAVE_SETTING_LIBRARY,
         payload: {
             librarySection: libraryId
+        }
+    };
+}
+
+export const getServers = (token) => {
+    return (dispatch, getState) => {
+        let state = getState();
+
+        // TODO: If we don't have this flag, we get into an
+        // infinite loop of the servers getting reloaded.
+        if (!state.settings.loaded) {
+
+            dispatch({ type: actionTypes.LOAD_SERVER_LIST });
+            
+            SettingsUtils.loadServers(token)
+                .then(response => {
+
+                    const serverId = state.settings.serverIdentifier;
+                    if (serverId && serverId !== "" ) {
+                        const resource = SettingsUtils.findResourceMatch(serverId, response);
+                        dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: resource });
+
+                        // TODO: This is duplicated code with getLibraries, handle better.....
+                        if (resource) {
+                            dispatch({ type: actionTypes.LOAD_LIBRARY_LIST });
+                            
+                            SettingsUtils.loadServerLibraries(resource)
+                                .then(libresponse => {
+                                    dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libresponse });
+                                })
+                                .catch(error => {
+                                    dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_ERROR });
+                                });
+                        }
+                    }
+
+                    dispatch({ type: actionTypes.LOAD_SERVER_LIST_COMPLETE, payload: response });
+                })
+                .catch(error => {
+                    dispatch({ type: actionTypes.LOAD_SERVER_LIST_ERROR });
+                });
+        }
+    };
+}
+
+export const getLibraries = (serverId) => {
+    return (dispatch, getState) => {
+        let state = getState();
+
+        if (state.settings.loaded && serverId && serverId !== "") {
+            const resource = SettingsUtils.findResourceMatch(serverId, state.settings.servers);
+            if (resource) {
+                dispatch({ type: actionTypes.LOAD_LIBRARY_LIST });
+                
+                SettingsUtils.loadServerLibraries(resource)
+                    .then(libresponse => {
+                        dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libresponse });
+                    })
+                    .catch(error => {
+                        dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_ERROR });
+                    });
+            }
         }
     };
 }

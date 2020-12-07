@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { connect , useDispatch } from 'react-redux'
-import { BrowserRouter as Router, Switch, Route, Redirect  } from 'react-router-dom';
+import { connect } from 'react-redux'
+import { BrowserRouter as Router, Switch, Route  } from 'react-router-dom';
 
 import * as appActions from "../context/actions/appStateActions";
 import * as settingsActions from "../context/actions/settingsActions";
@@ -23,13 +23,21 @@ const mapStateToProps = state => {
         authToken: state.application.authToken,
         authId: state.application.authId,
         baseUrl: state.application.baseUrl,
-        settings: state.settings
+        librarySection: state.settings.librarySection,
     };
-  };
+};
 
-function ConnectedMain(reduxprops) {
-
-    const dispatch = useDispatch();
+ const mapDispatchToProps = dispatch => {
+    return {
+        logout: () => dispatch(appActions.logout()),
+        getToken: () => dispatch(appActions.getToken()),
+        checkToken: token => dispatch(appActions.checkToken(token)),
+        checkAuthId: authId => dispatch(appActions.checkAuthId(authId)),
+        loadSettingsValues: () => dispatch(settingsActions.loadSettingsValues()),
+        getServers: authToken => dispatch(settingsActions.getServers(authToken))
+    };
+};
+function ConnectedMain(props) {
 
     const [playQueue, setPlayQueue] = useState({ id: "", queue: [] });
 
@@ -45,60 +53,58 @@ function ConnectedMain(reduxprops) {
             });
     };
 
-    const doUserLogout = () => {
-        dispatch(appActions.logout());
-    };
-
     useEffect(() => {
-        if (reduxprops.authToken) {
-            dispatch(settingsActions.getServers(reduxprops.authToken));
+        // Cannot load fully if no library section is set.
+        if (props.authToken && props.librarySection) {
+            props.getServers(props.authToken);
         }
-    }, [reduxprops.authToken, dispatch]);
+    }, [props.authToken, props.librarySection]);
 
     useEffect(() => {    
-        if (!reduxprops.user) {
+        if (!props.user) {
              // We have no user logged in, check for tokens.
-             dispatch(appActions.getToken());
+             props.getToken();
         } else
-            dispatch(settingsActions.loadSettingsValues());
-    }, [reduxprops.user, dispatch]);
+            props.loadSettingsValues();
+    }, [props.user]);
 
     useEffect(() => {
-        if (reduxprops.authToken) {
+        if (props.authToken) {
             // We have a token stored, attempt to authenticate.
-             dispatch(appActions.checkToken(reduxprops.authToken));
-        } else if (reduxprops.authId) {
+             props.checkToken(props.authToken);
+        } else if (props.authId) {
             // We have been redirected and now have an authorization id to handle.
-            dispatch(appActions.checkAuthId(reduxprops.authId));
+            props.checkAuthId(props.authId);
         }
-    }, [reduxprops.authToken, reduxprops.authId, dispatch]);
+    }, [props.authToken, props.authId]);
 
     return (
         <React.Fragment>
             <Router>
-                <Header userInfo={reduxprops.user} doUserLogin={doUserLogin} doUserLogout={doUserLogout} />
-                <NowPlaying baseUrl={reduxprops.baseUrl} userInfo={reduxprops.user} playQueue={playQueue} updatePlayQueue={updatePlayQueue} />
+                <Header userInfo={props.user} doUserLogin={doUserLogin} doUserLogout={props.logout} />
+                <NowPlaying baseUrl={props.baseUrl} userInfo={props.user} playQueue={playQueue} updatePlayQueue={updatePlayQueue} />
                 <main role="main" className="container">
                     <Switch>
-                        <Route exact path="/" component={() => 
-                            <React.Fragment>
-                                {reduxprops.applicationState === "ready" && (
-                                    <Redirect to="/library" />
-                                )}
-                                {reduxprops.applicationState === "loggedout" && (
-                                    <button className="btn btn-dark btn-block" onClick={doUserLogin}>Sign In with Plex</button>
-                                )}
-                                {reduxprops.applicationState === "error" && (
-                                    <div>Error Occurred - TODO: I need to be handled.</div> 
-                                )}
-                                {(reduxprops.applicationState !== "ready" && reduxprops.applicationState !== "loggedout" && reduxprops.applicationState !== "error") && (
-                                    <div></div> 
-                                )}
-                            </React.Fragment>
-                        } />
-                        <Route exact path="/library" component={() => <Library baseUrl={reduxprops.baseUrl} userInfo={reduxprops.user} section={reduxprops.settings.librarySection} />} />
-                        <Route exact path="/album/:ratingKey" component={(props) => <AlbumInfo baseUrl={reduxprops.baseUrl} userInfo={reduxprops.user} key={props.match.params.ratingKey} ratingKey={props.match.params.ratingKey} playQueue={updatePlayQueue} />} />
-                        <Route exact path="/settings" component={(props) => <Settings /> } />
+                        {props.applicationState === "ready" && (
+                            <Route exact path="/" component={() => <Library baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} />} />
+                        )}
+                        {props.applicationState === "loggedout" && (
+                            <Route exact path="/" component={() => 
+                                <button className="btn btn-dark btn-block" onClick={doUserLogin}>Sign In with Plex</button>
+                            } />
+                        )}
+                        {props.applicationState === "loggedout" && (
+                            <Route exact path="/" component={() => 
+                                <div>Error Occurred - TODO: I need to be handled.</div> 
+                            } />
+                        )}
+                        {(props.applicationState !== "ready" && props.applicationState !== "loggedout" && props.applicationState !== "error") && (
+                            <Route exact path="/" component={() => 
+                                <div></div> 
+                            } />
+                        )}
+                        <Route exact path="/album/:ratingKey" component={(comprops) => <AlbumInfo baseUrl={props.baseUrl} userInfo={props.user} key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} playQueue={updatePlayQueue} />} />
+                        <Route exact path="/settings" component={() => <Settings /> } />
                     </Switch>
                 </main>
             </Router>
@@ -106,6 +112,6 @@ function ConnectedMain(reduxprops) {
     ); 
 }
 
-const Main = connect(mapStateToProps)(ConnectedMain);
+const Main = connect(mapStateToProps, mapDispatchToProps)(ConnectedMain);
 
 export default Main;

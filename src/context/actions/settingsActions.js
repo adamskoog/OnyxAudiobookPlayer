@@ -22,8 +22,11 @@ export const setSettingServer = (serverId) => {
         if (servers && servers.length !== 0 ) {
             resource = SettingsUtils.findResourceMatch(serverId, servers);
             dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: resource });
+            SettingsUtils.findServerBaseUrl(resource)
+                .then(response => {
+                    dispatch({ type: actionTypes.SET_SERVER, payload: { baseUrl: response.url } });
+                });
         }
-
         SettingsUtils.saveSettingToStorage("settings_serverIdentifier", serverId);
         dispatch({ type: actionTypes.SAVE_SETTING_SERVER, payload: { serverIdentifier: serverId } });
     };
@@ -41,14 +44,13 @@ export const setSettingLibrary = (libraryId) => {
 
 export const getServers = (token) => {
     return (dispatch, getState) => {
-        let state = getState();
+        const state = getState();
 
         // TODO: If we don't have this flag, we get into an
         // infinite loop of the servers getting reloaded.
         if (!state.settings.loaded) {
-
             dispatch({ type: actionTypes.LOAD_SERVER_LIST });
-            
+
             SettingsUtils.loadServers(token)
                 .then(response => {
 
@@ -57,27 +59,30 @@ export const getServers = (token) => {
                         const resource = SettingsUtils.findResourceMatch(serverId, response);
                         dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: resource });
 
-                        // TODO: This is duplicated code with getLibraries, handle better.....
-                        if (resource) {
+                        SettingsUtils.findServerBaseUrl(resource)
+                        .then(response => {
+                            dispatch({ type: actionTypes.SET_SERVER, payload: { baseUrl: response.url } });
+
                             dispatch({ type: actionTypes.LOAD_LIBRARY_LIST });
-                            
-                            SettingsUtils.loadServerLibraries(resource)
+                
+                            // TODO: This really seems like it needs to be separated, but having it
+                            // not load on initialzation here causes infinite loops.... :(
+                            SettingsUtils.loadServerLibraries(response.url, resource.accessToken)
                                 .then(libresponse => {
                                     dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libresponse });
                                 })
                                 .catch(error => {
                                     dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_ERROR });
                                 });
-                        }
+                        });
                     }
-
                     dispatch({ type: actionTypes.LOAD_SERVER_LIST_COMPLETE, payload: response });
                 })
                 .catch(error => {
                     dispatch({ type: actionTypes.LOAD_SERVER_LIST_ERROR });
                 });
         }
-    };
+    }
 }
 
 export const getLibraries = (serverId) => {
@@ -89,7 +94,7 @@ export const getLibraries = (serverId) => {
             if (resource) {
                 dispatch({ type: actionTypes.LOAD_LIBRARY_LIST });
                 
-                SettingsUtils.loadServerLibraries(resource)
+                SettingsUtils.loadServerLibraries(state.application.baseUrl, resource.accessToken)
                     .then(libresponse => {
                         dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libresponse });
                     })

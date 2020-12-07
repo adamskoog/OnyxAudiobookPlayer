@@ -52,19 +52,9 @@ class SettingsUtils
         return null;
     }
 
-    static loadServerLibraries = (resource) => {
+    static loadServerLibraries = (url, token) => {
         return new Promise((resolve, reject) => {
-   
-            // TODO: use updated find connection code.
-            let connection = null;
-            for (let j = 0; j < resource.connections.length; j++) {
-                if (resource.connections[j].local === false && resource.connections[j].relay === false) {
-                    connection = resource.connections[j];
-                    break;
-                }
-            }
-
-            PlexRequest.getSections(connection.uri, resource.accessToken)
+               PlexRequest.getSections(url, token)
                 .then(mediaContainer => {
                     const sections = mediaContainer.MediaContainer.Directory;
 
@@ -75,12 +65,23 @@ class SettingsUtils
                             return section.type === "artist";
                         });
                         musicLibariries.unshift({ title: "", key: "" });
-                        // set the resources to the state.
+
                         resolve(musicLibariries);
                     }
                 });
         });
     }
+
+    static findServerBaseUrl = (resource) => {
+        return new Promise((resolve, reject) => {
+        PlexRequest.serverConnectionTest(resource.connections, resource.accessToken)
+            .then((response) => {
+                resolve({ url: response.uri });
+            }).catch((error) => {
+                reject({ message: "Failed to determine base url.", error: error });
+            });
+        });
+    };
 }
 
 export default SettingsUtils;

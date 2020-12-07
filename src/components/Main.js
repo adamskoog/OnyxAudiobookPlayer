@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { connect , useDispatch } from 'react-redux'
 import { BrowserRouter as Router, Switch, Route, Redirect  } from 'react-router-dom';
 
-import PlexRequest from '../plex/PlexRequest';
-
 import * as appActions from "../context/actions/appStateActions";
 import * as settingsActions from "../context/actions/settingsActions";
 
@@ -40,27 +38,6 @@ function ConnectedMain(reduxprops) {
         setPlayQueue(newQueue);
     };
 
-    const determineServerUrl = () => {
-        PlexRequest.getResources(reduxprops.authToken)
-            .then(newResources => {
-                // Filter for only media servers.
-                const server = newResources.filter((resource) => {
-                    return resource.clientIdentifier === reduxprops.settings.serverIdentifier;
-                });
-                if (!server || server.length === 0) {
-                    // TODO: This error state is currently not handled.
-                    dispatch(appActions.setApplicationState("error"));
-                } else {
-                    PlexRequest.serverConnectionTest(server[0].connections, reduxprops.authToken)
-                        .then((response) => {
-                            dispatch(appActions.setServerInfo(response.uri));
-                        }).catch((error) => {
-                            dispatch(appActions.setApplicationState("error"));
-                        });
-                }
-            });
-    };
-
     const doUserLogin = () => {
         PlexAuthentication.prepareLoginRequest()
             .then((response) => {
@@ -73,10 +50,10 @@ function ConnectedMain(reduxprops) {
     };
 
     useEffect(() => {
-        if (reduxprops.authToken && reduxprops.settings && reduxprops.settings.serverIdentifier) {
-            determineServerUrl();
+        if (reduxprops.authToken) {
+            dispatch(settingsActions.getServers(reduxprops.authToken));
         }
-    }, [reduxprops.authToken, reduxprops.settings, dispatch]);
+    }, [reduxprops.authToken, dispatch]);
 
     useEffect(() => {    
         if (!reduxprops.user) {

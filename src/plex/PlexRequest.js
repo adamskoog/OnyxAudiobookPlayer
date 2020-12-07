@@ -128,11 +128,8 @@ class PlexRequest
                 return PlexRequest.formatUrl(`${connection.uri}/library/sections`, params);
             });
 
-            // TODO: This might need better logic, from my (very limited) use of the 
-            // connections that Plex returns, it seems to return the array in order of
-            // local -> remote -> relay, so simply returning the first connection that
-            // works, "should" be the correct connection assuming the above holds true.
-            // TODO: This might be a bad way to do it since we need to way for all....
+            // TODO: This bit is fundementally flawed. The promises always seem to
+            // return as fulfilled - whether the connection is accesible or not.
             Promise.allSettled(connectionPromises).then((values) => {
                 let preferredConnection = null;
                 for (let i = 0; i < connections.length; i++) {

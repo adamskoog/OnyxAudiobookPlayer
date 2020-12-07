@@ -35,13 +35,6 @@ function ConnectedSettings({ authToken, serverIdentifier, librarySection, resour
         setLibrary(e.target.value);
     }
 
-    // TODO: Why does this run-off if we don't have some kind of a flag
-    //  to determine things are loaded?
-    useEffect(() => {
-        if (!authToken) return;
-        setupLists(authToken);
-    }, [authToken, setupLists]);
-
     return (
         <div>
             <select id="serverIdentifier" className="form-control mb-2" value={serverIdentifier} onChange={serverChanged}>

@@ -21,6 +21,7 @@ const defaultState = {
 };
 
 const appStateReducer = (state = defaultState, action) => {
+    console.log("appState", action);
     switch (action.type) {
         case actionTypes.CHANGE_APP_STATE:
             return Object.assign({}, state, { applicationState: action.payload.applicationState });

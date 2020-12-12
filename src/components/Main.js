@@ -11,8 +11,6 @@ import Settings from './Settings';
 import Library from './Library';
 import AlbumInfo from './AlbumInfo';
 
-import { v4 as uuidv4 } from 'uuid';
-
 import PlexAuthentication from "../plex/Authentication";
 
 const mapStateToProps = state => {

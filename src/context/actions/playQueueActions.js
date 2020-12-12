@@ -24,3 +24,28 @@ export const setPlayQueue = (playQueue) => {
         }
     }
 }
+
+export const nextTrackInQueue = () => {
+    return (dispatch, getState) => {
+        const currentState = getState();
+        const nextIndex = currentState.playQueue.index + 1;
+        dispatch({         
+            type: actionTypes.CHANGE_TRACK,
+            payload: nextIndex
+        });
+    }
+}
+
+export const previousTrackInQueue = () => {
+    return (dispatch, getState) => {
+
+        const currentState = getState();
+        const prevIndex = currentState.playQueue.index - 1;
+        if (prevIndex >= 0) {
+            dispatch({         
+                type: actionTypes.CHANGE_TRACK,
+                payload: prevIndex
+            });
+        }
+    }
+}

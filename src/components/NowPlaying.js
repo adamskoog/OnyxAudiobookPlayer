@@ -26,6 +26,8 @@ const mapStateToProps = state => {
  const mapDispatchToProps = dispatch => {
     return {
         clearPlayQueue: () => dispatch(playQueueActions.clearPlayQueue()),
+        previousTrackInQueue: () => dispatch(playQueueActions.previousTrackInQueue()),
+        nextTrackInQueue: () => dispatch(playQueueActions.nextTrackInQueue()),
     };
 };
 
@@ -178,6 +180,17 @@ function ConnectedNowPlaying(props) {
         updateTimeline(props.queue[props.queueIndex], PLAY_STATE_STOPPED, appPlayer.currentTime, appPlayer.duration);
         
         // set player to default state and clear the play queue;
+        setPlayState(PLAY_STATE_STOPPED);
+    };
+
+    const stopPlayer = () => {
+        let appPlayer = document.getElementById("appPlayer");
+        appPlayer.pause();
+        appPlayer.src = "";
+
+        updateTimeline(props.queue[props.queueIndex], PLAY_STATE_STOPPED, appPlayer.currentTime, appPlayer.duration);
+        
+        // set player to default state and clear the play queue;
         setPlayState(PLAY_STATE_STOPPED); 
         props.clearPlayQueue();
     };
@@ -202,39 +215,35 @@ function ConnectedNowPlaying(props) {
     };
 
     const hasPreviousTrack = () => {
-        // let newTrackIndex = queueIndex - 1;
-        // if (newTrackIndex >= 0) {
-        //     return true;
-        // }
+        let newTrackIndex = props.queueIndex - 1;
+        if (newTrackIndex >= 0) {
+            return true;
+        }
         return false;
     };
 
     const hasNextTrack = () => {
-        // let newTrackIndex = queueIndex + 1;
-        // if (newTrackIndex < props.playQueue.queue.length) {
-        //     return true;
-        // }
+        let newTrackIndex = props.queueIndex + 1;
+        if (newTrackIndex < props.queue.length) {
+            return true;
+        }
         return false;
     };
 
     const previousTrack = () => {
         // TODO: in this case, the upcoming tracks will need the play status
         // reset so they start at the beginning of the track.
-
-        // let newTrackIndex = queueIndex - 1;
-        // if (hasPreviousTrack()) {
-        //     setQueueIndex(newTrackIndex);
-        // }
+        if (hasPreviousTrack()) {
+            props.previousTrackInQueue();
+        }
     };
 
     const nextTrack = () => {
         // In this case, if the user is skipping a track, a timeline update should be done
         // so the track shows as completed to keep correct on deck position.
-        
-        // let newTrackIndex = queueIndex + 1;
-        // if (hasNextTrack()) {
-        //     setQueueIndex(newTrackIndex);
-        // }
+        if (hasNextTrack()) {
+            props.nextTrackInQueue();
+        }
     };
 
     // TODO: The time display needs to be pushed to a component, currently we are re-rending the
@@ -318,7 +327,7 @@ function ConnectedNowPlaying(props) {
                 </div>
                 {(playState === PLAY_STATE_PLAYING || playState === PLAY_STATE_PAUSED)  && (
                 <div className="ml-auto">
-                    <button className="btn btn-player-stop" type="button" onClick={() => stopTrack()}>
+                    <button className="btn btn-player-stop" type="button" onClick={() => stopPlayer()}>
                         <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                             <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
                             <path fillRule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>

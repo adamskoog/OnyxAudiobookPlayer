@@ -76,14 +76,12 @@ export const getServers = (token) => {
 
                     SettingsUtils.findServerBaseUrl(resource)
                     .then(response => {
-                        console.log("resp", response);
                         dispatch({ type: actionTypes.SET_SERVER, payload: { baseUrl: response.url } });
 
                         // TODO: This really seems like it needs to be separated, but having it
                         // not load on initialzation here causes infinite loops.... :(
                         SettingsUtils.loadServerLibraries(response.url, resource.accessToken)
                             .then(libresponse => {
-                                console.log("libraries", libresponse);
                                 dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libresponse });
                             })
                             .catch(error => {

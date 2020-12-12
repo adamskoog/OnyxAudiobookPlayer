@@ -1,10 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+
 import AlbumTrack from './AlbumTrack';
 import PlexRequest from '../plex/PlexRequest';
 import AlbumHelpers from '../plex/AlbumHelpers';
 
-function AlbumInfo(props) {
+import * as playQueueActions from "../context/actions/playQueueActions";
+
+const mapStateToProps = state => {
+    return { 
+        authToken: state.application.authToken,
+        baseUrl: state.application.baseUrl,
+        librarySection: state.settings.librarySection,
+    };
+};
+
+ const mapDispatchToProps = dispatch => {
+    return {
+        setPlayQueue: (queue) => dispatch(playQueueActions.setPlayQueue(queue)),
+    };
+};
+
+function ConnectedAlbumInfo(props) {
 
     const [album, setAlbum] = useState({ Metadata: [] });
     const [onDeck, setOnDeck] = useState(null);
@@ -44,7 +61,7 @@ function AlbumInfo(props) {
     const playOnDeckTrack = (trackInfo) => {
 
         let playQueue = AlbumHelpers.getAlbumQueue(trackInfo, album);
-        props.playQueue(playQueue);
+        props.setPlayQueue(playQueue);
     }
 
     const playSelectedTrack = (trackInfo) => {
@@ -56,11 +73,11 @@ function AlbumInfo(props) {
         // tracks to make sure previous are played and remaining are unplayed.
         // This will likely require timeline updates to be sent for all tracks <-- TODO: is this a bad idea???
         let playQueue = AlbumHelpers.getAlbumQueue(trackInfo, album);
-        props.playQueue(playQueue);
+        props.setPlayQueue(playQueue);
     }
 
     const getAlbumMetadata = () => {
-        PlexRequest.getAlbumMetadata(props.baseUrl, props.ratingKey, { "X-Plex-Token": props.userInfo.authToken })
+        PlexRequest.getAlbumMetadata(props.baseUrl, props.ratingKey, { "X-Plex-Token": props.authToken })
             .then(data => {
                 if (data.MediaContainer) {
                     let onDeck = AlbumHelpers.findOnDeck(data.MediaContainer);
@@ -71,16 +88,15 @@ function AlbumInfo(props) {
     }
 
     useEffect(() => {
-        console.log("show props", props);
-        if (props.userInfo && props.baseUrl && props.ratingKey)
+        if (props.authToken && props.baseUrl && props.ratingKey)
             getAlbumMetadata();
-    }, [props.baseUrl, props.userInfo, props.ratingKey]);
+    }, [props.baseUrl, props.authToken, props.ratingKey]);
 
     return (
         <React.Fragment>
-        {props.userInfo && (
+        {props.authToken && (
         <div className="album-info-container">
-            <img className="album-cover mr-4" src={PlexRequest.getThumbnailTranscodeUrl(200, 200, props.baseUrl, album.thumb, props.userInfo.authToken)} alt="Album Cover" />
+            <img className="album-cover mr-4" src={PlexRequest.getThumbnailTranscodeUrl(200, 200, props.baseUrl, album.thumb, props.authToken)} alt="Album Cover" />
             <div className="album-info">
                 <div className="mt-1 album-title">{album.parentTitle}</div>
                 <div className="mt-1 album-artist">{album.grandparentTitle}</div>
@@ -111,7 +127,7 @@ function AlbumInfo(props) {
                 <table>
                     <tbody>
                         {album.Metadata.map((track) => (
-                            <AlbumTrack key={track.key} trackInfo={track} baseUrl={props.baseUrl} userInfo={props.userInfo} playSelectedTrack={playSelectedTrack} />
+                            <AlbumTrack key={track.key} trackInfo={track} baseUrl={props.baseUrl} userInfo={props.user} playSelectedTrack={playSelectedTrack} />
                         ))}
                     </tbody>
                 </table>
@@ -122,11 +138,6 @@ function AlbumInfo(props) {
     ); 
 }
 
-AlbumInfo.propTypes = {
-    baseUrl: PropTypes.string.isRequired,
-    userInfo: PropTypes.object.isRequired,
-    ratingKey: PropTypes.string.isRequired,
-    playQueue: PropTypes.func.isRequired
-}
+const AlbumInfo = connect(mapStateToProps, mapDispatchToProps)(ConnectedAlbumInfo);
 
 export default AlbumInfo;

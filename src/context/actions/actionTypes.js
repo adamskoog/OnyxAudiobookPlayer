@@ -43,3 +43,7 @@ export const LOAD_SERVER_LIST_ERROR = "loadServerListError";
 export const LOAD_LIBRARY_LIST = "loadLibraryList";
 export const LOAD_LIBRARY_LIST_COMPLETE = "loadLibraryListComplete";
 export const LOAD_LIBRARY_LIST_ERROR = "loadLibraryListError";
+
+
+// Play Queue
+export const SET_PLAY_QUEUE = "setPlayQueue";

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route  } from 'react-router-dom';
 
 import * as appActions from "../context/actions/appStateActions";
@@ -92,7 +92,7 @@ function ConnectedMain(props) {
                     <Switch>
                         <Route exact path="/" component={() => <Library baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} />} />
                         <Route exact path="/album/:ratingKey" component={(comprops) => 
-                            <AlbumInfo baseUrl={props.baseUrl} userInfo={props.user} key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} playQueue={updatePlayQueue} />
+                            <AlbumInfo key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
                         }/>
                         <Route exact path="/settings" component={() => <Settings /> } />
                     </Switch>

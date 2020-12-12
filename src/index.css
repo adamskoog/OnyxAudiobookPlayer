@@ -52,3 +52,16 @@ body {
 .container {
     padding-bottom: 100px;
 }
+
+.loader {
+    display: none;
+}
+
+.loader.loading {
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ddd;
+    z-index: 1000;
+}

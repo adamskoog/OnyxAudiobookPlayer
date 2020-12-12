@@ -13,8 +13,7 @@ const defaultState = {
     librarySection: "",
     servers: [],
     libraries: [],
-    currentServer: null,
-    loaded: false
+    currentServer: null
 };
 
 const settingsReducer = (state = defaultState, action) => {
@@ -28,9 +27,9 @@ const settingsReducer = (state = defaultState, action) => {
         case actionTypes.LOAD_SERVER_LIST:
             return state;
         case actionTypes.LOAD_SERVER_LIST_COMPLETE:
-            return Object.assign({}, state, { servers: action.payload, loaded: true });
+            return Object.assign({}, state, { servers: action.payload });
         case actionTypes.LOAD_SERVER_LIST_ERROR:
-            return Object.assign({}, state, { servers: [], loaded: true });
+            return Object.assign({}, state, { servers: [] });
         case actionTypes.UPDATE_SELECTED_SERVER:
             return Object.assign({}, state, { currentServer: action.payload });
         case actionTypes.LOAD_LIBRARY_LIST:

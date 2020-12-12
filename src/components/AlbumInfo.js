@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import AlbumTrack from './AlbumTrack';
 import PlexRequest from '../plex/PlexRequest';
 import AlbumHelpers from '../plex/AlbumHelpers';
-import { Redirect } from 'react-router-dom';
 
 function AlbumInfo(props) {
 
@@ -72,13 +71,13 @@ function AlbumInfo(props) {
     }
 
     useEffect(() => {
+        console.log("show props", props);
         if (props.userInfo && props.baseUrl && props.ratingKey)
             getAlbumMetadata();
     }, [props.baseUrl, props.userInfo, props.ratingKey]);
 
     return (
         <React.Fragment>
-        {!props.userInfo && (<Redirect to="/" />)}
         {props.userInfo && (
         <div className="album-info-container">
             <img className="album-cover mr-4" src={PlexRequest.getThumbnailTranscodeUrl(200, 200, props.baseUrl, album.thumb, props.userInfo.authToken)} alt="Album Cover" />

@@ -29,8 +29,6 @@ class SettingsUtils
                     let servers = resources.filter((resource) => {
                         return resource.provides === "server";
                     });
-                    // Add empty server for list
-                    servers.unshift({ name: "", clientIdentifier: "" });
 
                     if (servers.length === 0)
                         reject({ message: "No servers were found."});
@@ -64,7 +62,6 @@ class SettingsUtils
                         const musicLibariries = sections.filter((section) => {
                             return section.type === "artist";
                         });
-                        musicLibariries.unshift({ title: "", key: "" });
 
                         resolve(musicLibariries);
                     }

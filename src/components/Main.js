@@ -55,7 +55,7 @@ function ConnectedMain(props) {
 
     useEffect(() => {
         // Cannot load fully if no library section is set.
-        if (props.authToken && props.librarySection) {
+        if (props.authToken) {
             props.getServers(props.authToken);
         }
     }, [props.authToken, props.librarySection]);
@@ -83,27 +83,17 @@ function ConnectedMain(props) {
             <Router>
                 <Header userInfo={props.user} doUserLogin={doUserLogin} doUserLogout={props.logout} />
                 <NowPlaying baseUrl={props.baseUrl} userInfo={props.user} playQueue={playQueue} updatePlayQueue={updatePlayQueue} />
+                <div className={(props.isLoading) ? "loader loading" : "loader"}>
+                    <div className="d-flex justify-content-center">
+                        <div className="spinner-border" style={{width: "3rem", height: "3rem"}} role="status"></div>
+                    </div>
+                </div>
                 <main role="main" className="container">
                     <Switch>
-                        {props.applicationState === "ready" && (
-                            <Route exact path="/" component={() => <Library baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} />} />
-                        )}
-                        {props.applicationState === "loggedout" && (
-                            <Route exact path="/" component={() => 
-                                <button className="btn btn-dark btn-block" onClick={doUserLogin}>Sign In with Plex</button>
-                            } />
-                        )}
-                        {props.applicationState === "loggedout" && (
-                            <Route exact path="/" component={() => 
-                                <div>Error Occurred - TODO: I need to be handled.</div> 
-                            } />
-                        )}
-                        {(props.applicationState !== "ready" && props.applicationState !== "loggedout" && props.applicationState !== "error") && (
-                            <Route exact path="/" component={() => 
-                                <div></div> 
-                            } />
-                        )}
-                        <Route exact path="/album/:ratingKey" component={(comprops) => <AlbumInfo baseUrl={props.baseUrl} userInfo={props.user} key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} playQueue={updatePlayQueue} />} />
+                        <Route exact path="/" component={() => <Library baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} />} />
+                        <Route exact path="/album/:ratingKey" component={(comprops) => 
+                            <AlbumInfo baseUrl={props.baseUrl} userInfo={props.user} key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} playQueue={updatePlayQueue} />
+                        }/>
                         <Route exact path="/settings" component={() => <Settings /> } />
                     </Switch>
                 </main>

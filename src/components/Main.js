@@ -39,13 +39,6 @@ const mapStateToProps = state => {
 };
 function ConnectedMain(props) {
 
-    const [playQueue, setPlayQueue] = useState({ id: "", queue: [] });
-
-    const updatePlayQueue = (newPlayQueue) => {
-        let newQueue = { id: uuidv4(), queue: newPlayQueue };
-        setPlayQueue(newQueue);
-    };
-
     const doUserLogin = () => {
         PlexAuthentication.prepareLoginRequest()
             .then((response) => {
@@ -82,7 +75,7 @@ function ConnectedMain(props) {
         <React.Fragment>
             <Router>
                 <Header userInfo={props.user} doUserLogin={doUserLogin} doUserLogout={props.logout} />
-                <NowPlaying baseUrl={props.baseUrl} userInfo={props.user} playQueue={playQueue} updatePlayQueue={updatePlayQueue} />
+                <NowPlaying />
                 <div className={(props.isLoading) ? "loader loading" : "loader"}>
                     <div className="d-flex justify-content-center">
                         <div className="spinner-border" style={{width: "3rem", height: "3rem"}} role="status"></div>

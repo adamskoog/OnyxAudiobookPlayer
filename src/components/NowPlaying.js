@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { connect } from 'react-redux';
+
 import PlexRequest from '../plex/PlexRequest';
 import throttle from 'lodash/throttle';
 import TimeUtils from '../utility/time';
@@ -7,9 +9,27 @@ import PlayerTime from './player/PlayerTime';
 import PlayerRangeControl from './player/PlayerRangeControl';
 
 import AlbumHelpers from '../plex/AlbumHelpers';
-//https://stackoverflow.com/questions/46983876/pass-argument-to-lodash-throttles-callback
+import * as playQueueActions from "../context/actions/playQueueActions";
 
-function NowPlaying(props) {
+//https://stackoverflow.com/questions/46983876/pass-argument-to-lodash-throttles-callback
+//playQueue={playQueue} updatePlayQueue={updatePlayQueue}
+const mapStateToProps = state => {
+    return { 
+        authToken: state.application.authToken,
+        baseUrl: state.application.baseUrl,
+        queueId: state.playQueue.id,
+        queue: state.playQueue.queue,
+        queueIndex: state.playQueue.index,
+    };
+};
+
+ const mapDispatchToProps = dispatch => {
+    return {
+        clearPlayQueue: () => dispatch(playQueueActions.clearPlayQueue()),
+    };
+};
+
+function ConnectedNowPlaying(props) {
 
     //https://dev.to/ma5ly/lets-make-a-little-audio-player-in-react-p4p
     //https://stackoverflow.com/questions/47686345/playing-sound-in-reactjs
@@ -28,19 +48,21 @@ function NowPlaying(props) {
         return ref.current;
     };
 
+    // This will move to the PlayerReducer.
     const [playerTimeState, setPlayerTimeState] = useState({ currentTime: 0, duration: 0 });   
-    const [queueIndex, setQueueIndex] = useState(0);
     const [playState, setPlayState] = useState(PLAY_STATE_STOPPED);
     const [currentTimeDisplay, setCurrentTimeDisplay] = useState(defaultTimeDisplay);
 
-    const prevIndex = usePrevious(queueIndex);
-    const prevQueue = usePrevious(props.playQueue);
+    const prevIndex = usePrevious(props.queueIndex);
+    const prevQueue = usePrevious(props.queueId);
 
+    // This should be handled more in the Queue Actions??
+    //
     function hasTrackChanged() {
         // we need to do something here to check if the
         // track has been changed.
-        if (prevQueue && prevQueue.id !== props.playQueue.id) return true;
-        if (queueIndex !== prevIndex) return true;
+        if (prevQueue && prevQueue.id !== props.queueId) return true;
+        if (prevIndex !== props.queueIndex) return true;
         return false;
     };
 
@@ -55,10 +77,10 @@ function NowPlaying(props) {
             time: TimeUtils.convertSecondsToMs(currentTime),
             playbackTime: TimeUtils.convertSecondsToMs(currentTime),
             duration: AlbumHelpers.timelineTrackDurationFlex(TimeUtils.convertSecondsToMs(duration)),
-            "X-Plex-Token": props.userInfo.authToken
+            "X-Plex-Token": props.authToken
         };
-        PlexRequest.updateTimeline(props.baseUrl, args)
-            .then(data => { /*console.log("data", data); TODO: This doesn't seem to return anything, and errors out often.*/ });
+        //PlexRequest.updateTimeline(props.baseUrl, args)
+        //    .then(data => { /*console.log("data", data); TODO: This doesn't seem to return anything, and errors out often.*/ });
     };
 
     // Event Handlers
@@ -69,19 +91,19 @@ function NowPlaying(props) {
     };
 
     const audioPlayerEnded = useCallback((event) => {
-        let nextIndex = queueIndex + 1;
-        if (props.playQueue && props.playQueue.queue && props.playQueue.queue[queueIndex]) {
-            setQueueIndex(nextIndex);
-        } else {
-            setQueueIndex(-1);
-            setPlayState(PLAY_STATE_STOPPED);
-        }
+        // let nextIndex = queueIndex + 1;
+        // if (props.playQueue && props.playQueue.queue && props.playQueue.queue[queueIndex]) {
+        //     setQueueIndex(nextIndex);
+        // } else {
+        //     setQueueIndex(-1);
+        //     setPlayState(PLAY_STATE_STOPPED);
+        // }
     });
 
     const throttleTimeline = throttle(() => {
         let appPlayer = document.getElementById("appPlayer");
         if (!appPlayer.paused) {
-            updateTimeline(props.playQueue.queue[queueIndex], PLAY_STATE_PLAYING, appPlayer.currentTime, appPlayer.duration);
+            updateTimeline(props.queue[props.queueIndex], PLAY_STATE_PLAYING, appPlayer.currentTime, appPlayer.duration);
             setPlayerTimeState({
                 currentTime: appPlayer.currentTime,
                 duration: appPlayer.duration
@@ -93,15 +115,15 @@ function NowPlaying(props) {
         let appPlayer = document.getElementById("appPlayer");
         appPlayer.addEventListener("timeupdate", throttleTimeline);
         return () => appPlayer.removeEventListener("timeupdate", throttleTimeline);
-    }, [props.playQueue]);
+    }, [props.queueId]);
 
     useEffect(() => {
         // No media to play
-        if (queueIndex < 0 || props.playQueue.queue.length === 0) return;
+        if (props.queueIndex < 0 || props.queue.length === 0) return;
 
         //console.log("Track has changed", hasTrackChanged());
         if (hasTrackChanged()) {
-            const playInfo = props.playQueue.queue[queueIndex];
+            const playInfo = props.queue[props.queueIndex];
             const currentTrack = playInfo.Media[0];
 
             // Stop playback, if you change the source of the audio while
@@ -114,7 +136,7 @@ function NowPlaying(props) {
             // Probably need to handle multiparts in some way? Even if it's just a warning?
             if (currentTrack.Part[0]) {
                 //console.log("START: Add source and start playing.", currentTrack);
-                const src = PlexRequest.formatUrl(`${props.baseUrl}${currentTrack.Part[0].key}`, { "X-Plex-Token": props.userInfo.authToken });
+                const src = PlexRequest.formatUrl(`${props.baseUrl}${currentTrack.Part[0].key}`, { "X-Plex-Token": props.authToken });
 
                 // get the reference to the audio tag.
                 let appPlayer = document.getElementById("appPlayer");
@@ -128,7 +150,7 @@ function NowPlaying(props) {
                 playTrack();
             }
         }
-    }, [props.playQueue, queueIndex]);
+    }, [props.queueId, props.queueIndex]);
 
     const playerRangeChanged = (evt) => {
         let appPlayer = document.getElementById("appPlayer");
@@ -144,7 +166,7 @@ function NowPlaying(props) {
     const pauseTrack = () => {
         let appPlayer = document.getElementById("appPlayer");
         appPlayer.pause();
-        updateTimeline(props.playQueue.queue[queueIndex], PLAY_STATE_PAUSED, appPlayer.currentTime, appPlayer.duration);
+        updateTimeline(props.queue[props.queueIndex], PLAY_STATE_PAUSED, appPlayer.currentTime, appPlayer.duration);
         setPlayState(PLAY_STATE_PAUSED);     
     };
 
@@ -153,12 +175,11 @@ function NowPlaying(props) {
         appPlayer.pause();
         appPlayer.src = "";
 
-        updateTimeline(props.playQueue.queue[queueIndex], PLAY_STATE_STOPPED, appPlayer.currentTime, appPlayer.duration);
+        updateTimeline(props.queue[props.queueIndex], PLAY_STATE_STOPPED, appPlayer.currentTime, appPlayer.duration);
         
         // set player to default state and clear the play queue;
         setPlayState(PLAY_STATE_STOPPED); 
-        setQueueIndex(0);
-        props.updatePlayQueue([]);
+        props.clearPlayQueue();
     };
 
     const skipForward = () => {
@@ -181,18 +202,18 @@ function NowPlaying(props) {
     };
 
     const hasPreviousTrack = () => {
-        let newTrackIndex = queueIndex - 1;
-        if (newTrackIndex >= 0) {
-            return true;
-        }
+        // let newTrackIndex = queueIndex - 1;
+        // if (newTrackIndex >= 0) {
+        //     return true;
+        // }
         return false;
     };
 
     const hasNextTrack = () => {
-        let newTrackIndex = queueIndex + 1;
-        if (newTrackIndex < props.playQueue.queue.length) {
-            return true;
-        }
+        // let newTrackIndex = queueIndex + 1;
+        // if (newTrackIndex < props.playQueue.queue.length) {
+        //     return true;
+        // }
         return false;
     };
 
@@ -200,32 +221,32 @@ function NowPlaying(props) {
         // TODO: in this case, the upcoming tracks will need the play status
         // reset so they start at the beginning of the track.
 
-        let newTrackIndex = queueIndex - 1;
-        if (hasPreviousTrack()) {
-            setQueueIndex(newTrackIndex);
-        }
+        // let newTrackIndex = queueIndex - 1;
+        // if (hasPreviousTrack()) {
+        //     setQueueIndex(newTrackIndex);
+        // }
     };
 
     const nextTrack = () => {
         // In this case, if the user is skipping a track, a timeline update should be done
         // so the track shows as completed to keep correct on deck position.
         
-        let newTrackIndex = queueIndex + 1;
-        if (hasNextTrack()) {
-            setQueueIndex(newTrackIndex);
-        }
+        // let newTrackIndex = queueIndex + 1;
+        // if (hasNextTrack()) {
+        //     setQueueIndex(newTrackIndex);
+        // }
     };
 
     // TODO: The time display needs to be pushed to a component, currently we are re-rending the
     // entire now playing component everytime the time updates, this should be pushed as a prop
     // so we (hopefully) only re-render that item.
     function getThumbnailUrl() {
-        if (!props.playQueue || !props.playQueue.queue || !props.playQueue.queue[queueIndex]) return "";    //TODO: We need a generic not found image.
-        return PlexRequest.getThumbnailTranscodeUrl(100, 100, props.baseUrl, props.playQueue.queue[queueIndex].thumb, props.userInfo.authToken);
+        if (!props.queue || !props.queue[props.queueIndex]) return "";    //TODO: We need a generic not found image.
+        return PlexRequest.getThumbnailTranscodeUrl(100, 100, props.baseUrl, props.queue[props.queueIndex].thumb, props.authToken);
     };
     function getPlayInfoAttr(attr) {
-        if (!props.playQueue || !props.playQueue.queue || !props.playQueue.queue[queueIndex]) return "";
-        return props.playQueue.queue[queueIndex][attr];
+        if (!props.queue || !props.queue[props.queueIndex]) return "";
+        return props.queue[props.queueIndex][attr];
     };
     
     return (
@@ -313,4 +334,5 @@ function NowPlaying(props) {
     );
 }
 
+const NowPlaying = connect(mapStateToProps, mapDispatchToProps)(ConnectedNowPlaying);
 export default NowPlaying;

@@ -48,3 +48,6 @@ export const LOAD_LIBRARY_LIST_ERROR = "loadLibraryListError";
 // Play Queue
 export const SET_PLAY_QUEUE = "setPlayQueue";
 export const CHANGE_TRACK = "changeTrack";
+
+export const CHANGE_PLAYER_STATE = "changePlayerState";
+export const UPDATE_PLAYER_TIME = "updatePlayerTime";

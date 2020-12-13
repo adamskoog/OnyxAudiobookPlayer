@@ -1,347 +1,57 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 
 import PlexRequest from '../plex/PlexRequest';
-import throttle from 'lodash/throttle';
-import TimeUtils from '../utility/time';
+
 import { Link } from 'react-router-dom';
 import PlayerTime from './player/PlayerTime';
-import PlayerRangeControl from './player/PlayerRangeControl';
+import AudioPlayer from './player/Player';
 
-import AlbumHelpers from '../plex/AlbumHelpers';
-import * as playQueueActions from "../context/actions/playQueueActions";
+import * as playerActions from "../context/actions/playerActions";
 
-//https://stackoverflow.com/questions/46983876/pass-argument-to-lodash-throttles-callback
-//playQueue={playQueue} updatePlayQueue={updatePlayQueue}
 const mapStateToProps = state => {
     return { 
         authToken: state.application.authToken,
         baseUrl: state.application.baseUrl,
-        queueId: state.playQueue.id,
         queue: state.playQueue.queue,
         queueIndex: state.playQueue.index,
+        playState: state.player.mode
     };
 };
-
- const mapDispatchToProps = dispatch => {
-    return {
-        clearPlayQueue: () => dispatch(playQueueActions.clearPlayQueue()),
-        previousTrackInQueue: () => dispatch(playQueueActions.previousTrackInQueue()),
-        nextTrackInQueue: () => dispatch(playQueueActions.nextTrackInQueue()),
-    };
-};
-
 function ConnectedNowPlaying(props) {
 
-    //https://dev.to/ma5ly/lets-make-a-little-audio-player-in-react-p4p
-    //https://stackoverflow.com/questions/47686345/playing-sound-in-reactjs
-
-    const defaultTimeDisplay = "--:--/--:--";
-
-    const PLAY_STATE_PLAYING = "playing";
-    const PLAY_STATE_PAUSED = "paused";
-    const PLAY_STATE_STOPPED = "stopped";
-
-    function usePrevious(value) {
-        const ref = useRef();
-        useEffect(() => {
-          ref.current = value;
-        });
-        return ref.current;
-    };
-
-    // This will move to the PlayerReducer.
-    const [playerTimeState, setPlayerTimeState] = useState({ currentTime: 0, duration: 0 });   
-    const [playState, setPlayState] = useState(PLAY_STATE_STOPPED);
-    const [currentTimeDisplay, setCurrentTimeDisplay] = useState(defaultTimeDisplay);
-
-    const prevIndex = usePrevious(props.queueIndex);
-    const prevQueue = usePrevious(props.queueId);
-
-    // This should be handled more in the Queue Actions??
-    //
-    function hasTrackChanged() {
-        // we need to do something here to check if the
-        // track has been changed.
-        if (prevQueue && prevQueue.id !== props.queueId) return true;
-        if (prevIndex !== props.queueIndex) return true;
-        return false;
-    };
-
-    const updateTimeline = (trackInfo, playState, currentTime, duration) => {
-        // we need a way to update the album info if the user is looking at the album
-        // page, It should keep the on deck updated.
-        // Should this be done while playing, or only when user pauses/kills the stream.
-        let args = {
-            ratingKey: trackInfo.ratingKey,
-            key: trackInfo.key,
-            state: playState,
-            time: TimeUtils.convertSecondsToMs(currentTime),
-            playbackTime: TimeUtils.convertSecondsToMs(currentTime),
-            duration: AlbumHelpers.timelineTrackDurationFlex(TimeUtils.convertSecondsToMs(duration)),
-            "X-Plex-Token": props.authToken
-        };
-        //PlexRequest.updateTimeline(props.baseUrl, args)
-        //    .then(data => { /*console.log("data", data); TODO: This doesn't seem to return anything, and errors out often.*/ });
-    };
-
-    // Event Handlers
-    const timeUpdated = (event) => {
-        let appPlayer = event.target;
-        let currentTimeDisplay = TimeUtils.formatPlayerDisplay(appPlayer.currentTime, appPlayer.duration);
-        setCurrentTimeDisplay(currentTimeDisplay);
-    };
-
-    const audioPlayerEnded = useCallback((event) => {
-        // let nextIndex = queueIndex + 1;
-        // if (props.playQueue && props.playQueue.queue && props.playQueue.queue[queueIndex]) {
-        //     setQueueIndex(nextIndex);
-        // } else {
-        //     setQueueIndex(-1);
-        //     setPlayState(PLAY_STATE_STOPPED);
-        // }
-    });
-
-    const throttleTimeline = throttle(() => {
-        let appPlayer = document.getElementById("appPlayer");
-        if (!appPlayer.paused) {
-            updateTimeline(props.queue[props.queueIndex], PLAY_STATE_PLAYING, appPlayer.currentTime, appPlayer.duration);
-            setPlayerTimeState({
-                currentTime: appPlayer.currentTime,
-                duration: appPlayer.duration
-            });
-        }
-    }, 4000, {trailing: false});
-    
-    useEffect(() => {
-        let appPlayer = document.getElementById("appPlayer");
-        appPlayer.addEventListener("timeupdate", throttleTimeline);
-        return () => appPlayer.removeEventListener("timeupdate", throttleTimeline);
-    }, [props.queueId]);
-
-    useEffect(() => {
-        // No media to play
-        if (props.queueIndex < 0 || props.queue.length === 0) return;
-
-        //console.log("Track has changed", hasTrackChanged());
-        if (hasTrackChanged()) {
-            const playInfo = props.queue[props.queueIndex];
-            const currentTrack = playInfo.Media[0];
-
-            // Stop playback, if you change the source of the audio while
-            // it's playing, there is an exception thrown in the console.
-            if (playState === PLAY_STATE_PLAYING) {
-                //console.log("STOP: Track is playing, pause and remove source.");
-                stopTrack();
-            }
-
-            // Probably need to handle multiparts in some way? Even if it's just a warning?
-            if (currentTrack.Part[0]) {
-                //console.log("START: Add source and start playing.", currentTrack);
-                const src = PlexRequest.formatUrl(`${props.baseUrl}${currentTrack.Part[0].key}`, { "X-Plex-Token": props.authToken });
-
-                // get the reference to the audio tag.
-                let appPlayer = document.getElementById("appPlayer");
-                appPlayer.src = src;
-
-                appPlayer.currentTime = 0;
-                if (playInfo.viewOffset) {
-                    // Check if we have a viewOffset, if so set the offset to the players time.
-                    appPlayer.currentTime = TimeUtils.convertMsToSeconds(playInfo.viewOffset);
-                }
-                playTrack();
-            }
-        }
-    }, [props.queueId, props.queueIndex]);
-
-    const playerRangeChanged = (evt) => {
-        let appPlayer = document.getElementById("appPlayer");
-        appPlayer.currentTime = evt.target.value;
-    };
-
-    const playTrack = () => {
-        let appPlayer = document.getElementById("appPlayer");
-        appPlayer.play();
-        setPlayState(PLAY_STATE_PLAYING); 
-    };
-
-    const pauseTrack = () => {
-        let appPlayer = document.getElementById("appPlayer");
-        appPlayer.pause();
-        updateTimeline(props.queue[props.queueIndex], PLAY_STATE_PAUSED, appPlayer.currentTime, appPlayer.duration);
-        setPlayState(PLAY_STATE_PAUSED);     
-    };
-
-    const stopTrack = () => {
-        let appPlayer = document.getElementById("appPlayer");
-        appPlayer.pause();
-        appPlayer.src = "";
-
-        updateTimeline(props.queue[props.queueIndex], PLAY_STATE_STOPPED, appPlayer.currentTime, appPlayer.duration);
-        
-        // set player to default state and clear the play queue;
-        setPlayState(PLAY_STATE_STOPPED);
-    };
-
-    const stopPlayer = () => {
-        let appPlayer = document.getElementById("appPlayer");
-        appPlayer.pause();
-        appPlayer.src = "";
-
-        updateTimeline(props.queue[props.queueIndex], PLAY_STATE_STOPPED, appPlayer.currentTime, appPlayer.duration);
-        
-        // set player to default state and clear the play queue;
-        setPlayState(PLAY_STATE_STOPPED); 
-        props.clearPlayQueue();
-    };
-
-    const skipForward = () => {
-        let appPlayer = document.getElementById("appPlayer");
-        let newTime = appPlayer.currentTime + 30;
-        if (newTime < appPlayer.duration)
-            appPlayer.currentTime = newTime;
-        else 
-            nextTrack();
-    };
-
-    const skipBackward = () => {
-        let appPlayer = document.getElementById("appPlayer");
-        let newTime = appPlayer.currentTime - 10;
-        if (newTime > 0) {
-            appPlayer.currentTime = newTime;
-        } else {
-            appPlayer.currentTime = 0;
-        }
-    };
-
-    const hasPreviousTrack = () => {
-        let newTrackIndex = props.queueIndex - 1;
-        if (newTrackIndex >= 0) {
-            return true;
-        }
-        return false;
-    };
-
-    const hasNextTrack = () => {
-        let newTrackIndex = props.queueIndex + 1;
-        if (newTrackIndex < props.queue.length) {
-            return true;
-        }
-        return false;
-    };
-
-    const previousTrack = () => {
-        // TODO: in this case, the upcoming tracks will need the play status
-        // reset so they start at the beginning of the track.
-        if (hasPreviousTrack()) {
-            props.previousTrackInQueue();
-        }
-    };
-
-    const nextTrack = () => {
-        // In this case, if the user is skipping a track, a timeline update should be done
-        // so the track shows as completed to keep correct on deck position.
-        if (hasNextTrack()) {
-            props.nextTrackInQueue();
-        }
-    };
-
-    // TODO: The time display needs to be pushed to a component, currently we are re-rending the
-    // entire now playing component everytime the time updates, this should be pushed as a prop
-    // so we (hopefully) only re-render that item.
     function getThumbnailUrl() {
         if (!props.queue || !props.queue[props.queueIndex]) return "";    //TODO: We need a generic not found image.
         return PlexRequest.getThumbnailTranscodeUrl(100, 100, props.baseUrl, props.queue[props.queueIndex].thumb, props.authToken);
     };
+
     function getPlayInfoAttr(attr) {
         if (!props.queue || !props.queue[props.queueIndex]) return "";
         return props.queue[props.queueIndex][attr];
     };
     
+    useEffect(() => {
+        const elem = document.querySelector(".now-playing");
+        if (elem && (props.playState === playerActions.PlayState.PLAY_STATE_PLAYING || props.playState === playerActions.PlayState.PLAY_STATE_PAUSED)) {
+            elem.classList.remove("hidden");
+        } else {
+            elem.classList.add("hidden");
+        }
+    }, [props.playState]);
+
     return (
-    <React.Fragment>
-        {(playState === PLAY_STATE_PLAYING || playState === PLAY_STATE_PAUSED)  && (
-        <React.Fragment>
-            <div className="navbar navbar-expand-md navbar-dark bg-dark fixed-bottom now-playing">
-                <img className="album-thumb" src={getThumbnailUrl()} alt="album art" />
-                <div className="album-info ml-3 mr-3">
-                    <div className="track-title">{getPlayInfoAttr("title")}</div>
-                    <div className="album-title"><Link to={`/album/${getPlayInfoAttr("parentRatingKey")}`}>{getPlayInfoAttr("parentTitle")}</Link></div>
-                    <div className="artist-name">{getPlayInfoAttr("grandparentTitle")}</div>
-                    <PlayerTime currentTimeDisplay={currentTimeDisplay} />
-                </div>
-                <div className="player-controls">
-                    <PlayerRangeControl currentTime={playerTimeState.currentTime} duration={((playerTimeState.duration) ? playerTimeState.duration : 0)} onChange={playerRangeChanged} />
-                    <div>
-                    {(playState === PLAY_STATE_PLAYING || playState === PLAY_STATE_PAUSED) && (
-                        <button className="btn btn-player-previous-track" type="button" disabled={!hasPreviousTrack()}  onClick={() => previousTrack()}>
-                        <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-skip-start-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path fillRule="evenodd" d="M4.5 3.5A.5.5 0 0 0 4 4v8a.5.5 0 0 0 1 0V4a.5.5 0 0 0-.5-.5z"/>
-                            <path d="M4.903 8.697l6.364 3.692c.54.313 1.232-.066 1.232-.697V4.308c0-.63-.692-1.01-1.232-.696L4.903 7.304a.802.802 0 0 0 0 1.393z"/>
-                        </svg>
-                        </button>
-                    )}
-                    {(playState === PLAY_STATE_PLAYING || playState === PLAY_STATE_PAUSED) && (
-                        <button className="btn btn-player-skip-back" type="button" onClick={() => skipBackward()}>
-                            <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-skip-backward-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path fillRule="evenodd" d="M.5 3.5A.5.5 0 0 0 0 4v8a.5.5 0 0 0 1 0V4a.5.5 0 0 0-.5-.5z"/>
-                                <path d="M.904 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.692-1.01-1.233-.696L.904 7.304a.802.802 0 0 0 0 1.393z"/>
-                                <path d="M8.404 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.693-1.01-1.233-.696L8.404 7.304a.802.802 0 0 0 0 1.393z"/>
-                            </svg>
-                        </button>
-                    )}
-                    {playState === PLAY_STATE_PAUSED && (
-                        <button className="btn btn-player-play" type="button" onClick={() => playTrack()}>
-                            <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                <path fillRule="evenodd" d="m 12.654334,8.697 -6.3630006,3.692 c -0.54,0.313 -1.233,-0.066 -1.233,-0.697 V 4.308 c 0,-0.63 0.692,-1.01 1.233,-0.696 l 6.3630006,3.692 a 0.802,0.802 0 0 1 0,1.393 z"/>
-                            </svg>
-                        </button>
-                    )}
-                    {playState === PLAY_STATE_PLAYING && (
-                        <button className="btn btn-player-pause" type="button" onClick={() => pauseTrack()}>
-                            <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/>
-                            </svg>
-                        </button>
-                    )}
-                    {(playState === PLAY_STATE_PLAYING || playState === PLAY_STATE_PAUSED) && (
-                        <button className="btn btn-player-skip-forward" type="button" onClick={() => skipForward()}>
-                            <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-skip-forward-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path fillRule="evenodd" d="M15.5 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/>
-                                <path d="M7.596 8.697l-6.363 3.692C.693 12.702 0 12.322 0 11.692V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-                                <path d="M15.096 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-                            </svg>
-                        </button>
-                    )}
-                    {(playState === PLAY_STATE_PLAYING || playState === PLAY_STATE_PAUSED) && (
-                        <button className="btn btn-player-next-track" type="button" disabled={!hasNextTrack()} onClick={() => nextTrack()}>
-                        <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-skip-end-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path fillRule="evenodd" d="M12 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/>
-                            <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-                        </svg>
-                        </button>
-                    )}
-                    </div>
-                </div>
-                {(playState === PLAY_STATE_PLAYING || playState === PLAY_STATE_PAUSED)  && (
-                <div className="ml-auto">
-                    <button className="btn btn-player-stop" type="button" onClick={() => stopPlayer()}>
-                        <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                            <path fillRule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                        </svg>
-                    </button>
-                </div>
-                )}
+        <div className="navbar navbar-expand-md navbar-dark bg-dark fixed-bottom now-playing">
+            <img className="album-thumb" src={getThumbnailUrl()} alt="album art" />
+            <div className="album-info ml-3 mr-3">
+                <div className="track-title">{getPlayInfoAttr("title")}</div>
+                <div className="album-title"><Link to={`/album/${getPlayInfoAttr("parentRatingKey")}`}>{getPlayInfoAttr("parentTitle")}</Link></div>
+                <div className="artist-name">{getPlayInfoAttr("grandparentTitle")}</div>
+                <PlayerTime />
             </div>
-        </React.Fragment>
-        )}
-        <audio id="appPlayer" onTimeUpdate={timeUpdated} onEnded={audioPlayerEnded} />
-    </React.Fragment>
+            <AudioPlayer />
+        </div>
     );
 }
 
-const NowPlaying = connect(mapStateToProps, mapDispatchToProps)(ConnectedNowPlaying);
+const NowPlaying = connect(mapStateToProps)(ConnectedNowPlaying);
 export default NowPlaying;

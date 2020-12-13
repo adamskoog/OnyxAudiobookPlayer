@@ -6,10 +6,10 @@ import * as appActions from "../context/actions/appStateActions";
 import * as settingsActions from "../context/actions/settingsActions";
 
 import Header from './Header';
-// import NowPlaying from './player/NowPlaying';
+import NowPlaying from './player/NowPlaying';
 import Settings from './settings/Settings';
 import Library from './library/Library';
-// import Album from './album/Album';
+import Album from './album/Album';
 
 import PlexAuthentication from "../plex/Authentication";
 
@@ -77,15 +77,15 @@ function ConnectedMain(props) {
                     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                     <Switch>
                         <Route exact path="/" component={() => <Library baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} />} />
-                        {/* <Route exact path="/album/:ratingKey" component={(comprops) => 
+                        <Route exact path="/album/:ratingKey" component={(comprops) => 
                             <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
-                        }/> */}
+                        }/>
                         <Route exact path="/settings" component={() => <Settings /> } />
                     </Switch>
                     </div>
                 </main>
-                {/* <NowPlaying />
-                <div className={(props.isLoading) ? "loader loading" : "loader"}>
+                <NowPlaying />
+                {/* <div className={(props.isLoading) ? "loader loading" : "loader"}>
                     <div className="d-flex justify-content-center">
                         <div className="spinner-border" style={{width: "3rem", height: "3rem"}} role="status"></div>
                     </div>

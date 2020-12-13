@@ -12,7 +12,7 @@ function Header(props) {
       <div className="flex items-center justify-between h-16">
         <div className="flex items-center">
           <div className="flex-shrink-0">
-              <div className="text-white px-3 py-2 text-lg font-medium">Onyx Player</div>
+              <div className="text-white px-3 py-2 text-xl font-medium">Onyx Player</div>
             {/* <img className="h-8 w-8" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow" /> */}
           </div>
           <div> {/* className="hidden md:block" */}
@@ -28,7 +28,7 @@ function Header(props) {
                 <button onClick={() => setIsOpen(!isOpen)} className="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" id="user-menu" aria-haspopup="true">
                   <span className="sr-only">Open user menu</span>
                   {props.userInfo && (
-                  <img className="h-8 w-8 rounded-full" src={props.userInfo.thumb} alt="" />
+                  <img className="h-12 w-12 rounded-full" src={props.userInfo.thumb} alt="" />
                   )}
                 </button>
               </div>

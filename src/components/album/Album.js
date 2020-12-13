@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import AlbumItem from './AlbumItem';
 import PlexApi from '../../plex/Api';
-import AlbumHelpers from '../../plex/AlbumHelpers';
+import PlexPlayback from '../../plex/Playback';
 
 import * as playQueueActions from "../../context/actions/playQueueActions";
 
@@ -60,7 +60,7 @@ function ConnectedAlbum(props) {
 
     const playOnDeckTrack = (trackInfo) => {
 
-        let playQueue = AlbumHelpers.getAlbumQueue(trackInfo, album);
+        let playQueue = PlexPlayback.getAlbumQueue(trackInfo, album);
         props.setPlayQueue(playQueue);
     }
 
@@ -72,7 +72,7 @@ function ConnectedAlbum(props) {
         // TODO: If they are playing a track out of order, we need to update all
         // tracks to make sure previous are played and remaining are unplayed.
         // This will likely require timeline updates to be sent for all tracks <-- TODO: is this a bad idea???
-        let playQueue = AlbumHelpers.getAlbumQueue(trackInfo, album);
+        let playQueue = PlexPlayback.getAlbumQueue(trackInfo, album);
         props.setPlayQueue(playQueue);
     }
 
@@ -80,7 +80,7 @@ function ConnectedAlbum(props) {
         PlexApi.getAlbumMetadata(props.baseUrl, props.ratingKey, { "X-Plex-Token": props.authToken })
             .then(data => {
                 if (data.MediaContainer) {
-                    let onDeck = AlbumHelpers.findOnDeck(data.MediaContainer);
+                    let onDeck = PlexPlayback.findOnDeck(data.MediaContainer);
                     setAlbum(data.MediaContainer);
                     setOnDeck(onDeck);
                 }

@@ -1,7 +1,6 @@
-//import TimeUtils from '../utility/time';
 import PlexApi from './Api';
 
-class AlbumHelpers
+class PlexPlayback
 {
     // Value in which we consider a track completed. This will hopefully only be temporary
     // and can be tightened up a bit once things are a bit more fully implemented.
@@ -17,7 +16,7 @@ class AlbumHelpers
     static trackIsStarted(offset, duration) {
         if (!offset) return false;
 
-        const percentComplete = AlbumHelpers.trackPercentComplete(offset, duration);
+        const percentComplete = PlexPlayback.trackPercentComplete(offset, duration);
         if (percentComplete > 0)
             return true;
         return false;
@@ -26,8 +25,8 @@ class AlbumHelpers
     static trackIsComplete(offset, duration) {
         if (!offset) return false;
 
-        const percentComplete = AlbumHelpers.trackPercentComplete(offset, duration);
-        if (percentComplete >= AlbumHelpers.TRACK_COMPLETE_PERCENT)
+        const percentComplete = PlexPlayback.trackPercentComplete(offset, duration);
+        if (percentComplete >= PlexPlayback.TRACK_COMPLETE_PERCENT)
             return true;
         return false;
     }
@@ -59,7 +58,7 @@ class AlbumHelpers
     // this will keep the trackInfo.viewOffset from being removed to allow keeping track of completed tracks.
     static timelineTrackDurationFlex(ms) {
         if (!ms) return 0;
-        return ms * AlbumHelpers.TRACK_DURATION_FACTOR;
+        return ms * PlexPlayback.TRACK_DURATION_FACTOR;
     }
 
     // On Deck - this is the first in progress or unplayed track that is encountered when
@@ -72,16 +71,16 @@ class AlbumHelpers
             const track = albumInfo.Metadata[i];
 
             // Track is Started, but not finished, we found On Deck
-            if (AlbumHelpers.trackIsStarted(track.viewOffset, track.duration) 
-                && !AlbumHelpers.trackIsComplete(track.viewOffset, track.duration)) {
+            if (PlexPlayback.trackIsStarted(track.viewOffset, track.duration) 
+                && !PlexPlayback.trackIsComplete(track.viewOffset, track.duration)) {
                     return track;
                 }
             
             // Is previous Track complete and current track not started, we found On Deck
             const prevTrack = albumInfo.Metadata[i-1];
             if (prevTrack) {
-                if (AlbumHelpers.trackIsComplete(prevTrack.viewOffset, prevTrack.duration)
-                    && !AlbumHelpers.trackIsStarted(track.viewOffset, track.duration))
+                if (PlexPlayback.trackIsComplete(prevTrack.viewOffset, prevTrack.duration)
+                    && !PlexPlayback.trackIsStarted(track.viewOffset, track.duration))
                     return track;
             }
         }
@@ -105,4 +104,4 @@ class AlbumHelpers
     }
 }
 
-export default AlbumHelpers;
+export default PlexPlayback;

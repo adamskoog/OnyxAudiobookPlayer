@@ -1,6 +1,6 @@
 import React from 'react';
 import TimeUtils from '../../utility/time';
-import AlbumHelpers from '../../plex/AlbumHelpers';
+import PlexPlayback from '../../plex/Playback';
 
 // trackInfo.viewOffset = the location in the track
 //      this seems to not be complete in most cases, not the full track length.
@@ -12,7 +12,7 @@ function AlbumItem(props) {
     const trackClass = () => {
         var output = ["album-track"];
         if (props.trackInfo.viewOffset) {
-            if (AlbumHelpers.trackIsComplete(props.trackInfo.viewOffset, props.trackInfo.duration)) {
+            if (PlexPlayback.trackIsComplete(props.trackInfo.viewOffset, props.trackInfo.duration)) {
                 output.push("complete");
             } else {
                 output.push("in-progress");
@@ -22,11 +22,11 @@ function AlbumItem(props) {
     }
 
     const markPlayed = (trackInfo) => {
-        AlbumHelpers.markTrackPlayed(trackInfo , props.baseUrl, props.userInfo.authToken);
+        PlexPlayback.markTrackPlayed(trackInfo , props.baseUrl, props.userInfo.authToken);
     }
  
     const markUnplayed = (trackInfo) => {
-        AlbumHelpers.markTrackUnplayed(trackInfo , props.baseUrl, props.userInfo.authToken);
+        PlexPlayback.markTrackUnplayed(trackInfo , props.baseUrl, props.userInfo.authToken);
     }
 
     return (

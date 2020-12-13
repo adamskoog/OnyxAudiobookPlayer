@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Container, Row } from 'react-bootstrap';
 import LibraryItem from './LibraryItem';
 import PlexApi from '../../plex/Api';
 
@@ -34,7 +33,7 @@ function Library(props) {
         {(!props.baseUrl || !props.section) && (
             <div>Failed to load library, please update your settings.</div>
         )}
-        {props.userInfo && props.baseUrl && props.section && (
+        {/* {props.userInfo && props.baseUrl && props.section && (
         <Container className="p-3">
             <Row>
                 {libraryItems.map((item) => (
@@ -42,7 +41,7 @@ function Library(props) {
                 ))}
             </Row>
         </Container>
-        )}
+        )} */}
         </React.Fragment>
     ); 
 }

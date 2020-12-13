@@ -4,11 +4,11 @@ import PlexApi from '../../plex/Api';
 
 function LibraryItem(props) {
     return (
-        <div>
+        <div className="text-center">
             <Link to={`/album/${props.albumInfo.ratingKey}`}>
-                <img src={PlexApi.getThumbnailTranscodeUrl(200, 200, props.baseUrl, props.albumInfo.thumb,  props.userInfo.authToken)} alt="Album Cover" loading="lazy" />
-                <div className="mt-1">{props.albumInfo.title}</div>
-                <div>{props.albumInfo.parentTitle}</div>
+                <img className="shadow-xl rounded-md mb-1" src={PlexApi.getThumbnailTranscodeUrl(200, 200, props.baseUrl, props.albumInfo.thumb,  props.userInfo.authToken)} alt="Album Cover" loading="lazy" />
+                <div className="truncate ..." title={props.albumInfo.title}>{props.albumInfo.title}</div>
+                <div className="truncate ..." title={props.albumInfo.parentTitle}>{props.albumInfo.parentTitle}</div>
             </Link>
         </div>
     ); 

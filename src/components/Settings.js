@@ -30,7 +30,6 @@ function ConnectedSettings({ serverIdentifier, librarySection, resources, librar
 
     return (
         <div>
-            {console.log("settings render")}
             <select id="serverIdentifier" className="form-control mb-2" value={serverIdentifier} onChange={serverChanged}>
             <option value="" disabled hidden>Select a Server</option>
             {(resources.map((resource) => (

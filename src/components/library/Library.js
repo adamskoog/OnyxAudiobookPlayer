@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row } from 'react-bootstrap';
 import LibraryItem from './LibraryItem';
-import PlexRequest from '../../plex/PlexRequest';
+import PlexApi from '../../plex/Api';
 
 //https://reactgo.com/javascript-get-data-from-api/
 function Library(props) {
@@ -17,7 +17,7 @@ function Library(props) {
 
     useEffect(() => {
         if (props.userInfo && props.baseUrl && props.section) {
-            PlexRequest.getLibraryItems(props.baseUrl, props.section, { "X-Plex-Token": props.userInfo.authToken })
+            PlexApi.getLibraryItems(props.baseUrl, props.section, { "X-Plex-Token": props.userInfo.authToken })
                 .then(data => {
                     if (data.MediaContainer.Metadata && isMountedRef.current)
                         setLibraryItems(data.MediaContainer.Metadata);

@@ -1,4 +1,4 @@
-import PlexRequest from '../plex/PlexRequest';
+import PlexApi from '../plex/Api';
 
 class SettingsUtils
 {
@@ -22,7 +22,7 @@ class SettingsUtils
 
     static loadServers = (authToken) => {
         return new Promise((resolve, reject) => {
-            PlexRequest.getResources(authToken)
+            PlexApi.getResources(authToken)
                 .then(resources => {
     
                     // Filter for only media servers.
@@ -52,7 +52,7 @@ class SettingsUtils
 
     static loadServerLibraries = (url, token) => {
         return new Promise((resolve, reject) => {
-               PlexRequest.getSections(url, token)
+            PlexApi.getSections(url, token)
                 .then(mediaContainer => {
                     const sections = mediaContainer.MediaContainer.Directory;
 
@@ -71,12 +71,12 @@ class SettingsUtils
 
     static findServerBaseUrl = (resource) => {
         return new Promise((resolve, reject) => {
-        PlexRequest.serverConnectionTest(resource.connections, resource.accessToken)
-            .then((response) => {
-                resolve({ url: response.uri });
-            }).catch((error) => {
-                reject({ message: "Failed to determine base url.", error: error });
-            });
+            PlexApi.serverConnectionTest(resource.connections, resource.accessToken)
+                .then((response) => {
+                    resolve({ url: response.uri });
+                }).catch((error) => {
+                    reject({ message: "Failed to determine base url.", error: error });
+                });
         });
     };
 }

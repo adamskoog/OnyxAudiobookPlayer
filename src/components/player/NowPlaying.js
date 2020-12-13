@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 
-import PlexRequest from '../../plex/PlexRequest';
+import PlexApi from '../../plex/Api';
 
 import { Link } from 'react-router-dom';
 import PlayerTime from './controls/PlayerTime';
@@ -21,7 +21,7 @@ function ConnectedNowPlaying(props) {
 
     function getThumbnailUrl() {
         if (!props.currentTrack) return "";
-        return PlexRequest.getThumbnailTranscodeUrl(100, 100, props.baseUrl, props.currentTrack.thumb, props.authToken);
+        return PlexApi.getThumbnailTranscodeUrl(100, 100, props.baseUrl, props.currentTrack.thumb, props.authToken);
     };
 
     function getPlayInfoAttr(attr) {

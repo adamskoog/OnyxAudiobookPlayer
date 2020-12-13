@@ -12,7 +12,7 @@ import StopControl from './controls/Stop';
 import throttle from 'lodash/throttle';
 import TimeUtils from '../../utility/time';
 import AlbumHelpers from '../../plex/AlbumHelpers';
-import PlexRequest from '../../plex/PlexRequest';
+import PlexApi from '../../plex/Api';
 
 import * as playQueueActions from "../../context/actions/playQueueActions";
 import * as playerActions from "../../context/actions/playerActions";
@@ -117,9 +117,9 @@ function ConnectedAudioPlayer(props) {
             duration: AlbumHelpers.timelineTrackDurationFlex(TimeUtils.convertSecondsToMs(duration)),
             "X-Plex-Token": props.authToken
         };
-        console.log("updateTimeline", args);
-        //PlexRequest.updateTimeline(props.baseUrl, args)
-        //    .then(data => { /*console.log("data", data); TODO: This doesn't seem to return anything, and errors out often.*/ });
+        //console.log("updateTimeline", args);
+        PlexApi.updateTimeline(props.baseUrl, args)
+            .then(data => { /*console.log("data", data); TODO: This doesn't seem to return anything, and errors out often.*/ });
     };
 
     const timeUpdated = (event) => {
@@ -168,7 +168,7 @@ function ConnectedAudioPlayer(props) {
             // Probably need to handle multiparts in some way? Even if it's just a warning?
             if (currentTrack.Part[0]) {
                 //console.log("START: Add source and start playing.", currentTrack);
-                const src = PlexRequest.formatUrl(`${props.baseUrl}${currentTrack.Part[0].key}`, { "X-Plex-Token": props.authToken });
+                const src = PlexApi.formatUrl(`${props.baseUrl}${currentTrack.Part[0].key}`, { "X-Plex-Token": props.authToken });
 
                 // get the reference to the audio tag.
                 playerElement.src = src;

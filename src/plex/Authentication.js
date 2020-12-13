@@ -1,4 +1,4 @@
-import PlexRequest from './PlexRequest';
+import PlexApi from './Api';
 
 class PlexAuthentication
 {
@@ -15,7 +15,7 @@ class PlexAuthentication
     // Action = CHECK_TOKEN
     static checkToken = (token) => {
         return new Promise((resolve, reject) => {
-            PlexRequest.checkToken(token)
+            PlexApi.checkToken(token)
                 .then(userInfo => {
                     if (userInfo.message) {
                         // Remove the token from storage.
@@ -41,7 +41,7 @@ class PlexAuthentication
 
     static prepareLoginRequest = () => {
         return new Promise((resolve, reject) => {
-            PlexRequest.signIn()
+            PlexApi.signIn()
                 .then(redirectInfo => {
                     localStorage.setItem("login_redirect_id", redirectInfo.id);
                     resolve({ url: redirectInfo.redirectUrl });
@@ -53,7 +53,7 @@ class PlexAuthentication
         return new Promise((resolve, reject) => {
 
             // We need to clear the id and process the auth redirection.
-            PlexRequest.validatePin(authId)
+            PlexApi.validatePin(authId)
                 .then(regInfo => {
                     localStorage.removeItem("login_redirect_id");
                     localStorage.setItem("authToken", regInfo.authToken);

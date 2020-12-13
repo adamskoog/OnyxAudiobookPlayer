@@ -1,4 +1,4 @@
-class PlexRequest
+class PlexApi
 {
     static baseParams = {
         "X-Plex-Product": "Audiobook Player for Plex",
@@ -40,10 +40,10 @@ class PlexRequest
     static checkToken(token) {
         return new Promise((resolve, reject) => {
 
-            const params = Object.assign({}, PlexRequest.baseParams, { "X-Plex-Token" : token });
-            const url = PlexRequest.formatUrl(`https://plex.tv/api/v2/user`, params);
+            const params = Object.assign({}, PlexApi.baseParams, { "X-Plex-Token" : token });
+            const url = PlexApi.formatUrl(`https://plex.tv/api/v2/user`, params);
     
-            fetch(url, PlexRequest.getArgs)
+            fetch(url, PlexApi.getArgs)
                 .then((response) => {
                     return response.json();
                 })
@@ -61,22 +61,22 @@ class PlexRequest
             const localParams = {
                 strong: true
             }
-            const params = Object.assign({}, PlexRequest.baseParams, localParams);
-            let url = PlexRequest.formatUrl('https://plex.tv/api/v2/pins', params);
+            const params = Object.assign({}, PlexApi.baseParams, localParams);
+            let url = PlexApi.formatUrl('https://plex.tv/api/v2/pins', params);
 
-            fetch(url, PlexRequest.postArgs)
+            fetch(url, PlexApi.postArgs)
                 .then((response) => {
                     return response.json();
                 })
                 .then((data) => {
                     // We have the pin information, now we construct the url
-                    const authAppUrl = PlexRequest.formatUrl(`https://app.plex.tv/auth#`, {
-                        clientID: PlexRequest.baseParams["X-Plex-Client-Identifier"],
+                    const authAppUrl = PlexApi.formatUrl(`https://app.plex.tv/auth#`, {
+                        clientID: PlexApi.baseParams["X-Plex-Client-Identifier"],
                         code: data.code,
                         forwardUrl: window.location.href,
                         context: {
                             device: {
-                                product: PlexRequest.baseParams["X-Plex-Product"]
+                                product: PlexApi.baseParams["X-Plex-Product"]
                             },
                         }
                     });
@@ -90,10 +90,10 @@ class PlexRequest
         return new Promise((resolve, reject) => {
             let url = `https://plex.tv/api/v2/pins/${id}?` +
             require('qs').stringify({
-                "X-Plex-Client-Identifier": PlexRequest.baseParams["X-Plex-Client-Identifier"],
+                "X-Plex-Client-Identifier": PlexApi.baseParams["X-Plex-Client-Identifier"],
             });
     
-            fetch(url, PlexRequest.getArgs)
+            fetch(url, PlexApi.getArgs)
                 .then((response) => {
                     return response.json();
                 })
@@ -108,11 +108,11 @@ class PlexRequest
             includeHttps: 1,
             includeRelay: 1
         };
-        const params = Object.assign({}, PlexRequest.baseParams, localParams, { "X-Plex-Token": token });
+        const params = Object.assign({}, PlexApi.baseParams, localParams, { "X-Plex-Token": token });
 
-        let url = PlexRequest.formatUrl(`https://plex.tv/api/v2/resources`, params);
+        let url = PlexApi.formatUrl(`https://plex.tv/api/v2/resources`, params);
 
-        return fetch(url, PlexRequest.getArgs)
+        return fetch(url, PlexApi.getArgs)
             .then((response) => {
                 return response.json();
         });
@@ -121,11 +121,11 @@ class PlexRequest
     static serverConnectionTest(connections, token) {
         return new Promise((resolve, reject) => {
             const localParams = {}
-            const params = Object.assign({}, PlexRequest.baseParams, localParams, { "X-Plex-Token": token });
+            const params = Object.assign({}, PlexApi.baseParams, localParams, { "X-Plex-Token": token });
 
             // TODO: There might be a better endpoint, but the payload on this is relatively small.
             const connectionPromises =connections.map((connection) => {
-                return PlexRequest.formatUrl(`${connection.uri}/library/sections`, params);
+                return PlexApi.formatUrl(`${connection.uri}/library/sections`, params);
             });
 
             // TODO: This bit is fundementally flawed. The promises always seem to
@@ -154,18 +154,18 @@ class PlexRequest
     static getSections(baseUrl, token) {
         
         const localParams = {}
-        const params = Object.assign({}, PlexRequest.baseParams, localParams, { "X-Plex-Token": token });
+        const params = Object.assign({}, PlexApi.baseParams, localParams, { "X-Plex-Token": token });
 
-        let url = PlexRequest.formatUrl(`${baseUrl}/library/sections`, params);
+        let url = PlexApi.formatUrl(`${baseUrl}/library/sections`, params);
 
-        return fetch(url, PlexRequest.getArgs)
+        return fetch(url, PlexApi.getArgs)
             .then((response) => {
                 return response.json();
         });
     }
 
     static getThumbnailUrl(baseUrl, thumb, args) {
-        return PlexRequest.formatUrl(`${baseUrl}${thumb}`, args);
+        return PlexApi.formatUrl(`${baseUrl}${thumb}`, args);
     }
 
     static getThumbnailTranscodeUrl(h, w, baseUrl, thumb, token) {
@@ -178,7 +178,7 @@ class PlexRequest
             "X-Plex-Token": token
         };
 
-        return PlexRequest.formatUrl(`${baseUrl}/photo/:/transcode`, params);
+        return PlexApi.formatUrl(`${baseUrl}/photo/:/transcode`, params);
     }
 
     static getLibraryItems(baseUrl, section, args) {
@@ -191,11 +191,11 @@ class PlexRequest
             includeExternalMedia: 1,
             sort: "artist.titleSort,album.titleSort,album.index,album.id,album.originallyAvailableAt"
         };
-        const params = Object.assign({}, PlexRequest.baseParams, localParams, args);
+        const params = Object.assign({}, PlexApi.baseParams, localParams, args);
 
-        let url = PlexRequest.formatUrl(`${baseUrl}/library/sections/${section}/all`, params);
+        let url = PlexApi.formatUrl(`${baseUrl}/library/sections/${section}/all`, params);
 
-        return fetch(url, PlexRequest.getArgs)
+        return fetch(url, PlexApi.getArgs)
             .then((response) => {
                 return response.json();
         });
@@ -205,11 +205,11 @@ class PlexRequest
         let url = `${baseUrl}/library/metadata/${itemId}/children`;
 
         const localParams = { };
-        const params = Object.assign({}, PlexRequest.baseParams, localParams, args);
+        const params = Object.assign({}, PlexApi.baseParams, localParams, args);
 
-        url = PlexRequest.formatUrl(url, params);
+        url = PlexApi.formatUrl(url, params);
 
-        return fetch(url, PlexRequest.getArgs)
+        return fetch(url, PlexApi.getArgs)
             .then((response) => {
                 return response.json();
         });
@@ -224,10 +224,10 @@ class PlexRequest
 
         // Using unscrobble to not add to play count - scrobble endpoint takes same
         // params and does effectively the same thing however.
-        const params = Object.assign({}, PlexRequest.baseParams, localParams);
-        let url = PlexRequest.formatUrl(`${baseUrl}/:/scrobble`, params);
+        const params = Object.assign({}, PlexApi.baseParams, localParams);
+        let url = PlexApi.formatUrl(`${baseUrl}/:/scrobble`, params);
 
-        return fetch(url, PlexRequest.getArgs)
+        return fetch(url, PlexApi.getArgs)
             .then((response) => {
                 return response.json();
             }).catch((err) => {
@@ -242,10 +242,10 @@ class PlexRequest
             identifier: "com.plexapp.plugins.library"
         };
 
-        const params = Object.assign({}, PlexRequest.baseParams, localParams);
-        let url = PlexRequest.formatUrl(`${baseUrl}/:/unscrobble`, params);
+        const params = Object.assign({}, PlexApi.baseParams, localParams);
+        let url = PlexApi.formatUrl(`${baseUrl}/:/unscrobble`, params);
 
-        return fetch(url, PlexRequest.getArgs)
+        return fetch(url, PlexApi.getArgs)
             .then((response) => {
                 return response.json();
             }).catch((err) => {
@@ -258,10 +258,10 @@ class PlexRequest
             identifier: "com.plexapp.plugins.library"
         };
 
-        const params = Object.assign({}, PlexRequest.baseParams, localParams, args);
-        let url = PlexRequest.formatUrl(`${baseUrl}/:/progress`, params);
+        const params = Object.assign({}, PlexApi.baseParams, localParams, args);
+        let url = PlexApi.formatUrl(`${baseUrl}/:/progress`, params);
 
-        return fetch(url, PlexRequest.getArgs)
+        return fetch(url, PlexApi.getArgs)
             .then((response) => {
                 return response.json();
             }).catch((err) => {
@@ -282,10 +282,10 @@ class PlexRequest
             "X-Plex-Text-Format": "plain"
         };
 
-        const params = Object.assign({}, PlexRequest.baseParams, localParams, args);
-        let url = PlexRequest.formatUrl(`${baseUrl}/:/timeline`, params);
+        const params = Object.assign({}, PlexApi.baseParams, localParams, args);
+        let url = PlexApi.formatUrl(`${baseUrl}/:/timeline`, params);
 
-        return fetch(url, PlexRequest.getArgs)
+        return fetch(url, PlexApi.getArgs)
             .then((response) => {
                 return response.json();
             }).catch((err) => {
@@ -294,4 +294,4 @@ class PlexRequest
     }
 }
 
-export default PlexRequest;
+export default PlexApi;

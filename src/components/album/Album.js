@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 
 import AlbumItem from './AlbumItem';
-import PlexRequest from '../../plex/PlexRequest';
+import PlexApi from '../../plex/Api';
 import AlbumHelpers from '../../plex/AlbumHelpers';
 
 import * as playQueueActions from "../../context/actions/playQueueActions";
@@ -77,7 +77,7 @@ function ConnectedAlbum(props) {
     }
 
     const getAlbumMetadata = () => {
-        PlexRequest.getAlbumMetadata(props.baseUrl, props.ratingKey, { "X-Plex-Token": props.authToken })
+        PlexApi.getAlbumMetadata(props.baseUrl, props.ratingKey, { "X-Plex-Token": props.authToken })
             .then(data => {
                 if (data.MediaContainer) {
                     let onDeck = AlbumHelpers.findOnDeck(data.MediaContainer);
@@ -96,7 +96,7 @@ function ConnectedAlbum(props) {
         <React.Fragment>
         {props.authToken && (
         <div className="album-info-container">
-            <img className="album-cover mr-4" src={PlexRequest.getThumbnailTranscodeUrl(200, 200, props.baseUrl, album.thumb, props.authToken)} alt="Album Cover" />
+            <img className="album-cover mr-4" src={PlexApi.getThumbnailTranscodeUrl(200, 200, props.baseUrl, album.thumb, props.authToken)} alt="Album Cover" />
             <div className="album-info">
                 <div className="mt-1 album-title">{album.parentTitle}</div>
                 <div className="mt-1 album-artist">{album.grandparentTitle}</div>

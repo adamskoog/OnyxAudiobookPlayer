@@ -1,5 +1,5 @@
 //import TimeUtils from '../utility/time';
-import PlexRequest from './PlexRequest';
+import PlexApi from './Api';
 
 class AlbumHelpers
 {
@@ -41,7 +41,7 @@ class AlbumHelpers
             time: doneTime, 
             "X-Plex-Token": token
         };
-        PlexRequest.progress(baseUrl, args)
+        PlexApi.progress(baseUrl, args)
             .then(data => { 
                 //console.log("");
             });
@@ -49,7 +49,7 @@ class AlbumHelpers
 
     static markTrackUnplayed(trackInfo, baseUrl, token) {
 
-        PlexRequest.unscrobble(baseUrl, trackInfo.ratingKey, token)
+        PlexApi.unscrobble(baseUrl, trackInfo.ratingKey, token)
              .then(data => { 
                  //console.log("");
              });

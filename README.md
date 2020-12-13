@@ -6,10 +6,13 @@ This is my feeble attempt to learn both ReactJS as well as better understand the
 * Better handling and selection of server end point
 * Better audio player - I'm not sure what all formats the html5 audio tag can play, but I'm guessing it's lacking.
 * Error handling - I'm sure this will break in many a spectacular way currently
-* Move to central state storage.
 * I'm sure there is much more as well...
 
 ## Patch Notes
+### Version: 0.3.1
+* Central State Management (Redux)
+* Complete Rework of Player Components to allow better rendering.
+
 ### Version: 0.2.2
 * Better handling of play queue and properly clear when play is stopped.
 * Lazy load images on Album list.

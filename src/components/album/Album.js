@@ -36,8 +36,8 @@ function ConnectedAlbum(props) {
     }
 
     const expandSummary = () => {
-        let container = document.querySelector(".album-summary-container");
-        let btnExpand = document.querySelector(".btn.btn-expand-summary");
+        let container = document.querySelector(".album-summary");
+        let btnExpand = document.querySelector(".btn-expand-summary");
 
         if (container && btnExpand) {
             if (container.classList.contains('expand')) {
@@ -91,35 +91,41 @@ function ConnectedAlbum(props) {
         if (props.authToken && props.baseUrl && props.ratingKey)
             getAlbumMetadata();
     }, [props.baseUrl, props.authToken, props.ratingKey]);
-
+    //https://tailwindcomponents.com/component/button-component-default
     return (
         <React.Fragment>
         {props.authToken && (
         <div className="album-info-container">
-            <img className="album-cover mr-4" src={PlexApi.getThumbnailTranscodeUrl(200, 200, props.baseUrl, album.thumb, props.authToken)} alt="Album Cover" />
-            <div className="album-info">
-                <div className="mt-1 album-title">{album.parentTitle}</div>
-                <div className="mt-1 album-artist">{album.grandparentTitle}</div>
-                <div className="album-year">{album.parentYear}</div>
-                {onDeck && (
-                <div className="on-deck">
-                    <button className="btn btn-play-on-deck" type="button" onClick={() => playOnDeckTrack(onDeck)}>
-                        <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                            <path fillRule="evenodd" d="m 12.654334,8.697 -6.3630006,3.692 c -0.54,0.313 -1.233,-0.066 -1.233,-0.697 V 4.308 c 0,-0.63 0.692,-1.01 1.233,-0.696 l 6.3630006,3.692 a 0.802,0.802 0 0 1 0,1.393 z"/>
-                        </svg>
-                    </button>
-                    <div className="on-deck-title">{onDeck.title}</div>
+            <div className="flex space-x-4">
+                <div className="flex-none align-baseline">
+                    <img className="album-cover mr-4 shadow-xl rounded-md" src={PlexApi.getThumbnailTranscodeUrl(200, 200, props.baseUrl, album.thumb, props.authToken)} alt="Album Cover" />
                 </div>
-                )}
+                <div className="flex-grow align-baseline relative">
+                    <div className="mt-1 album-title text-xl">{album.parentTitle}</div>
+                    <div className="mt-1 album-artist text-lg">{album.grandparentTitle}</div>
+                    <div className="mt-1 album-year text-md">{album.parentYear}</div>
+                    {onDeck && (
+                    <div className="table absolute bottom-0">
+                        <div className="table-cell align-middle">
+                        <button className="text-3xl pr-3 align-middle" type="button" onClick={() => playOnDeckTrack(onDeck)}>
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path fillRule="evenodd" d="m 12.654334,8.697 -6.3630006,3.692 c -0.54,0.313 -1.233,-0.066 -1.233,-0.697 V 4.308 c 0,-0.63 0.692,-1.01 1.233,-0.696 l 6.3630006,3.692 a 0.802,0.802 0 0 1 0,1.393 z"/>
+                            </svg>
+                        </button>
+                        {onDeck.title}
+                        </div>
+                    </div>
+                    )}
+                </div>
             </div>
             <div className={expandContainerClass()}>
-                <div className="mt-3 album-summary-container">
-                    <div className="album-summary" dangerouslySetInnerHTML={{__html: formatSummary(album.summary)}}></div>
+                <div className="mt-3 album-summary text-base">
+                    <div className="inline-block space-y-1" dangerouslySetInnerHTML={{__html: formatSummary(album.summary)}}></div>
                 </div>
                 <div className="expand-btn-container">
                     <div className="separator"></div>
-                    <button className="btn btn-dark btn-expand-summary" type="button" onClick={() => expandSummary()}>Expand</button>
+                    <button className="border border-gray-700 bg-gray-700 text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-gray-800 focus:outline-none focus:shadow-outline btn-expand-summary" type="button" onClick={() => expandSummary()}>Expand</button>
                 </div>
             </div>
             <div className="track-container">

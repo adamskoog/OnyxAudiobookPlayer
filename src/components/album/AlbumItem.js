@@ -51,10 +51,10 @@ function AlbumItem(props) {
                             <path fillRule="evenodd" d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
                         </svg>
                     </button>
-                    <div className="dropdown-menu" aria-labelledby={`trackOptions${props.trackInfo.ratingKey}`}>
+                    {/* <div className="dropdown-menu" aria-labelledby={`trackOptions${props.trackInfo.ratingKey}`}>
                         <button className="dropdown-item" type="button" onClick={() => markPlayed(props.trackInfo)}>Mark as Played</button>
                         <button className="dropdown-item" type="button" onClick={() => markUnplayed(props.trackInfo)}>Mark as Unplayed</button>
-                    </div>
+                    </div> */}
                 </div>
             </td>
         </tr>

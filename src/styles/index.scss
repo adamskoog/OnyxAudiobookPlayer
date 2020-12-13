@@ -29211,52 +29211,23 @@ body {
   width: 180px;
 }
 
-.album-info-container .album-info .album-title {
-  font-size: 24px;
-}
-
-.album-summary-container {
+.album-summary {
   max-height: 120px;
   overflow: hidden;
 }
 
-.album-summary-container.expand {
+.album-summary.expand {
   max-height: none;
   overflow: hidden;
 }
 
-.no-expand .album-summary-container {
+.no-expand .album-summary {
   overflow: auto;
   max-height: 300px;
 }
 
 .no-expand .expand-btn-container {
   display: none;
-}
-
-.album-summary {
-  display: inline-block;
-}
-
-.btn.btn-play-on-deck {
-  font-size: 2em;
-  padding: 0;
-}
-
-.on-deck {
-  display: inline-block;
-  line-height: 3;
-  vertical-align: middle;
-}
-
-.on-deck button {
-  margin-top: -9px;
-}
-
-.on-deck .on-deck-title {
-  padding-left: 15px;
-  display: inline-block;
-  vertical-align: middle;
 }
 
 .expand-btn-container {
@@ -29269,7 +29240,7 @@ body {
   margin: 15px 0;
 }
 
-.expand-btn-container .btn {
+.expand-btn-container .btn-expand-summary {
   margin-top: -55px;
   padding: 0 !important;
   width: 25%;

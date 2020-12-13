@@ -73,10 +73,9 @@ function ConnectedMain(props) {
         <React.Fragment>
             <Router>
                 <Header userInfo={props.user} doUserLogin={doUserLogin} doUserLogout={props.logout} />
-                <main role="main" className="container">
+                <main role="main" className="justify-center">
                     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                     <Switch>
-                        <Route exact path="/" />
                         <Route exact path="/" component={() => <Library baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} />} />
                         {/* <Route exact path="/album/:ratingKey" component={(comprops) => 
                             <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />

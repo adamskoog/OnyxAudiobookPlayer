@@ -33,15 +33,13 @@ function Library(props) {
         {(!props.baseUrl || !props.section) && (
             <div>Failed to load library, please update your settings.</div>
         )}
-        {/* {props.userInfo && props.baseUrl && props.section && (
-        <Container className="p-3">
-            <Row>
+        {props.userInfo && props.baseUrl && props.section && (
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {libraryItems.map((item) => (
                     <LibraryItem key={item.key} baseUrl={props.baseUrl} userInfo={props.userInfo} albumInfo={item} />
                 ))}
-            </Row>
-        </Container>
-        )} */}
+            </div>
+        )}
         </React.Fragment>
     ); 
 }

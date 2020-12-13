@@ -1,33 +1,32 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 
-import PlexRequest from '../plex/PlexRequest';
+import PlexRequest from '../../plex/PlexRequest';
 
 import { Link } from 'react-router-dom';
-import PlayerTime from './player/PlayerTime';
-import AudioPlayer from './player/Player';
+import PlayerTime from './controls/PlayerTime';
+import AudioPlayer from './Player';
 
-import * as playerActions from "../context/actions/playerActions";
+import * as playerActions from "../../context/actions/playerActions";
 
 const mapStateToProps = state => {
     return { 
         authToken: state.application.authToken,
         baseUrl: state.application.baseUrl,
-        queue: state.playQueue.queue,
-        queueIndex: state.playQueue.index,
-        playState: state.player.mode
+        playState: state.player.mode,
+        currentTrack: state.playQueue.currentTrack
     };
 };
 function ConnectedNowPlaying(props) {
 
     function getThumbnailUrl() {
-        if (!props.queue || !props.queue[props.queueIndex]) return "";    //TODO: We need a generic not found image.
-        return PlexRequest.getThumbnailTranscodeUrl(100, 100, props.baseUrl, props.queue[props.queueIndex].thumb, props.authToken);
+        if (!props.currentTrack) return "";
+        return PlexRequest.getThumbnailTranscodeUrl(100, 100, props.baseUrl, props.currentTrack.thumb, props.authToken);
     };
 
     function getPlayInfoAttr(attr) {
-        if (!props.queue || !props.queue[props.queueIndex]) return "";
-        return props.queue[props.queueIndex][attr];
+        if (!props.currentTrack) return "";
+        return props.currentTrack[attr];
     };
     
     useEffect(() => {

@@ -23,7 +23,7 @@ function Header(props) {
                         </div>
                         <div className="dropdown-menu" aria-labelledby="settingsDropdown">
                             <div className="dropdown-item label">{props.userInfo.username}</div>
-                            <Link className="dropdown-item" to={`/settings`}>Account</Link>
+                            {/* <Link className="dropdown-item" to={`/settings`}>Account</Link> */}
                             <Link className="dropdown-item" to={`/settings`}>Settings</Link>
                             <div className="item-separator"></div>
                             <div className="dropdown-item" onClick={props.doUserLogout}>Sign Out</div>

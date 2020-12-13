@@ -117,9 +117,9 @@ function ConnectedAudioPlayer(props) {
             duration: AlbumHelpers.timelineTrackDurationFlex(TimeUtils.convertSecondsToMs(duration)),
             "X-Plex-Token": props.authToken
         };
-        //console.log("updateTimeline", args);
-        PlexRequest.updateTimeline(props.baseUrl, args)
-            .then(data => { /*console.log("data", data); TODO: This doesn't seem to return anything, and errors out often.*/ });
+        console.log("updateTimeline", args);
+        //PlexRequest.updateTimeline(props.baseUrl, args)
+        //    .then(data => { /*console.log("data", data); TODO: This doesn't seem to return anything, and errors out often.*/ });
     };
 
     const timeUpdated = (event) => {

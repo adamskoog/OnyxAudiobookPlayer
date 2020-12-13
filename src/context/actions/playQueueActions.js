@@ -7,7 +7,8 @@ export const clearPlayQueue = () => {
         payload: {
             id: uuidv4(),
             queue: [],
-            index: -1
+            index: -1,
+            currentTrack: null
         }
     };
 }
@@ -20,7 +21,8 @@ export const setPlayQueue = (playQueue) => {
         payload: {
             id: uuidv4(),
             queue: queue,
-            index: index
+            index: index,
+            currentTrack: queue[index]
         }
     }
 }
@@ -29,9 +31,13 @@ export const nextTrackInQueue = () => {
     return (dispatch, getState) => {
         const currentState = getState();
         const nextIndex = currentState.playQueue.index + 1;
+        const queue = currentState.playQueue.queue;
         dispatch({         
             type: actionTypes.CHANGE_TRACK,
-            payload: nextIndex
+            payload: {
+                index: nextIndex,
+                currentTrack: queue[nextIndex]
+            }
         });
     }
 }
@@ -41,10 +47,14 @@ export const previousTrackInQueue = () => {
 
         const currentState = getState();
         const prevIndex = currentState.playQueue.index - 1;
+        const queue = currentState.playQueue.queue;
         if (prevIndex >= 0) {
             dispatch({         
                 type: actionTypes.CHANGE_TRACK,
-                payload: prevIndex
+                payload: {
+                    index: prevIndex,
+                    currentTrack: queue[prevIndex]
+                }
             });
         }
     }

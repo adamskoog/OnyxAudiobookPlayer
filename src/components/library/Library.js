@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row } from 'react-bootstrap';
-import AlbumItem from './AlbumListItem';
-import PlexRequest from '../plex/PlexRequest';
+import LibraryItem from './LibraryItem';
+import PlexRequest from '../../plex/PlexRequest';
 
 //https://reactgo.com/javascript-get-data-from-api/
 function Library(props) {
@@ -38,7 +38,7 @@ function Library(props) {
         <Container className="p-3">
             <Row>
                 {libraryItems.map((item) => (
-                    <AlbumItem key={item.key} baseUrl={props.baseUrl} userInfo={props.userInfo} albumInfo={item} />
+                    <LibraryItem key={item.key} baseUrl={props.baseUrl} userInfo={props.userInfo} albumInfo={item} />
                 ))}
             </Row>
         </Container>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import * as settingsActions from "../context/actions/settingsActions";
+import * as settingsActions from "../../context/actions/settingsActions";
 
 const mapStateToProps = state => {
     return { 

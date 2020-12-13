@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 
-import AlbumTrack from './AlbumTrack';
-import PlexRequest from '../plex/PlexRequest';
-import AlbumHelpers from '../plex/AlbumHelpers';
+import AlbumItem from './AlbumItem';
+import PlexRequest from '../../plex/PlexRequest';
+import AlbumHelpers from '../../plex/AlbumHelpers';
 
-import * as playQueueActions from "../context/actions/playQueueActions";
+import * as playQueueActions from "../../context/actions/playQueueActions";
 
 const mapStateToProps = state => {
     return { 
@@ -21,7 +21,7 @@ const mapStateToProps = state => {
     };
 };
 
-function ConnectedAlbumInfo(props) {
+function ConnectedAlbum(props) {
 
     const [album, setAlbum] = useState({ Metadata: [] });
     const [onDeck, setOnDeck] = useState(null);
@@ -127,7 +127,7 @@ function ConnectedAlbumInfo(props) {
                 <table>
                     <tbody>
                         {album.Metadata.map((track) => (
-                            <AlbumTrack key={track.key} trackInfo={track} baseUrl={props.baseUrl} userInfo={props.user} playSelectedTrack={playSelectedTrack} />
+                            <AlbumItem key={track.key} trackInfo={track} baseUrl={props.baseUrl} userInfo={props.user} playSelectedTrack={playSelectedTrack} />
                         ))}
                     </tbody>
                 </table>
@@ -138,6 +138,6 @@ function ConnectedAlbumInfo(props) {
     ); 
 }
 
-const AlbumInfo = connect(mapStateToProps, mapDispatchToProps)(ConnectedAlbumInfo);
+const Album = connect(mapStateToProps, mapDispatchToProps)(ConnectedAlbum);
 
-export default AlbumInfo;
+export default Album;

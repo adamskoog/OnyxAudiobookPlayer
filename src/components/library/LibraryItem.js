@@ -1,9 +1,9 @@
 import React from 'react';
 import { Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import PlexRequest from '../plex/PlexRequest';
+import PlexRequest from '../../plex/PlexRequest';
 
-function AlbumItem(props) {
+function LibraryItem(props) {
     return (
         <Col xs={6} sm={6} md={4} xl={3} className="mb-3 album-item">
             <Link to={`/album/${props.albumInfo.ratingKey}`}>
@@ -15,4 +15,4 @@ function AlbumItem(props) {
     ); 
 }
 
-export default AlbumItem;
+export default LibraryItem;

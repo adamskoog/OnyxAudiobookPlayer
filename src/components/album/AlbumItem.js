@@ -1,13 +1,13 @@
 import React from 'react';
-import TimeUtils from '../utility/time';
-import AlbumHelpers from '../plex/AlbumHelpers';
+import TimeUtils from '../../utility/time';
+import AlbumHelpers from '../../plex/AlbumHelpers';
 
 // trackInfo.viewOffset = the location in the track
 //      this seems to not be complete in most cases, not the full track length.
 //      need to determine how to handle this
 // trackInfo.viewCount = the play count of the file
 // trackInfo.duration = the length of the track, seconds?
-function AlbumTrack(props) {
+function AlbumItem(props) {
 
     const trackClass = () => {
         var output = ["album-track"];
@@ -61,4 +61,4 @@ function AlbumTrack(props) {
     ); 
 }
 
-export default AlbumTrack;
+export default AlbumItem;

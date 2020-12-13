@@ -30,13 +30,13 @@ function ConnectedSettings({ serverIdentifier, librarySection, resources, librar
 
     return (
         <div>
-            <select id="serverIdentifier" className="form-control mb-2" value={serverIdentifier} onChange={serverChanged}>
+            <select id="serverIdentifier" className="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value={serverIdentifier} onChange={serverChanged}>
             <option value="" disabled hidden>Select a Server</option>
             {(resources.map((resource) => (
                 <option key={resource.clientIdentifier} value={resource.clientIdentifier}>{resource.name}</option>
             )))}
             </select>
-            <select id="librarySection" className="form-control mb-2" value={librarySection} onChange={libraryChanged}>
+            <select id="librarySection" className="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value={librarySection} onChange={libraryChanged}>
             <option value="" disabled hidden>Select a Library</option>
             {(libraries.map((library) => (
                 <option key={library.key} value={library.key}>{library.title}</option>

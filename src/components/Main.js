@@ -7,7 +7,7 @@ import * as settingsActions from "../context/actions/settingsActions";
 
 import Header from './Header';
 // import NowPlaying from './player/NowPlaying';
-// import Settings from './settings/Settings';
+import Settings from './settings/Settings';
 import Library from './library/Library';
 // import Album from './album/Album';
 
@@ -79,8 +79,8 @@ function ConnectedMain(props) {
                         <Route exact path="/" component={() => <Library baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} />} />
                         {/* <Route exact path="/album/:ratingKey" component={(comprops) => 
                             <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
-                        }/>
-                        <Route exact path="/settings" component={() => <Settings /> } /> */}
+                        }/> */}
+                        <Route exact path="/settings" component={() => <Settings /> } />
                     </Switch>
                     </div>
                 </main>

@@ -3,10 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Main from './components/Main';
 import reportWebVitals from './reportWebVitals';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './index.css';
-
-import 'bootstrap/dist/js/bootstrap.bundle.min';
+import './styles/index.scss'
 
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';

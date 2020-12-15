@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Transition } from '@headlessui/react'
 import TimeUtils from '../../utility/time';
 import PlexPlayback from '../../plex/Playback';
 
@@ -29,6 +30,17 @@ function AlbumItem(props) {
         PlexPlayback.markTrackUnplayed(trackInfo , props.baseUrl, props.userInfo.authToken);
     }
 
+    const [isOpen, setIsOpen] = useState(false);
+
+    const closeMenu = () => {
+        if (isOpen) setIsOpen(false);
+    }
+
+    useEffect(() => {
+        document.addEventListener("click", closeMenu);
+        return () => { document.removeEventListener("click", closeMenu); }
+    }, [isOpen]);
+
     return (
         <tr className={trackClass()}>
             <td className="col-track-play">
@@ -45,16 +57,32 @@ function AlbumItem(props) {
             <td className="col-track-title">{props.trackInfo.title}</td>
             <td className="col-track-duration">{TimeUtils.formatTrackDisplay(props.trackInfo.duration)}</td>
             <td className="col-track-options">
-                <div className="dropdown">
-                    <button className="btn" type="button" id={`trackOptions${props.trackInfo.ratingKey}`} data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-three-dots-vertical" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path fillRule="evenodd" d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-                        </svg>
-                    </button>
-                    {/* <div className="dropdown-menu" aria-labelledby={`trackOptions${props.trackInfo.ratingKey}`}>
-                        <button className="dropdown-item" type="button" onClick={() => markPlayed(props.trackInfo)}>Mark as Played</button>
-                        <button className="dropdown-item" type="button" onClick={() => markUnplayed(props.trackInfo)}>Mark as Unplayed</button>
-                    </div> */}
+                <div className="ml-4 flex items-center md:ml-6">
+                    <div className="ml-3 relative">
+                        <div>
+                            <button onClick={() => setIsOpen(!isOpen)} className="text-lg items-center focus:outline-none" id="user-menu" aria-haspopup="true">
+                                <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-three-dots-vertical" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fillRule="evenodd" d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <Transition
+                            show={isOpen}
+                            enter="transition ease-out duration-100"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95">
+                            {(ref) => (
+                                <div ref={ref} className="z-50 origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
+                                    <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" role="menuitem" onClick={() => markPlayed(props.trackInfo)}>Mark as Played</div>
+                                    <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" role="menuitem" onClick={() => markUnplayed(props.trackInfo)}>Mark as Unplayed</div>
+                                </div>
+                            )}
+                        </Transition>
+                    </div>
                 </div>
             </td>
         </tr>

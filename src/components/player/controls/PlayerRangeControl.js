@@ -16,10 +16,10 @@ function ConnectedPlayerRangeControl(props) {
     }
 
     return (
-        <div className="range-container">
+        <div className="flex flex-grow mx-5 mt-4 mb-2">
             <input id="playerTimeRange" 
                 type="range" 
-                className="form-control-range" 
+                className="flex-grow" 
                 min={0} 
                 max={checkValid(props.duration)} 
                 value={checkValid(props.currentTime)} 

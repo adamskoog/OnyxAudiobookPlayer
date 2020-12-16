@@ -21,7 +21,7 @@ const mapStateToProps = state => {
         authToken: state.application.authToken,
         authId: state.application.authId,
         baseUrl: state.application.baseUrl,
-        librarySection: state.settings.librarySection,
+        librarySection: state.settings.librarySection
     };
 };
 
@@ -73,15 +73,17 @@ function ConnectedMain(props) {
         <React.Fragment>
             <Router>
                 <Header userInfo={props.user} doUserLogin={doUserLogin} doUserLogout={props.logout} />
-                <main role="main" className="justify-center">
-                    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                    <Switch>
-                        <Route exact path="/" component={() => <Library baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} />} />
-                        <Route exact path="/album/:ratingKey" component={(comprops) => 
-                            <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
-                        }/>
-                        <Route exact path="/settings" component={() => <Settings /> } />
-                    </Switch>
+                <main role="main" className="main-viewer">
+                    <div className="h-full overflow-auto">
+                        <div className="max-w-7xl mx-auto py-6 px-3 sm:px-6 lg:px-8">
+                        <Switch>
+                            <Route exact path="/" component={() => <Library baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} />} />
+                            <Route exact path="/album/:ratingKey" component={(comprops) => 
+                                <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
+                            }/>
+                            <Route exact path="/settings" component={() => <Settings /> } />
+                        </Switch>
+                        </div>
                     </div>
                 </main>
                 <NowPlaying />

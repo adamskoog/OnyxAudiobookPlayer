@@ -30,24 +30,29 @@ function ConnectedNowPlaying(props) {
     };
     
     useEffect(() => {
-        const elem = document.querySelector(".now-playing");
-        if (elem && (props.playState === playerActions.PlayState.PLAY_STATE_PLAYING || props.playState === playerActions.PlayState.PLAY_STATE_PAUSED)) {
-            elem.classList.remove("hidden");
+        const main = document.querySelector(".main-viewer");
+        const player = document.querySelector(".now-playing");
+        if (props.playState === "stopped") {
+            main.classList.remove("playing");
+            player.classList.remove("playing");
         } else {
-            elem.classList.add("hidden");
+            main.classList.add("playing");
+            player.classList.add("playing");
         }
     }, [props.playState]);
 
     return (
-        <div className="navbar navbar-expand-md navbar-dark bg-dark fixed-bottom now-playing">
-            <img className="album-thumb" src={getThumbnailUrl()} alt="album art" />
-            <div className="album-info ml-3 mr-3">
-                <div className="track-title">{getPlayInfoAttr("title")}</div>
-                <div className="album-title"><Link to={`/album/${getPlayInfoAttr("parentRatingKey")}`}>{getPlayInfoAttr("parentTitle")}</Link></div>
-                <div className="artist-name">{getPlayInfoAttr("grandparentTitle")}</div>
-                <PlayerTime />
+        <div className="bg-gray-800 text-white now-playing">
+            <div className="flex flex-row flex-nowrap">
+                <img className="album-thumb inline-block" src={getThumbnailUrl()} alt="album art" />
+                <div className="inline-block ml-3 mr-3">
+                    <div className="truncate">{getPlayInfoAttr("title")}</div>
+                    <div className="text-gray-300 truncate"><Link to={`/album/${getPlayInfoAttr("parentRatingKey")}`}>{getPlayInfoAttr("parentTitle")}</Link></div>
+                    <div className="text-gray-300 truncate">{getPlayInfoAttr("grandparentTitle")}</div>
+                    <PlayerTime />
+                </div>
+                <AudioPlayer />
             </div>
-            <AudioPlayer />
         </div>
     );
 }

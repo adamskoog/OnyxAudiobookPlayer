@@ -29132,47 +29132,30 @@ body {
   background-color: #ddd;
 }
 
-.now-playing.hidden {
-  display: none;
+.main-viewer {
+  position: absolute;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0px;
+  overflow: hidden;
 }
 
-.now-playing .album-info,
-.now-playing .album-info a {
-  color: rgba(255,255,255,.5);
+.main-viewer.playing {
+  bottom: 100px;
 }
 
-.now-playing .album-info a:hover {
-  color: rgba(255,255,255,.7);
-  text-decoration: none;
+.now-playing {
+  position: absolute;
+  height: 0px;
+  left: 0;
+  right: 0;
+  bottom: 0px;
+  overflow: hidden;
 }
 
-.now-playing .album-info .track-title,
-.bg-dark.fixed-bottom .btn {
-  color: #fff;
-}
-
-.bg-dark.fixed-bottom .btn:disabled {
-  color: #858585;
-}
-
-.btn.btn-player-play,
-.btn.btn-player-pause {
-  font-size:2em;
-  padding: 0 8px;
-}
-
-.btn.btn-player-skip-back,
-.btn.btn-player-skip-forward,
-.btn.btn-player-previous-track,
-.btn.btn-player-next-track {
-  font-size:1.25em;
-  padding: 0 8px;
-  margin-top:5px;
-}
-
-.btn.btn-player-stop {
-  font-size:1.3em;
-  padding: 0;
+.now-playing.playing {
+  height: 100px;
 }
 
 .now-playing .album-thumb {
@@ -29180,35 +29163,17 @@ body {
   width: 100px;
 }
 
-.now-playing .player-controls {
-  width: 100%;
-  padding: 0 15px;
-  padding-top: 15px;
-  text-align: center;
-}
-
-.range-container {
-  padding-left: 25px;
-  padding-right: 25px;
-}
-
-/* Album Information */
-
-.album-cover {
-  height: 200px;
-  width: 200px;
-  display: inline-block;
-}
-
-.album-info {
-  display: inline-block;
-}
-
 .now-playing .album-info > div {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   width: 180px;
+}
+
+.album-cover {
+  height: 200px;
+  width: 200px;
+  display: inline-block;
 }
 
 .album-summary {
@@ -29245,6 +29210,8 @@ body {
   padding: 0 !important;
   width: 25%;
 }
+
+/* Left to migrate to tailwindcss */
 
 .track-container table {
   border-top: solid 1px black;

@@ -184,9 +184,10 @@ function ConnectedAudioPlayer(props) {
 
     return (
         <React.Fragment>
-            <div className="player-controls">
+            <div className="flex flex-grow flex-wrap">
                 <PlayerRangeControl playerRangeChanged={playerRangeChanged} />
-                <div>
+                <div style={{flexBasis: "100%", height: "0" }}></div>
+                <div className="flex flex-grow items-center justify-center mb-5">
                     <PreviousTrackControl />
                     <SkipBackControl skipBackward={skipBackward} />
                     <PlayPauseControl playTrack={playTrack} pauseTrack={pauseTrack}/>

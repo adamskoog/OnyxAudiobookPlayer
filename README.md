@@ -9,6 +9,10 @@ This is my feeble attempt to learn both ReactJS as well as better understand the
 * I'm sure there is much more as well...
 
 ## Patch Notes
+
+### Version: 0.4.1
+* Full UI overhaul - move from Bootstrap to Tailwind
+
 ### Version: 0.3.1
 * Central State Management (Redux)
 * Complete Rework of Player Components to allow better rendering.

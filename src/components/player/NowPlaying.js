@@ -7,8 +7,6 @@ import { Link } from 'react-router-dom';
 import PlayerTime from './controls/PlayerTime';
 import AudioPlayer from './Player';
 
-import * as playerActions from "../../context/actions/playerActions";
-
 const mapStateToProps = state => {
     return { 
         authToken: state.application.authToken,
@@ -44,7 +42,7 @@ function ConnectedNowPlaying(props) {
     return (
         <div className="bg-gray-800 text-white now-playing">
             <div className="flex flex-row flex-nowrap">
-                <img className="album-thumb inline-block" src={getThumbnailUrl()} alt="album art" />
+                <img className="album-thumb hidden sm:inline-block" src={getThumbnailUrl()} alt="album art" />
                 <div className="inline-block ml-3 mr-3">
                     <div className="truncate">{getPlayInfoAttr("title")}</div>
                     <div className="text-gray-300 truncate"><Link to={`/album/${getPlayInfoAttr("parentRatingKey")}`}>{getPlayInfoAttr("parentTitle")}</Link></div>

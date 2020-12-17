@@ -18,7 +18,9 @@ body {
 .main-viewer.playing {
     bottom: 100px;
 }
-
+.main-viewer.menu-open {
+    top: 168px;
+}
 .now-playing {
     position: absolute;
     height: 0px;

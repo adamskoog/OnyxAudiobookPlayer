@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 function Header(props) {
 
+    const TITLE = "Onyx Player";
     const [accountIsOpen, setAccountIsOpen] = useState(false);
     const [menuIsOpen, setMenuIsOpen] = useState(false);
 
@@ -25,8 +26,14 @@ function Header(props) {
     }
 
     const menuCss = (isOpen) => {
-        if (isOpen)
+        const main = document.querySelector(".main-viewer");
+        if (main) {
+            main.classList.remove("menu-open");
+        }
+        if (main && isOpen) {
+            main.classList.add("menu-open");
             return "block md:hidden z-50";
+        }
         return "hidden md:hidden";
     }
 
@@ -83,8 +90,8 @@ function Header(props) {
 
                   <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                       <div className="flex-shrink-0 flex items-center">
-                          <div className="text-white block md:hidden h-8 w-auto">Onyx Player</div>
-                          <div className="text-white hidden md:block h-8 w-auto">Onyx Player</div>
+                          <div className="text-white block md:hidden h-8 w-auto">{TITLE}</div>
+                          <div className="text-white hidden md:block h-8 w-auto">{TITLE}</div>
                       </div>
                       <div className="hidden sm:block">
                           <div className="ml-10 flex items-baseline space-x-4">
@@ -133,7 +140,6 @@ function Header(props) {
                   </div>
               </div>
           </div>
-          {/* TODO: This is not going to work correctly, until something is done for autoresize of main content pane. */}
           <div className={menuCss(menuIsOpen)}>
                 <div className="px-2 pt-2 pb-3 space-y-1">
                     <Link className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium" to={`/`}>Home</Link>

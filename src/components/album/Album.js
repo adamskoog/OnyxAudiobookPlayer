@@ -59,32 +59,36 @@ function ConnectedAlbum(props) {
     }
 
     const playOnDeckTrack = (trackInfo) => {
-
-        let playQueue = PlexPlayback.getAlbumQueue(trackInfo, album);
-        props.setPlayQueue(playQueue);
+        props.setPlayQueue(PlexPlayback.getAlbumQueue(trackInfo, album));
     }
 
     const playSelectedTrack = (trackInfo) => {
-        // TODO: Check for played track, if it is current on deck (tbd)
-        // then we need to tell user they are changing played track
-        // progress
-            
-        // TODO: If they are playing a track out of order, we need to update all
-        // tracks to make sure previous are played and remaining are unplayed.
-        // This will likely require timeline updates to be sent for all tracks <-- TODO: is this a bad idea???
-        let playQueue = PlexPlayback.getAlbumQueue(trackInfo, album);
-        props.setPlayQueue(playQueue);
+        if (!PlexPlayback.isTrackOnDeck(trackInfo, album)) {
+            PlexPlayback.updateOnDeck(trackInfo, album, props.baseUrl, props.authToken)
+                .then(() => {
+                    getAlbumMetadata()
+                        .then((info) => {
+                            props.setPlayQueue(PlexPlayback.getAlbumQueue(info.track, info.album));
+                        });
+                });
+        }
+        else
+            playOnDeckTrack(trackInfo);
     }
 
     const getAlbumMetadata = () => {
-        PlexApi.getAlbumMetadata(props.baseUrl, props.ratingKey, { "X-Plex-Token": props.authToken })
-            .then(data => {
-                if (data.MediaContainer) {
-                    let onDeck = PlexPlayback.findOnDeck(data.MediaContainer);
-                    setAlbum(data.MediaContainer);
-                    setOnDeck(onDeck);
-                }
-            });
+        return new Promise ((resolve) => {
+            PlexApi.getAlbumMetadata(props.baseUrl, props.ratingKey, { "X-Plex-Token": props.authToken })
+                .then(data => {
+                    if (data.MediaContainer) {
+                        const onDeck = PlexPlayback.findOnDeck(data.MediaContainer);
+                        resolve({ album: data.MediaContainer, track: onDeck });
+
+                        setAlbum(data.MediaContainer);
+                        setOnDeck(onDeck);
+                    }
+                });
+        });
     }
 
     useEffect(() => {

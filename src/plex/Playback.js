@@ -93,6 +93,36 @@ class PlexPlayback
         return albumInfo.Metadata[0];
     }
 
+    static isTrackOnDeck(trackInfo, album) {
+        const onDeck = PlexPlayback.findOnDeck(album);
+        if (onDeck.key !== trackInfo.key) return false;
+        return true;
+    }
+
+    static updateOnDeck(trackInfo, album, baseUrl, token) {
+        return new Promise((resolve) => {
+            // We need to queue up promises for all the tracks in the album
+            // if they select a current track that was in progress, it will not be updated.
+            let promises = [];
+            for (let i = 0; i < album.Metadata.length; i++) {
+                const track = album.Metadata[i];
+                if (trackInfo.index > track.index) {
+                    // previous tracks need to be marked as played
+                    promises.push(PlexPlayback.markTrackPlayed(track, baseUrl, token));
+                } else if (trackInfo.index <= track.index) {
+                    // upcoming tracks should be marked as unplayed.
+                    promises.push(PlexPlayback.markTrackUnplayed(track, baseUrl, token));
+                }
+            }
+
+            Promise.allSettled(promises)
+                .then(() => {
+                    // promises have been settled
+                    resolve();
+                });  
+        });
+    }
+
     // Genereate album queue based on selected track.
     static getAlbumQueue(selectedTrack, albumInfo) {
         let queue = [];

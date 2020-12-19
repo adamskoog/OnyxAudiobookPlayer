@@ -32,26 +32,30 @@ class PlexPlayback
     }
 
     static markTrackPlayed(trackInfo, baseUrl, token) {
+        return new Promise((resolve) => {
+            let doneTime = Math.round(trackInfo.duration * 0.96);
 
-        let doneTime = Math.round(trackInfo.duration * 0.96);
-
-        let args = {
-            key: trackInfo.ratingKey,
-            time: doneTime, 
-            "X-Plex-Token": token
-        };
-        PlexApi.progress(baseUrl, args)
-            .then(data => { 
-                //console.log("");
-            });
+            let args = {
+                key: trackInfo.ratingKey,
+                time: doneTime, 
+                "X-Plex-Token": token
+            };
+            PlexApi.progress(baseUrl, args)
+                .then(data => { 
+                    //console.log("");
+                    resolve();
+                });
+        });
     }
 
     static markTrackUnplayed(trackInfo, baseUrl, token) {
-
-        PlexApi.unscrobble(baseUrl, trackInfo.ratingKey, token)
-             .then(data => { 
-                 //console.log("");
-             });
+        return new Promise((resolve) => {
+            PlexApi.unscrobble(baseUrl, trackInfo.ratingKey, token)
+                .then(data => { 
+                    //console.log("");
+                    resolve();
+                });
+        });
     }
 
     // To keep track of tracks beyond 90%, we can increase the value of the duration on timeline updates,

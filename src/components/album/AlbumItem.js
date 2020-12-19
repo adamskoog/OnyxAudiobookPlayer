@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
+
 import { Transition } from '@headlessui/react'
 import TimeUtils from '../../utility/time';
 import PlexPlayback from '../../plex/Playback';
@@ -8,7 +10,16 @@ import PlexPlayback from '../../plex/Playback';
 //      need to determine how to handle this
 // trackInfo.viewCount = the play count of the file
 // trackInfo.duration = the length of the track, seconds?
-function AlbumItem(props) {
+
+const mapStateToProps = state => {
+    return { 
+        authToken: state.application.authToken,
+        baseUrl: state.application.baseUrl,
+        currentTrack: state.playQueue.currentTrack
+    };
+};
+
+function ConnectedAlbumItem(props) {
 
     const trackClass = () => {
         var output = ["album-track"];
@@ -23,11 +34,17 @@ function AlbumItem(props) {
     }
 
     const markPlayed = (trackInfo) => {
-        PlexPlayback.markTrackPlayed(trackInfo , props.baseUrl, props.userInfo.authToken);
+        PlexPlayback.markTrackPlayed(trackInfo , props.baseUrl, props.authToken)
+            .then(() => {
+                props.updateAlbumInfo();
+            });
     }
  
     const markUnplayed = (trackInfo) => {
-        PlexPlayback.markTrackUnplayed(trackInfo , props.baseUrl, props.userInfo.authToken);
+        PlexPlayback.markTrackUnplayed(trackInfo , props.baseUrl, props.authToken)
+            .then(() => {
+                props.updateAlbumInfo();
+            });
     }
 
     const [isOpen, setIsOpen] = useState(false);
@@ -40,6 +57,14 @@ function AlbumItem(props) {
         document.addEventListener("click", closeMenu);
         return () => { document.removeEventListener("click", closeMenu); }
     }, [isOpen]);
+
+    useEffect(() => {
+        if (props.currentTrack && props.trackInfo) {
+            if (props.currentTrack.key === props.trackInfo.key) {
+                props.updateAlbumInfo();
+            }
+        }
+    }, [props.currentTrack]);
 
     return (
         <tr className={trackClass()}>
@@ -88,5 +113,7 @@ function AlbumItem(props) {
         </tr>
     ); 
 }
+
+const AlbumItem = connect(mapStateToProps)(ConnectedAlbumItem);
 
 export default AlbumItem;

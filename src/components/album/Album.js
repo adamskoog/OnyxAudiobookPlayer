@@ -11,7 +11,7 @@ const mapStateToProps = state => {
     return { 
         authToken: state.application.authToken,
         baseUrl: state.application.baseUrl,
-        librarySection: state.settings.librarySection,
+        librarySection: state.settings.librarySection
     };
 };
 
@@ -91,6 +91,7 @@ function ConnectedAlbum(props) {
         if (props.authToken && props.baseUrl && props.ratingKey)
             getAlbumMetadata();
     }, [props.baseUrl, props.authToken, props.ratingKey]);
+
     //https://tailwindcomponents.com/component/button-component-default
     return (
         <React.Fragment>
@@ -133,7 +134,7 @@ function ConnectedAlbum(props) {
                 <table>
                     <tbody>
                         {album.Metadata.map((track) => (
-                            <AlbumItem key={track.key} trackInfo={track} baseUrl={props.baseUrl} userInfo={props.user} playSelectedTrack={playSelectedTrack} />
+                            <AlbumItem key={track.key} trackInfo={track} playSelectedTrack={playSelectedTrack} updateAlbumInfo={getAlbumMetadata} />
                         ))}
                     </tbody>
                 </table>

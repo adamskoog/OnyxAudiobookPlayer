@@ -105,6 +105,9 @@ function Header(props) {
                       </div>
                   </div>
                   <div>
+                    {!props.userInfo && (
+                        <button onClick={() => props.doUserLogin()}>Login</button>
+                    )}
                       <div className="ml-4 flex items-center md:ml-6">
                           <div className="ml-3 relative">
                               <div>

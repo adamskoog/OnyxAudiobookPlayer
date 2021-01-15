@@ -11,7 +11,6 @@ import StopControl from './controls/Stop';
 
 import throttle from 'lodash/throttle';
 import TimeUtils from '../../utility/time';
-import PlexPlayback from '../../plex/Playback';
 import PlexApi from '../../plex/Api';
 
 import * as playQueueActions from "../../context/actions/playQueueActions";
@@ -114,7 +113,7 @@ function ConnectedAudioPlayer(props) {
             state: playState,
             time: TimeUtils.convertSecondsToMs(currentTime),
             playbackTime: TimeUtils.convertSecondsToMs(currentTime),
-            duration: PlexPlayback.timelineTrackDurationFlex(TimeUtils.convertSecondsToMs(duration)),
+            duration: TimeUtils.convertSecondsToMs(duration),
             "X-Plex-Token": props.authToken
         };
         //console.log("updateTimeline", args);

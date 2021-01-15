@@ -16,8 +16,8 @@ const mapStateToProps = state => {
 function ConnectedAlbumItem(props) {
 
     const trackStatus = () => {
-        if (props.trackInfo.viewOffset) {
-            if (PlexPlayback.trackIsComplete(props.trackInfo.viewOffset, props.trackInfo.duration)) {
+        if (props.trackInfo.viewOffset || props.trackInfo.viewCount) {
+            if (PlexPlayback.trackIsComplete(props.trackInfo)) {
                 return "complete";
             } else {
                 return "in-progress";

@@ -92,7 +92,7 @@ class PlexApi
             require('qs').stringify({
                 "X-Plex-Client-Identifier": PlexApi.baseParams["X-Plex-Client-Identifier"],
             });
-    
+            console.log("validateurl", url);
             fetch(url, PlexApi.getArgs)
                 .then((response) => {
                     return response.json();
@@ -118,30 +118,46 @@ class PlexApi
         });
     }
 
+    static async fetchWithTimeout(resource, options) {
+        const { timeout = 8000 } = options;
+        
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+      
+        const response = await fetch(resource, {
+          ...options,
+          signal: controller.signal  
+        });
+        clearTimeout(id);
+      
+        return response;
+    }
+
     static serverConnectionTest(connections, token) {
         return new Promise((resolve, reject) => {
             const localParams = {}
             const params = Object.assign({}, PlexApi.baseParams, localParams, { "X-Plex-Token": token });
 
             // TODO: There might be a better endpoint, but the payload on this is relatively small.
-            const connectionPromises =connections.map((connection) => {
-                return PlexApi.formatUrl(`${connection.uri}/library/sections`, params);
+            //       The timeout length could also be a concern.
+            const connectionPromises = connections.map((connection) => {
+                return PlexApi.fetchWithTimeout(PlexApi.formatUrl(`${connection.uri}/library/sections`, params), {
+                    timeout: 1000
+                  });
             });
 
-            // TODO: This bit is fundementally flawed. The promises always seem to
-            // return as fulfilled - whether the connection is accesible or not.
             Promise.allSettled(connectionPromises).then((values) => {
                 let preferredConnection = null;
                 for (let i = 0; i < connections.length; i++) {
                     for (let j = 0; j < values.length; j++) {
-                        if (values[i].status === "fulfilled" && values[i].value.includes(connections[j].uri)) {
+                        if (values[i].status === "fulfilled" && values[i].value.url.includes(connections[j].uri)) {
                             preferredConnection = connections[j].uri;
                             break;
                         }
                     }
                     if (preferredConnection) break;
                 }
-
+                
                 if (preferredConnection)
                     resolve({ uri: preferredConnection });
                 reject({ message: "Failed to resolve connection to server." });

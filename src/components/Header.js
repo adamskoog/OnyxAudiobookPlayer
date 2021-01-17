@@ -106,7 +106,7 @@ function Header(props) {
                   </div>
                   <div>
                     {!props.userInfo && (
-                        <button onClick={() => props.doUserLogin()}>Login</button>
+                        <button className="nav-menu nav-signin text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" onClick={() => props.doUserLogin()}>Login</button>
                     )}
                       <div className="ml-4 flex items-center md:ml-6">
                           <div className="ml-3 relative">

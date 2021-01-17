@@ -110,7 +110,7 @@ function ConnectedAlbum(props) {
                     <div className="mt-1 album-artist text-lg">{album.grandparentTitle}</div>
                     <div className="mt-1 album-year text-md">{album.parentYear}</div>
                     {onDeck && (
-                    <div className="table absolute bottom-0">
+                    <div className="table absolute bottom-0 mt-8">
                         <div className="table-cell align-middle">
                         <button className="text-3xl pr-3 align-middle" type="button" onClick={() => playOnDeckTrack(onDeck)}>
                             <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

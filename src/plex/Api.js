@@ -180,6 +180,20 @@ class PlexApi
         });
     }
 
+    static getSectionHubs(baseUrl, section, token) {
+        const localParams = {
+            excludeFields: "summary"
+        }
+        const params = Object.assign({}, localParams, PlexApi.baseParams, { "X-Plex-Token": token });
+
+        let url = PlexApi.formatUrl(`${baseUrl}/hubs/sections/${section}`, params);
+
+        return fetch(url, PlexApi.getArgs)
+            .then((response) => {
+                return response.json();
+        });
+    }
+
     static getThumbnailUrl(baseUrl, thumb, args) {
         return PlexApi.formatUrl(`${baseUrl}${thumb}`, args);
     }
@@ -197,7 +211,7 @@ class PlexApi
         return PlexApi.formatUrl(`${baseUrl}/photo/:/transcode`, params);
     }
 
-    static getLibraryItems(baseUrl, section, args) {
+    static getLibraryItems(baseUrl, section, args, sort) {
 
         const localParams = {
             type: 9,
@@ -205,7 +219,7 @@ class PlexApi
             includeMeta: 1,
             includeCollections: 1,
             includeExternalMedia: 1,
-            sort: "artist.titleSort,album.titleSort,album.index,album.id,album.originallyAvailableAt"
+            sort: sort ?? "artist.titleSort,album.titleSort,album.index,album.id,album.originallyAvailableAt"
         };
         const params = Object.assign({}, PlexApi.baseParams, localParams, args);
 

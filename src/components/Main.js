@@ -8,6 +8,7 @@ import * as settingsActions from "../context/actions/settingsActions";
 import Header from './Header';
 import NowPlaying from './player/NowPlaying';
 import Settings from './settings/Settings';
+import Home from './home/Home';
 import Library from './library/Library';
 import Album from './album/Album';
 
@@ -77,7 +78,8 @@ function ConnectedMain(props) {
                     <div className="h-full overflow-auto">
                         <div className="max-w-7xl mx-auto py-6 px-3 sm:px-6 lg:px-8">
                         <Switch>
-                            <Route exact path="/" component={() => <Library baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} />} />
+                            <Route exact path="/" component={() => <Home baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} /> } />
+                            <Route exact path="/library" component={() => <Library baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} />} />
                             <Route exact path="/album/:ratingKey" component={(comprops) => 
                                 <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
                             }/>

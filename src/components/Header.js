@@ -100,7 +100,7 @@ function Header(props) {
                       </div>
                       <div className="hidden sm:block">
                           <div className="ml-10 flex items-baseline space-x-4">
-                              <Link className="nav-menu nav-library text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to={`/`}>Library</Link>
+                              <Link className="nav-menu nav-library text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to={`/library`}>Library</Link>
                           </div>
                       </div>
                   </div>
@@ -146,7 +146,7 @@ function Header(props) {
           <div className={menuCss(menuIsOpen)}>
                 <div className="px-2 pt-2 pb-3 space-y-1">
                     <Link className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium" to={`/`}>Home</Link>
-                    <Link className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium" to={`/`}>Library</Link>
+                    <Link className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium" to={`/library`}>Library</Link>
                 </div>
             </div>
       </nav>

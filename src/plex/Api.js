@@ -300,13 +300,7 @@ class PlexApi
     }
 
     static updateTimeline(baseUrl, args) {
-
-        // TODO: Need to better understand the play queue, we will want to 
-        //       queue up the remaining tracks in the books to continue playing.
-        // - playQueueItemID=719012     ? how do we get this? is it needed?
-        // - state=paused       playing? stopped?
-        // - X-Plex-Session-Identifier=8lq3f8kkqi58si6u1d0waehf
-    
+   
         const localParams = { 
             hasMDE: 0,
             "X-Plex-Text-Format": "plain"

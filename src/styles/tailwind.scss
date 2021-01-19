@@ -111,3 +111,19 @@ body {
 .col-track-duration {
     width: 65px;
 }
+
+/* Remove the default scrollbar for WebKit implementations */
+.hub-button:disabled {
+    color: #aaa;
+}
+.hub-container::webkit-scrollbar {
+    display: none;
+}
+
+.hub-contents {
+    transition: transform .2s ease-in-out;
+}
+
+.hub-contents.hub-no-transition {
+    transition: none;
+}

@@ -58,8 +58,8 @@ function Home(props) {
         )}
         {props.userInfo && props.baseUrl && (
             <React.Fragment>
-                <Hub title="Recently Added" baseUrl={props.baseUrl} userInfo={props.userInfo} items={recentlyAddedInfo} />
-                <Hub title="Recently Played" baseUrl={props.baseUrl} userInfo={props.userInfo} items={recentlyPlayedInfo} />
+                <Hub prefix="added" title="Recently Added" baseUrl={props.baseUrl} userInfo={props.userInfo} items={recentlyAddedInfo} />
+                <Hub prefix="played" title="Recently Played" baseUrl={props.baseUrl} userInfo={props.userInfo} items={recentlyPlayedInfo} />
             </React.Fragment>
         )}
         </React.Fragment>

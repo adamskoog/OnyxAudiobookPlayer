@@ -10,6 +10,11 @@ This is my feeble attempt to learn both ReactJS as well as better understand the
 
 ## Patch Notes
 
+### Version: 0.5.1
+* Add Home Screen with Hubs - Recently Added, Recently Played
+* Remove hack to augment Plex progress to 99% as this was added to PMS.
+* If user starts a track that is not On Deck, set play state of other tracks to reflect album progress.
+
 ### Version: 0.4.1
 * Full UI overhaul - move from Bootstrap to Tailwind
 

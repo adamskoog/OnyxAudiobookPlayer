@@ -1,17 +1,18 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import LibraryItem from '../library/LibraryItem';
 
-//https://webdevtrick.com/horizontal-scroll-navigation/
+// Horizontal scrolling based on: https://webdevtrick.com/horizontal-scroll-navigation/
 function Hub(props) {
+
+    const [leftScrollDisabled, setLeftScrollDisabled] = useState(true);
+    const [rightScrollDisabled, setRightScrollDisabled] = useState(true);
 
     const containerRef = useRef(null);
     const contentRef = useRef(null);
 
     const isTickingRef = useRef(false);
-    const scrollPosRef = useRef(0);
     const isTravelingRef = useRef(false);
     const directionRef = useRef("");
-    const travelDistance = useRef(400);
     
     function determineOverflow(container, content) {
         var containerMetrics = container.getBoundingClientRect();
@@ -31,15 +32,13 @@ function Hub(props) {
         }
     }
 
-    function checkOverflow(scroll_pos) {
+    function checkOverflow() {
         const overflow = determineOverflow(containerRef.current, contentRef.current);
 
-        const left = document.getElementById(`${props.prefix}_left`);
-        const right = document.getElementById(`${props.prefix}_right`);
-        left.disabled = (overflow === "both" || overflow === "left") ? "" : "disabled";
-        right.disabled = (overflow === "both" || overflow === "right") ? "" : "disabled";
+        setLeftScrollDisabled((overflow === "both" || overflow === "left") ? false : true);
+        setRightScrollDisabled((overflow === "both" || overflow === "right") ? false : true);
 
-        containerRef.current.setAttribute("data-overflowing", determineOverflow(containerRef.current, contentRef.current));
+        containerRef.current.setAttribute("data-overflowing", overflow);
     }
 
     const advanceRight = () => {
@@ -50,14 +49,16 @@ function Hub(props) {
             // Get the right edge of the container and content
             var navBarRightEdge = contentRef.current.getBoundingClientRect().right;
             var navBarScrollerRightEdge = containerRef.current.getBoundingClientRect().right;
+            // get width of scroll area - this will change all contents
+            var navBarScrollerWidth = containerRef.current.getBoundingClientRect().width;
             // Now we know how much space we have available to scroll
             var availableScrollRight = Math.floor(navBarRightEdge - navBarScrollerRightEdge);
             // If the space available is less than two lots of our desired distance, just move the whole amount
             // otherwise, move by the amount in the settings
-            if (availableScrollRight < travelDistance.current * 2) {
+            if (availableScrollRight < navBarScrollerWidth) {
                 contentRef.current.style.transform = `translateX(-${availableScrollRight}px)`;
             } else {
-                contentRef.current.style.transform = `translateX(-${travelDistance.current}px)`;
+                contentRef.current.style.transform = `translateX(-${navBarScrollerWidth}px)`;
             }
             // We do want a transition (this is set in CSS) when moving so remove the class that would prevent that
             contentRef.current.classList.remove("hub-no-transition");
@@ -76,12 +77,13 @@ function Hub(props) {
         if (determineOverflow(containerRef.current, contentRef.current) === "left" || determineOverflow(containerRef.current, contentRef.current) === "both") {
             // Find how far this panel has been scrolled
             var availableScrollLeft = containerRef.current.scrollLeft;
+            var navBarScrollerWidth = containerRef.current.getBoundingClientRect().width;
             // If the space available is less than two lots of our desired distance, just move the whole amount
             // otherwise, move by the amount in the settings
-            if (availableScrollLeft < travelDistance.current * 2) {
+            if (availableScrollLeft < navBarScrollerWidth) {
                 contentRef.current.style.transform = `translateX(${availableScrollLeft}px)`;
             } else {
-                contentRef.current.style.transform = `translateX(${travelDistance.current}px)`;
+                contentRef.current.style.transform = `translateX(${navBarScrollerWidth}px)`;
             }
             // We do want a transition (this is set in CSS) when moving so remove the class that would prevent that
             contentRef.current.classList.remove("hub-no-transition");
@@ -111,10 +113,9 @@ function Hub(props) {
     }
 
     function scroller() {
-        scrollPosRef.current = window.scrollY;
         if (!isTickingRef.current) {
             window.requestAnimationFrame(function() {
-                checkOverflow(scrollPosRef.current);
+                checkOverflow();
                 isTickingRef.current = false;
             });
         }
@@ -122,47 +123,44 @@ function Hub(props) {
     }
 
     useEffect(() => {
-        if (!containerRef.current || contentRef.current) {
-            containerRef.current = document.getElementById(`${props.prefix}_outer`);
-            contentRef.current = document.getElementById(`${props.prefix}_inner`);
-        }
-
-        if (!containerRef.current && !contentRef.current) return;
-        containerRef.current.addEventListener("scroll", scroller);
-        contentRef.current.addEventListener("transitionend", navTransition);
+        const container = containerRef.current;
+        const content = contentRef.current;
+        if (!container && !content) return;
+        container.addEventListener("scroll", scroller);
+        content.addEventListener("transitionend", navTransition);
         window.addEventListener("resize", checkOverflow);
 
         checkOverflow();
         return () => {
-            containerRef.current.removeEventListener("scroll", scroller);
-            contentRef.current.removeEventListener("transitionend", navTransition);
+            container.removeEventListener("scroll", scroller);
+            content.removeEventListener("transitionend", navTransition);
             window.removeEventListener("resize", checkOverflow);
         }
     });
 
     return (
-        <React.Fragment>
-        <div className="inline-block font-bold mb-2 text-xl">{props.title}</div>
-        <div className="float-right text-2xl">
-            <button id={`${props.prefix}_left`} className="focus:outline-none hub-button" onClick={() => advanceLeft()}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" className="bi bi-caret-left-fill" viewBox="0 0 16 16">
-                    <path d="M3.86 8.753l5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                </svg>
-            </button>
-            <button id={`${props.prefix}_right`} className="focus:outline-none hub-button" onClick={() => advanceRight()}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" className="bi bi-caret-right-fill" viewBox="0 0 16 16">
-                    <path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                </svg>
-            </button>
-        </div>
-        <div id={`${props.prefix}_outer`} className="hub-container w-full overflow-x-scroll overflow-y-hidden mb-6">
-            <div id={`${props.prefix}_inner`} className="hub-contents flex flex-row w-max gap-4">            
-                {props.items.map((item) => (
-                    <LibraryItem key={item.ratingKey} baseUrl={props.baseUrl} userInfo={props.userInfo} albumInfo={item} />
-                ))}
+        <div className="home-hub">
+            <div className="inline-block font-bold mb-2 text-xl">{props.title}</div>
+            <div className="float-right text-2xl">
+                <button type="button" className="focus:outline-none hub-button" onClick={() => advanceLeft()} disabled={leftScrollDisabled}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" className="bi bi-caret-left-fill" viewBox="0 0 16 16">
+                        <path d="M3.86 8.753l5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+                    </svg>
+                </button>
+                <button type="button" className="focus:outline-none hub-button" onClick={() => advanceRight()} disabled={rightScrollDisabled}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" className="bi bi-caret-right-fill" viewBox="0 0 16 16">
+                        <path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                    </svg>
+                </button>
+            </div>
+            <div ref={containerRef} className="hub-container w-full overflow-x-auto overflow-y-hidden mb-6">
+                <div ref={contentRef} className="hub-contents flex flex-row w-max gap-4">            
+                    {props.items.map((item) => (
+                        <LibraryItem key={item.ratingKey} baseUrl={props.baseUrl} userInfo={props.userInfo} albumInfo={item} />
+                    ))}
+                </div>
             </div>
         </div>
-        </React.Fragment>
     ); 
 }
 

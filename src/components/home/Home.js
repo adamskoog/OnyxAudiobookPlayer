@@ -37,8 +37,9 @@ function Home(props) {
             PlexApi.getLibraryItems(props.baseUrl, props.section, { 
                 "X-Plex-Token": props.userInfo.authToken,
                 "X-Plex-Container-Start": 0,
-                "X-Plex-Container-Size": 10
-            }, "lastViewedAt:desc")
+                "X-Plex-Container-Size": 10,
+                sort: "lastViewedAt:desc"
+            })
                 .then(data => {
                     if (data.MediaContainer.Metadata && isMountedRef.current)
                         setRecentlyPlayedInfo(data.MediaContainer.Metadata);
@@ -58,8 +59,8 @@ function Home(props) {
         )}
         {props.userInfo && props.baseUrl && (
             <React.Fragment>
-                <Hub prefix="added" title="Recently Added" baseUrl={props.baseUrl} userInfo={props.userInfo} items={recentlyAddedInfo} />
-                <Hub prefix="played" title="Recently Played" baseUrl={props.baseUrl} userInfo={props.userInfo} items={recentlyPlayedInfo} />
+                <Hub title="Recently Added" baseUrl={props.baseUrl} userInfo={props.userInfo} items={recentlyAddedInfo} />
+                <Hub title="Recently Played" baseUrl={props.baseUrl} userInfo={props.userInfo} items={recentlyPlayedInfo} />
             </React.Fragment>
         )}
         </React.Fragment>

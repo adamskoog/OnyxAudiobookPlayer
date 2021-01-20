@@ -89,11 +89,12 @@ function ConnectedMain(props) {
                     </div>
                 </main>
                 <NowPlaying />
-                {/* <div className={(props.isLoading) ? "loader loading" : "loader"}>
+                {/* https://tailwindcomponents.com/component/spinner */}
+                <div className={(props.isLoading) ? "loader loading" : "loader"}>
                     <div className="d-flex justify-content-center">
                         <div className="spinner-border" style={{width: "3rem", height: "3rem"}} role="status"></div>
                     </div>
-                </div> */}
+                </div>
             </Router>
         </React.Fragment>
     ); 

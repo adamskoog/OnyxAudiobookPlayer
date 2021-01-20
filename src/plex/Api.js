@@ -211,7 +211,7 @@ class PlexApi
         return PlexApi.formatUrl(`${baseUrl}/photo/:/transcode`, params);
     }
 
-    static getLibraryItems(baseUrl, section, args, sort) {
+    static getLibraryItems(baseUrl, section, args) {
 
         const localParams = {
             type: 9,
@@ -219,7 +219,7 @@ class PlexApi
             includeMeta: 1,
             includeCollections: 1,
             includeExternalMedia: 1,
-            sort: sort ?? "artist.titleSort,album.titleSort,album.index,album.id,album.originallyAvailableAt"
+            sort: "artist.titleSort,album.titleSort,album.index,album.id,album.originallyAvailableAt"
         };
         const params = Object.assign({}, PlexApi.baseParams, localParams, args);
 

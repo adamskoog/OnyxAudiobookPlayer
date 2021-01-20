@@ -7,6 +7,20 @@ body {
     background-color: #ddd;
 }
 
+.loader {
+    background: white;
+    display: none;
+}
+.loader.loading {
+    background: white;
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
 .main-viewer {
     position: absolute;
     top: 64px;
@@ -113,10 +127,11 @@ body {
 }
 
 /* Remove the default scrollbar for WebKit implementations */
-.hub-button:disabled {
+button:disabled {
     color: #aaa;
 }
-.hub-container::webkit-scrollbar {
+
+.hub-container::-webkit-scrollbar {
     display: none;
 }
 

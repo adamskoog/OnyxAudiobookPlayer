@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route  } from 'react-router-dom';
 
@@ -89,11 +89,8 @@ function ConnectedMain(props) {
                     </div>
                 </main>
                 <NowPlaying />
-                {/* https://tailwindcomponents.com/component/spinner */}
-                <div className={(props.isLoading) ? "loader loading" : "loader"}>
-                    <div className="d-flex justify-content-center">
-                        <div className="spinner-border" style={{width: "3rem", height: "3rem"}} role="status"></div>
-                    </div>
+                <div className={(props.isLoading || props.applicationState !== "ready") ? "bg-gray-800 loader loading" : "bg-gray-800 loader"}>
+                    <div id="loader" role="status"></div>
                 </div>
             </Router>
         </React.Fragment>

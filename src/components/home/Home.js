@@ -14,18 +14,15 @@ function Home(props) {
 
     useEffect(() => {
         if (props.userInfo && props.baseUrl && props.section) {
-            PlexApi.getSectionHubs(props.baseUrl, props.section, props.userInfo.authToken)
+            PlexApi.getLibraryItems(props.baseUrl, props.section, { 
+                "X-Plex-Token": props.userInfo.authToken,
+                "X-Plex-Container-Start": 0,
+                "X-Plex-Container-Size": 10,
+                sort: "addedAt:desc"
+            })
                 .then(data => {
-                    if (data.MediaContainer && data.MediaContainer.Hub) {
-                        for (let i = 0; i < data.MediaContainer.Hub.length; i++) {
-                            const hub = data.MediaContainer.Hub[i];
-                            if (hub.context ==="hub.music.recent.added") {
-                                setRecentlyAddedInfo(hub.Metadata);
-                            }
-                        }
-                    } else {
-                        setRecentlyAddedInfo([]);
-                    }
+                    if (data.MediaContainer.Metadata && isMountedRef.current)
+                        setRecentlyAddedInfo(data.MediaContainer.Metadata);
                 });
         } else {
             setRecentlyAddedInfo([]);

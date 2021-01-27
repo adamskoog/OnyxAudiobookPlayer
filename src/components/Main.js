@@ -9,15 +9,14 @@ import Header from './Header';
 import NowPlaying from './player/NowPlaying';
 import Settings from './settings/Settings';
 import Home from './home/Home';
+import Loader from './Loader';
 import Library from './library/Library';
 import Album from './album/Album';
 
 import PlexAuthentication from "../plex/Authentication";
 
 const mapStateToProps = state => {
-    return { 
-        isLoading: state.application.isLoading,
-        applicationState: state.application.applicationState,
+    return {
         user: state.application.user, 
         authToken: state.application.authToken,
         authId: state.application.authId,
@@ -72,6 +71,7 @@ function ConnectedMain(props) {
 
     return (
         <React.Fragment>
+            <Loader />
             <Router>
                 <Header userInfo={props.user} doUserLogin={doUserLogin} doUserLogout={props.logout} />
                 <main role="main" className="main-viewer">
@@ -88,10 +88,7 @@ function ConnectedMain(props) {
                         </div>
                     </div>
                 </main>
-                <NowPlaying />
-                <div className={(props.isLoading || props.applicationState !== "ready") ? "bg-gray-800 loader loading" : "bg-gray-800 loader"}>
-                    <div id="loader" role="status"></div>
-                </div>
+                <NowPlaying />               
             </Router>
         </React.Fragment>
     ); 

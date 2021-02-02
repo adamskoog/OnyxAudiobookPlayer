@@ -14,7 +14,7 @@ function ConnectedLoader({ isLoading, applicationState }) {
     const containerRef = useRef(null);
 
     useEffect(() => {
-        if (isLoading || applicationState !== "ready") {
+        if (isLoading) {
             containerRef.current.classList.replace("hidden", "block");
         } else {
             containerRef.current.classList.replace("block", "hidden");

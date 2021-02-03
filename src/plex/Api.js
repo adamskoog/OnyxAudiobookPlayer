@@ -143,9 +143,13 @@ class PlexApi
             const localParams = {}
             const params = Object.assign({}, PlexApi.baseParams, localParams, { "X-Plex-Token": token });
 
+            const localConnection = null;
             const connectionPromises = connections.map((connection) => {
                 // Use different timeout lengths for local vs remote servers.
                 const timeout = (connection.local) ? 1000 : 5000;
+                if (connection.local) {
+                    localConnection = connection;
+                }
 
                 // Identity endpoint is very small, used by other projects.
                 return PlexApi.fetchWithTimeout(PlexApi.formatUrl(`${connection.uri}/identity`, params), {
@@ -167,12 +171,19 @@ class PlexApi
                 
                 if (preferredConnection)
                     resolve({ uri: preferredConnection });
-                else {
-                    // Run a check of the local ip address using an http connection.
-                    
+                else if (localConnection) {
+                    const baseUrl = `http://${localConnection.address}:${localConnection.port}`;
+                    // Run a check of the local ip address using an http connection - this is quick and dirty - needs to be cleaned up.
+                    PlexApi.fetchWithTimeout(PlexApi.formatUrl(`${baseUrl}/identity`, params), {
+                        timeout: timeout
+                    }).then((response) => {
+                        resolve({ uri: baseUrl });
+                    }).catch((err) => { 
+                        reject({ message: "Failed to resolve connection to server." });
+                    });
+                } else {
+                    reject({ message: "Failed to resolve connection to server." });
                 }
-                
-                reject({ message: "Failed to resolve connection to server." });
             }).catch((error) => {
                 reject({ message: "Failed to resolve connection to server." });
             });

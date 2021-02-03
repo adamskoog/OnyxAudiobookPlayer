@@ -133,17 +133,24 @@ class PlexApi
         return response;
     }
 
+    /**
+     * Run connection tests for a server to determine the best connection to use.
+     * @param {array[uri]} connections - An array of the server connections to be tested.
+     * @param {string} token 
+     */
     static serverConnectionTest(connections, token) {
         return new Promise((resolve, reject) => {
             const localParams = {}
             const params = Object.assign({}, PlexApi.baseParams, localParams, { "X-Plex-Token": token });
 
-            // TODO: There might be a better endpoint, but the payload on this is relatively small.
-            //       The timeout length could also be a concern.
             const connectionPromises = connections.map((connection) => {
-                return PlexApi.fetchWithTimeout(PlexApi.formatUrl(`${connection.uri}/library/sections`, params), {
-                    timeout: 1000
-                  });
+                // Use different timeout lengths for local vs remote servers.
+                const timeout = (connection.local) ? 1000 : 5000;
+
+                // Identity endpoint is very small, used by other projects.
+                return PlexApi.fetchWithTimeout(PlexApi.formatUrl(`${connection.uri}/identity`, params), {
+                    timeout: timeout
+                });
             });
 
             Promise.allSettled(connectionPromises).then((values) => {
@@ -160,6 +167,11 @@ class PlexApi
                 
                 if (preferredConnection)
                     resolve({ uri: preferredConnection });
+                else {
+                    // Run a check of the local ip address using an http connection.
+                    
+                }
+                
                 reject({ message: "Failed to resolve connection to server." });
             }).catch((error) => {
                 reject({ message: "Failed to resolve connection to server." });

@@ -1,4 +1,4 @@
-# Onxy Audiobook Player
+# Onyx Audiobook Player
 This is my feeble attempt to learn both ReactJS as well as better understand the Plex Media Server API. The goal is to create a web based Audiobook player that works with Plex Media Server's audio library with Stored Progress enabled.
 
 ## Things to do:

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import { connect } from 'react-redux';
 
 import AlbumItem from './AlbumItem';
@@ -20,6 +21,16 @@ const mapStateToProps = state => {
         setPlayQueue: (queue) => dispatch(playQueueActions.setPlayQueue(queue)),
     };
 };
+
+const TrackContainer = styled.div`
+    display: grid;
+    grid-template-columns: 30px 30px auto 65px 30px;
+    row-gap: .8rem;
+    align-items: center;
+
+    border-top: solid 1px black;
+    padding-top: .8rem;
+`;
 
 function ConnectedAlbum(props) {
 
@@ -135,13 +146,11 @@ function ConnectedAlbum(props) {
             </div>
             <div className="track-container">
                 <div className="mb-2 track-header">{album.size} Track{(album.size > 1) ? "s" : ""}</div>
-                <table>
-                    <tbody>
-                        {album.Metadata.map((track) => (
-                            <AlbumItem key={track.key} trackInfo={track} playSelectedTrack={playSelectedTrack} updateAlbumInfo={getAlbumMetadata} />
-                        ))}
-                    </tbody>
-                </table>
+                <TrackContainer>
+                    {album.Metadata.map((track) => (
+                        <AlbumItem key={track.key} trackInfo={track} playSelectedTrack={playSelectedTrack} updateAlbumInfo={getAlbumMetadata} />
+                    ))}
+                </TrackContainer>
             </div>
         </div>
         )}

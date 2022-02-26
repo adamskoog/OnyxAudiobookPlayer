@@ -1,8 +1,36 @@
 import React, { useRef, useEffect, useState } from 'react';
+import styled from 'styled-components';
+
 import LibraryItem from '../library/LibraryItem';
 
+import { ReactComponent as HubScrollLeftSvg } from '../../assets/hubScrollLeft.svg';
+import { ReactComponent as HubScrollRightSvg } from '../../assets/hubScrollRight.svg';
+
+const HubContainer = styled.div``;
+
+const Title = styled.div`
+    display: inline-block;
+    font-weight: 700;
+
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+
+    margin-bottom: 0.5rem;
+`;
+
+const ButtonContainer = styled.div`
+    float: right;
+
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+`;
+
+const HubScrollButton = styled.button`
+
+`;
+
 // Horizontal scrolling based on: https://webdevtrick.com/horizontal-scroll-navigation/
-function Hub(props) {
+const Hub = (props) => {
 
     const [leftScrollDisabled, setLeftScrollDisabled] = useState(true);
     const [rightScrollDisabled, setRightScrollDisabled] = useState(true);
@@ -14,7 +42,7 @@ function Hub(props) {
     const isTravelingRef = useRef(false);
     const directionRef = useRef("");
     
-    function determineOverflow(container, content) {
+    const determineOverflow = (container, content) => {
         var containerMetrics = container.getBoundingClientRect();
         var containerMetricsRight = Math.floor(containerMetrics.right);
         var containerMetricsLeft = Math.floor(containerMetrics.left);
@@ -32,7 +60,7 @@ function Hub(props) {
         }
     }
 
-    function checkOverflow() {
+    const checkOverflow = () => {
         const overflow = determineOverflow(containerRef.current, contentRef.current);
 
         setLeftScrollDisabled((overflow === "both" || overflow === "left") ? false : true);
@@ -95,7 +123,7 @@ function Hub(props) {
         containerRef.current.setAttribute("data-overflowing", determineOverflow(containerRef.current, contentRef.current));
     }
 
-    function navTransition() {
+    const navTransition = () => {
         // get the value of the transform, apply that to the current scroll position (so get the scroll pos first) and then remove the transform
         var styleOfTransform = window.getComputedStyle(contentRef.current, null);
         var tr = styleOfTransform.getPropertyValue("-webkit-transform") || styleOfTransform.getPropertyValue("transform");
@@ -112,7 +140,7 @@ function Hub(props) {
         isTravelingRef.current = false;
     }
 
-    function scroller() {
+    const scroller = () => {
         if (!isTickingRef.current) {
             window.requestAnimationFrame(function() {
                 checkOverflow();
@@ -139,20 +167,16 @@ function Hub(props) {
     });
 
     return (
-        <div className="home-hub">
-            <div className="inline-block font-bold mb-2 text-xl">{props.title}</div>
-            <div className="float-right text-2xl">
-                <button type="button" className="focus:outline-none hub-button" onClick={() => advanceLeft()} disabled={leftScrollDisabled}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" className="bi bi-caret-left-fill" viewBox="0 0 16 16">
-                        <path d="M3.86 8.753l5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                    </svg>
-                </button>
-                <button type="button" className="focus:outline-none hub-button" onClick={() => advanceRight()} disabled={rightScrollDisabled}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" className="bi bi-caret-right-fill" viewBox="0 0 16 16">
-                        <path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                    </svg>
-                </button>
-            </div>
+        <HubContainer>
+            <Title>{props.title}</Title>
+            <ButtonContainer>
+                <HubScrollButton onClick={() => advanceLeft()} disabled={leftScrollDisabled}>
+                    <HubScrollLeftSvg />
+                </HubScrollButton>
+                <HubScrollButton onClick={() => advanceRight()} disabled={rightScrollDisabled}>
+                    <HubScrollRightSvg />
+                </HubScrollButton>
+            </ButtonContainer>
             <div ref={containerRef} className="hub-container w-full overflow-x-auto overflow-y-hidden mb-6">
                 <div ref={contentRef} className="hub-contents flex flex-row w-max gap-4">            
                     {props.items.map((item) => (
@@ -160,7 +184,7 @@ function Hub(props) {
                     ))}
                 </div>
             </div>
-        </div>
+        </HubContainer>
     ); 
 }
 

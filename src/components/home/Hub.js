@@ -6,7 +6,7 @@ import LibraryItem from '../library/LibraryItem';
 import { ReactComponent as HubScrollLeftSvg } from '../../assets/hubScrollLeft.svg';
 import { ReactComponent as HubScrollRightSvg } from '../../assets/hubScrollRight.svg';
 
-const HubContainer = styled.div``;
+const Container = styled.div``;
 
 const Title = styled.div`
     display: inline-block;
@@ -26,11 +26,31 @@ const ButtonContainer = styled.div`
 `;
 
 const HubScrollButton = styled.button`
+`;
 
+const HubContainer = styled.div`
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin-bottom: 1.5rem;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+`;
+const HubContents = styled.div`
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: max-content;
+    transition: transform .2s ease-in-out;
+
+    &.hub-no-transition {
+        transition: none;
+    }
 `;
 
 // Horizontal scrolling based on: https://webdevtrick.com/horizontal-scroll-navigation/
-const Hub = (props) => {
+const Hub = ({ title, items, baseUrl, userInfo }) => {
 
     const [leftScrollDisabled, setLeftScrollDisabled] = useState(true);
     const [rightScrollDisabled, setRightScrollDisabled] = useState(true);
@@ -167,8 +187,8 @@ const Hub = (props) => {
     });
 
     return (
-        <HubContainer>
-            <Title>{props.title}</Title>
+        <Container>
+            <Title>{title}</Title>
             <ButtonContainer>
                 <HubScrollButton onClick={() => advanceLeft()} disabled={leftScrollDisabled}>
                     <HubScrollLeftSvg />
@@ -177,14 +197,14 @@ const Hub = (props) => {
                     <HubScrollRightSvg />
                 </HubScrollButton>
             </ButtonContainer>
-            <div ref={containerRef} className="hub-container w-full overflow-x-auto overflow-y-hidden mb-6">
-                <div ref={contentRef} className="hub-contents flex flex-row w-max gap-4">            
-                    {props.items.map((item) => (
-                        <LibraryItem key={item.ratingKey} baseUrl={props.baseUrl} userInfo={props.userInfo} albumInfo={item} />
+            <HubContainer ref={containerRef}>
+                <HubContents ref={contentRef}>            
+                    {items.map((item) => (
+                        <LibraryItem key={item.ratingKey} baseUrl={baseUrl} userInfo={userInfo} albumInfo={item} />
                     ))}
-                </div>
-            </div>
-        </HubContainer>
+                </HubContents>
+            </HubContainer>
+        </Container>
     ); 
 }
 

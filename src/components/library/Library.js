@@ -1,9 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react';
+import styled from 'styled-components';
+
 import LibraryItem from './LibraryItem';
 import PlexApi from '../../plex/Api';
 
+const Grid = styled.div`
+    display: grid;
+    grid-gap: 1rem;
+    gap: 1rem;
+    align-items: center;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    @media (min-width: 640px) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+`;
+
+const ErrorMessage = styled.div`
+    margin: 30px;
+`;
+
 //https://reactgo.com/javascript-get-data-from-api/
-function Library(props) {
+const Library = ({ userInfo, baseUrl, section }) => {
  
     const [libraryItems, setLibraryItems] = useState([]);
 
@@ -15,32 +42,32 @@ function Library(props) {
     useEffect(() => () => { isMountedRef.current = false }, [])
 
     useEffect(() => {
-        if (props.userInfo && props.baseUrl && props.section) {
-            PlexApi.getLibraryItems(props.baseUrl, props.section, { "X-Plex-Token": props.userInfo.authToken })
+        if (userInfo && baseUrl && section) {
+            PlexApi.getLibraryItems(baseUrl, section, { "X-Plex-Token": userInfo.authToken })
                 .then(data => {
                     if (data.MediaContainer.Metadata && isMountedRef.current)
                         setLibraryItems(data.MediaContainer.Metadata);
                 });
         } else 
             setLibraryItems([]);
-    }, [props.baseUrl, props.section, props.userInfo]);
+    }, [baseUrl, section, userInfo]);
 
     return (
-        <React.Fragment>
-        {!props.userInfo && (
-            <div>Must login to view library.</div>
+        <>
+        {!userInfo && (
+            <ErrorMessage>Must login to view library.</ErrorMessage>
         )}
-        {(!props.baseUrl || !props.section) && (
-            <div>Failed to load library, please update your settings.</div>
+        {(!baseUrl || !section) && (
+            <ErrorMessage>Failed to load library, please update your settings.</ErrorMessage>
         )}
-        {props.userInfo && props.baseUrl && props.section && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {userInfo && baseUrl && section && (
+            <Grid>
                 {libraryItems.map((item) => (
-                    <LibraryItem key={item.key} baseUrl={props.baseUrl} userInfo={props.userInfo} albumInfo={item} />
+                    <LibraryItem key={item.key} baseUrl={baseUrl} userInfo={userInfo} albumInfo={item} />
                 ))}
-            </div>
+            </Grid>
         )}
-        </React.Fragment>
+        </>
     ); 
 }
 

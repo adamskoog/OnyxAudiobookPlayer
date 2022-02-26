@@ -1,16 +1,34 @@
 import React from 'react';
+import styled from 'styled-components';
+
 import { Link } from 'react-router-dom';
 import PlexApi from '../../plex/Api';
 
-function LibraryItem(props) {
+const Container = styled.div`
+    text-align: center;
+`;
+
+const AlbumCover = styled.img`
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-radius: 0.375rem;
+    margin-bottom: 0.25rem;
+`;
+
+const OverflowText = styled.div`
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+`;
+
+const LibraryItem = ({ albumInfo, baseUrl, userInfo }) => {
     return (
-        <div className="text-center">
-            <Link to={`/album/${props.albumInfo.ratingKey}`}>
-                <img className="shadow-xl rounded-md mb-1" src={PlexApi.getThumbnailTranscodeUrl(200, 200, props.baseUrl, props.albumInfo.thumb, props.userInfo.authToken)} alt="Album Cover" loading="lazy" />
-                <div className="truncate" title={props.albumInfo.title}>{props.albumInfo.title}</div>
-                <div className="truncate" title={props.albumInfo.parentTitle}>{props.albumInfo.parentTitle}</div>
+        <Container>
+            <Link to={`/album/${albumInfo.ratingKey}`}>
+                <AlbumCover src={PlexApi.getThumbnailTranscodeUrl(200, 200, baseUrl, albumInfo.thumb, userInfo.authToken)} alt="Album Cover" loading="lazy" />
+                <OverflowText title={albumInfo.title}>{albumInfo.title}</OverflowText>
+                <OverflowText title={albumInfo.parentTitle}>{albumInfo.parentTitle}</OverflowText>
             </Link>
-        </div>
+        </Container>
     ); 
 }
 

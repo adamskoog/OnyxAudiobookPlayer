@@ -26,7 +26,7 @@ function Header(props) {
     }
 
     const menuCss = (isOpen) => {
-        const main = document.querySelector(".main-viewer");
+        const main = props.containerRef.current;
         if (main) {
             main.classList.remove("menu-open");
         }

@@ -2,7 +2,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { useSelector } from 'react-redux'
+import { useSelector } from 'react-redux';
 
 const isLoading = (loading, state) => {
     // TODO: we should utilize the state to determine when

@@ -28,7 +28,7 @@ function ConnectedNowPlaying(props) {
     };
     
     useEffect(() => {
-        const main = document.querySelector(".main-viewer");
+        const main = props.containerRef.current;
         const player = document.querySelector(".now-playing");
         if (props.playState === "stopped") {
             main.classList.remove("playing");
@@ -37,7 +37,7 @@ function ConnectedNowPlaying(props) {
             main.classList.add("playing");
             player.classList.add("playing");
         }
-    }, [props.playState]);
+    }, [props.playState, props.containerRef]);
 
     return (
         <div className="bg-gray-800 text-white now-playing">

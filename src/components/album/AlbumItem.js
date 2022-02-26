@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
 import { useSelector } from 'react-redux'
@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux'
 import TimeUtils from '../../utility/time';
 import PlexPlayback from '../../plex/Playback';
 
-import Menu from './Menu';
+import TrackMenu from './TrackMenu';
 
 import { ReactComponent as TrackCompleteSvg } from '../../assets/trackComplete.svg';
 import { ReactComponent as TrackInProgressSvg } from '../../assets/trackInProgress.svg';
@@ -23,20 +23,6 @@ const trackStatus = (trackInfo) => {
     return "";
 };
 
-const markPlayed = (trackInfo, baseUrl, authToken, updateAlbumInfo) => {
-    PlexPlayback.markTrackPlayed(trackInfo , baseUrl, authToken)
-		.then(() => {
-			updateAlbumInfo();
-		});
-};
-
-const markUnplayed = (trackInfo, baseUrl, authToken, updateAlbumInfo) => {
-    PlexPlayback.markTrackUnplayed(trackInfo , baseUrl, authToken)
-        .then(() => {
-            updateAlbumInfo();
-        });
-};
-
 const TrackCell = styled.div``;
 
 const AlbumItem = ({ trackInfo, playSelectedTrack, updateAlbumInfo }) => {
@@ -44,17 +30,6 @@ const AlbumItem = ({ trackInfo, playSelectedTrack, updateAlbumInfo }) => {
     const authToken = useSelector(state => state.application.authToken);
     const baseUrl = useSelector(state => state.application.baseUrl);
     const currentTrack = useSelector(state => state.playQueue.currentTrack);
-
-    const [isOpen, setIsOpen] = useState(false);
-
-    const closeMenu = () => {
-        if (isOpen) setIsOpen(false);
-    }
-
-    useEffect(() => {
-        document.addEventListener("click", closeMenu);
-        return () => { document.removeEventListener("click", closeMenu); }
-    }, [isOpen]);
 
     useEffect(() => {
         if (currentTrack && trackInfo) {
@@ -75,16 +50,12 @@ const AlbumItem = ({ trackInfo, playSelectedTrack, updateAlbumInfo }) => {
             <TrackCell>{trackInfo.title}</TrackCell>
             <TrackCell>{TimeUtils.formatTrackDisplay(trackInfo.duration)}</TrackCell>
             <TrackCell>
-                <Menu
+                <TrackMenu
                     trackInfo={trackInfo}
                     baseUrl={baseUrl}
                     authToken={authToken}
                     playSelectedTrack={playSelectedTrack}
-                    markPlayed={markPlayed}
-                    markUnplayed={markUnplayed}
                     updateAlbumInfo={updateAlbumInfo}
-                    setIsOpen={setIsOpen}
-                    isOpen={isOpen}
                 />
             </TrackCell>
         </>

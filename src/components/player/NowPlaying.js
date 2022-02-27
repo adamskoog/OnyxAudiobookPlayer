@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect, useRef } from 'react';
+import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 
 import PlexApi from '../../plex/Api';
 
@@ -7,53 +8,91 @@ import { Link } from 'react-router-dom';
 import PlayerTime from './controls/PlayerTime';
 import AudioPlayer from './Player';
 
-const mapStateToProps = state => {
-    return { 
-        authToken: state.application.authToken,
-        baseUrl: state.application.baseUrl,
-        playState: state.player.mode,
-        currentTrack: state.playQueue.currentTrack
-    };
-};
-function ConnectedNowPlaying(props) {
+const Container = styled.div`
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0px;
+    overflow: hidden;
 
-    function getThumbnailUrl() {
-        if (!props.currentTrack) return "";
-        return PlexApi.getThumbnailTranscodeUrl(100, 100, props.baseUrl, props.currentTrack.thumb, props.authToken);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    color: #fff;
+    background-color: rgba(31, 41, 55, 1);
+    
+    height: 0px;
+    &.playing {
+        height: 100px;
+    }
+`;
+const AlbumImage = styled.img`
+    height: 100px;
+    width: 100px;
+
+    display: none;
+    @media (min-width: 640px) {
+        display: block;
+    }
+`;
+const InfoContainer = styled.div`
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+
+    max-width: 180px;
+`;
+const TextBlock = styled.div`
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: ${(props) => (props.fontColor) ? props.fontColor : '#fff'};
+`;
+
+const NowPlaying = (props) => {
+
+    const containerRef = useRef(null);
+
+    const authToken = useSelector(state => state.application.authToken);
+    const baseUrl = useSelector(state => state.application.baseUrl);
+    const playState = useSelector(state => state.player.mode);
+    const currentTrack = useSelector(state => state.playQueue.currentTrack);
+        
+    const getThumbnailUrl = () => {
+        if (!currentTrack) return "";
+        return PlexApi.getThumbnailTranscodeUrl(100, 100, baseUrl, currentTrack.thumb, authToken);
     };
 
-    function getPlayInfoAttr(attr) {
-        if (!props.currentTrack) return "";
-        return props.currentTrack[attr];
+    const getPlayInfoAttr = (attr) => {
+        if (!currentTrack) return "";
+        return currentTrack[attr];
     };
     
     useEffect(() => {
         const main = props.containerRef.current;
-        const player = document.querySelector(".now-playing");
-        if (props.playState === "stopped") {
+        const player = containerRef.current;
+        if (playState === "stopped") {
             main.classList.remove("playing");
             player.classList.remove("playing");
         } else {
             main.classList.add("playing");
             player.classList.add("playing");
         }
-    }, [props.playState, props.containerRef]);
+    }, [playState, props.containerRef]);
 
     return (
-        <div className="bg-gray-800 text-white now-playing">
-            <div className="flex flex-row flex-nowrap">
-                <img className="album-thumb hidden sm:inline-block" src={getThumbnailUrl()} alt="album art" />
-                <div className="inline-block ml-3 mr-3">
-                    <div className="truncate">{getPlayInfoAttr("title")}</div>
-                    <div className="text-gray-300 truncate"><Link to={`/album/${getPlayInfoAttr("parentRatingKey")}`}>{getPlayInfoAttr("parentTitle")}</Link></div>
-                    <div className="text-gray-300 truncate">{getPlayInfoAttr("grandparentTitle")}</div>
-                    <PlayerTime />
-                </div>
-                <AudioPlayer />
-            </div>
-        </div>
+        <Container ref={containerRef}>
+            <AlbumImage src={getThumbnailUrl()} alt="album art" />
+            <InfoContainer>
+                <TextBlock>{getPlayInfoAttr("title")}</TextBlock>
+                <TextBlock fontColor={"rgba(209, 213, 219, 1)"}><Link to={`/album/${getPlayInfoAttr("parentRatingKey")}`}>{getPlayInfoAttr("parentTitle")}</Link></TextBlock>
+                <TextBlock fontColor={"rgba(209, 213, 219, 1)"}>{getPlayInfoAttr("grandparentTitle")}</TextBlock>
+                <PlayerTime />
+            </InfoContainer>
+            <AudioPlayer />
+        </Container>
     );
 }
 
-const NowPlaying = connect(mapStateToProps)(ConnectedNowPlaying);
 export default NowPlaying;

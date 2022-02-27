@@ -30,11 +30,9 @@ const NexTrackControl = () => {
     const queue = useSelector(state => state.playQueue.queue);
 
     return (
-        <>
-            <PlayerSmallButton disabled={!hasNextTrack(queueIndex, queue)} onClick={() => dispatch(nextTrackInQueue())}>
-                <NextTrackSvg />
-            </PlayerSmallButton>
-        </>
+        <PlayerSmallButton disabled={!hasNextTrack(queueIndex, queue)} onClick={() => dispatch(nextTrackInQueue())}>
+            <NextTrackSvg />
+        </PlayerSmallButton>
     ); 
 }
 

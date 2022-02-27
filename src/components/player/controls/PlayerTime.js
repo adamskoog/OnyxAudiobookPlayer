@@ -1,27 +1,25 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import styled from 'styled-components';
+import { useSelector } from 'react-redux';
+
 import TimeUtils from '../../../utility/time';
 
-const mapStateToProps = state => {
-    return { 
-        currentTime: state.player.currentTime,
-        duration: state.player.duration
-    };
+const TimeDisplay = styled.div``;
+
+const defaultTimeDisplay = "--:--/--:--";
+const formatTime = (currentTime, duration) => {
+    if (!currentTime && !duration)
+        return defaultTimeDisplay;
+    return TimeUtils.formatPlayerDisplay(currentTime, duration);
 };
 
-function ConnectedPlayerTime(props) {
-    const defaultTimeDisplay = "--:--/--:--";
-    
-    function formatTime () {
-        if (!props.currentTime && !props.duration)
-            return defaultTimeDisplay;
-        return TimeUtils.formatPlayerDisplay(props.currentTime, props.duration);
-    }
+const PlayerTime = () => {    
+    const currentTime = useSelector(state => state.player.currentTime);
+    const duration = useSelector(state => state.player.duration);
 
     return (
-        <div className="player-timer">{formatTime()}</div>
+        <TimeDisplay>{formatTime(currentTime, duration)}</TimeDisplay>
     ); 
 }
 
-const PlayerTime = connect(mapStateToProps)(ConnectedPlayerTime);
 export default PlayerTime;

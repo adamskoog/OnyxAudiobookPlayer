@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import { useSelector, useDispatch } from 'react-redux'
 
+import AlbumSummary from './AlbumSummary';
 import AlbumItem from './AlbumItem';
 import PlexApi from '../../plex/Api';
 import PlexPlayback from '../../plex/Playback';
@@ -56,16 +57,6 @@ const OnDeckButton = styled.button`
     line-height: 2.25rem;
 `;
 
-const AlbumSummaryContainer = styled.div`
-    margin: 0.75rem 0;
-    font-size: 1rem;
-    line-height: 1.5rem;
-
-    display:flex;
-    flex-direction: column;
-    gap: .25rem;
-`;
-
 const TrackContainer = styled.div`
 `;
 const Tracks = styled.div`
@@ -90,14 +81,6 @@ const Album = ({ ratingKey }) => {
 
     const [album, setAlbum] = useState({ Metadata: [] });
     const [onDeck, setOnDeck] = useState(null);
-
-    const formatSummary = (summary) => {
-        if (summary) {
-            var splitted = summary.split("\n");
-            return `<p>${splitted.join("</p><p>")}</p>`;
-        }
-        return "";
-    }
 
     const playOnDeckTrack = (trackInfo) => {
         dispatch(setPlayQueue(PlexPlayback.getAlbumQueue(trackInfo, album)));
@@ -158,7 +141,7 @@ const Album = ({ ratingKey }) => {
                     )}
                 </AlbumInfo>
             </AlbumContainer>
-            <AlbumSummaryContainer dangerouslySetInnerHTML={{__html: formatSummary(album.summary)}} />
+            <AlbumSummary summary={album.summary} />
             <TrackContainer>
                 <TrackCount>{album.size} Track{(album.size > 1) ? "s" : ""}</TrackCount>
                 <Tracks>

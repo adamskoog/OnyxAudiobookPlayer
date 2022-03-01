@@ -9,7 +9,6 @@
     "@testing-library/user-event": "^12.2.2",
     "express": "^4.17.3",
     "lodash": "^4.17.20",
-    "node-sass": "^4.14.1",
     "qs": "^6.5.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -19,17 +18,17 @@
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
+    "styled-components": "^5.3.3",
     "uuid": "^8.3.1",
     "web-vitals": "^0.2.4",
     "yargs": "^17.3.1"
   },
   "scripts": {
-    "start": "npm run build:css && set PORT=3001 && react-scripts start",
-    "build": "npm run build:css && react-scripts build",
+    "start": "set PORT=3001 && react-scripts start",
+    "build": "react-scripts build",
     "build:docker": "npm run build && node serve --port 3001 --host 0.0.0.0",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "build:css": "postcss src/styles/tailwind.scss -o src/styles/index.scss "
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -50,9 +49,6 @@
     ]
   },
   "devDependencies": {
-    "autoprefixer": "^10.1.0",
-    "postcss-cli": "^8.3.1",
-    "regenerator-runtime": "^0.13.7",
-    "tailwindcss": "^2.0.2"
+    "regenerator-runtime": "^0.13.7"
   }
 }

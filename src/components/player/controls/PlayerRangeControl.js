@@ -1,33 +1,26 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 
-const mapStateToProps = state => {
-    return { 
-        currentTime: state.player.currentTime,
-        duration: state.player.duration
-    };
-};
+const PlayerRangeInput = styled.input`
+    margin: .75rem 1rem;
+    flex-grow: 1;
+`;
 
-function ConnectedPlayerRangeControl(props) {
+const checkValid = (value) => {
+    if (!value || isNaN(value)) return 0;
+    return value;
+}
 
-    function checkValid(value) {
-        if (!value || isNaN(value)) return 0;
-        return value;
-    }
+const PlayerRangeControl = ({ playerRangeChanged }) => {
 
+    const currentTime = useSelector(state => state.player.currentTime);
+    const duration = useSelector(state => state.player.duration);
+    
     return (
-        <div className="flex flex-grow mx-5 mt-4 mb-2">
-            <input id="playerTimeRange" 
-                type="range" 
-                className="flex-grow" 
-                min={0} 
-                max={checkValid(props.duration)} 
-                value={checkValid(props.currentTime)} 
-                onChange={props.playerRangeChanged} 
-                />
-        </div>
+        <PlayerRangeInput type="range" min={0}  max={checkValid(duration)} 
+            value={checkValid(currentTime)}  onChange={playerRangeChanged} />
     ); 
 }
 
-const PlayerRangeControl = connect(mapStateToProps)(ConnectedPlayerRangeControl);
 export default PlayerRangeControl;

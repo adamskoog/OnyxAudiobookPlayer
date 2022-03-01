@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect, useRef } from 'react';
+import styled from 'styled-components';
+import { useSelector, useDispatch } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route  } from 'react-router-dom';
 
-import * as appActions from "../context/actions/appStateActions";
-import * as settingsActions from "../context/actions/settingsActions";
+import { logout, getToken, checkToken, checkAuthId } from "../context/actions/appStateActions";
+import { loadSettingsValues, getServers } from "../context/actions/settingsActions";
 
 import Header from './Header';
 import NowPlaying from './player/NowPlaying';
@@ -15,27 +16,48 @@ import Album from './album/Album';
 
 import PlexAuthentication from "../plex/Authentication";
 
-const mapStateToProps = state => {
-    return {
-        user: state.application.user, 
-        authToken: state.application.authToken,
-        authId: state.application.authId,
-        baseUrl: state.application.baseUrl,
-        librarySection: state.settings.librarySection
-    };
-};
+const MainContainer = styled.main`
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0px;
+    overflow: hidden;
 
- const mapDispatchToProps = dispatch => {
-    return {
-        logout: () => dispatch(appActions.logout()),
-        getToken: () => dispatch(appActions.getToken()),
-        checkToken: token => dispatch(appActions.checkToken(token)),
-        checkAuthId: authId => dispatch(appActions.checkAuthId(authId)),
-        loadSettingsValues: () => dispatch(settingsActions.loadSettingsValues()),
-        getServers: authToken => dispatch(settingsActions.getServers(authToken))
-    };
-};
-function ConnectedMain(props) {
+    &.playing {
+        bottom: 100px;
+    }
+    &.menu-open {
+        top: 168px;
+    }
+`;
+
+const ScrollContainer = styled.div`
+    height: 100%;
+    overflow: auto;
+`;
+
+// TODO: handle responsive grid and padding.
+const ScrollContent = styled.div`
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: .75rem;
+    padding-right: .75rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+`;
+
+const Main = () => {
+    const dispatch = useDispatch();
+
+    const user = useSelector(state => state.application.user);
+    const authToken = useSelector(state => state.application.authToken);
+    const authId = useSelector(state => state.application.authId);
+    const baseUrl = useSelector(state => state.application.baseUrl);
+    const librarySection = useSelector(state => state.settings.librarySection);
+
+    const containerRef = useRef(null);
 
     const doUserLogin = () => {
         PlexAuthentication.prepareLoginRequest()
@@ -46,54 +68,52 @@ function ConnectedMain(props) {
 
     useEffect(() => {
         // Cannot load fully if no library section is set.
-        if (props.authToken) {
-            props.getServers(props.authToken);
+        if (authToken) {
+            dispatch(getServers(authToken));
         }
-    }, [props.authToken, props.librarySection]);
+    }, [authToken, librarySection]);
 
     useEffect(() => {    
-        if (!props.user) {
+        if (!user) {
              // We have no user logged in, check for tokens.
-             props.getToken();
+             dispatch(getToken());
         } else
-            props.loadSettingsValues();
-    }, [props.user]);
+            dispatch(loadSettingsValues());
+    }, [user]);
 
     useEffect(() => {
-        if (props.authToken) {
+        if (authToken) {
             // We have a token stored, attempt to authenticate.
-             props.checkToken(props.authToken);
-        } else if (props.authId) {
+             dispatch(checkToken(authToken));
+        } else if (authId) {
             // We have been redirected and now have an authorization id to handle.
-            props.checkAuthId(props.authId);
+            dispatch(checkAuthId(authId));
         }
-    }, [props.authToken, props.authId]);
+    }, [authToken, authId]);
 
     return (
-        <React.Fragment>
+        <>
             <Loader />
             <Router>
-                <Header userInfo={props.user} doUserLogin={doUserLogin} doUserLogout={props.logout} />
-                <main role="main" className="main-viewer">
-                    <div className="h-full overflow-auto">
-                        <div className="max-w-7xl mx-auto py-6 px-3 sm:px-6 lg:px-8">
-                        <Switch>
-                            <Route exact path="/" component={() => <Home baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} /> } />
-                            <Route exact path="/library" component={() => <Library baseUrl={props.baseUrl} userInfo={props.user} section={props.librarySection} />} />
-                            <Route exact path="/album/:ratingKey" component={(comprops) => 
-                                <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
-                            }/>
-                            <Route exact path="/settings" component={() => <Settings /> } />
-                        </Switch>
-                        </div>
-                    </div>
-                </main>
-                <NowPlaying />               
+                <Header containerRef={containerRef} userInfo={user} doUserLogin={doUserLogin} doUserLogout={logout} />
+                <MainContainer role="main" ref={containerRef}>
+                    <ScrollContainer>
+                        <ScrollContent className="px-3 sm:px-6 lg:px-8">
+                            <Switch>
+                                <Route exact path="/" component={() => <Home baseUrl={baseUrl} userInfo={user} section={librarySection} /> } />
+                                <Route exact path="/library" component={() => <Library baseUrl={baseUrl} userInfo={user} section={librarySection} />} />
+                                <Route exact path="/album/:ratingKey" component={(comprops) => 
+                                    <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
+                                }/>
+                                <Route exact path="/settings" component={() => <Settings /> } />
+                            </Switch>
+                        </ScrollContent>
+                    </ScrollContainer>
+                </MainContainer>
+                <NowPlaying containerRef={containerRef} />               
             </Router>
-        </React.Fragment>
+        </>
     ); 
 }
-
-const Main = connect(mapStateToProps, mapDispatchToProps)(ConnectedMain);
 
 export default Main;

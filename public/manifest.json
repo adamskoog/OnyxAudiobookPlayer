@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Onyx",
+  "name": "Onyx Audiobook Player",
+  "description": "A browser based Audiobook Player for Plex.",
   "icons": [
     {
       "src": "favicon.ico",

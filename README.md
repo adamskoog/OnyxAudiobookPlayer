@@ -9,6 +9,9 @@ This is my feeble attempt to learn both ReactJS as well as better understand the
 * I'm sure there is much more as well...
 
 ## Patch Notes
+### Version: 0.6.0
+* Refactor redux usage to hooks.
+* Refactor full app to removed tailwind and use styled components - Note: styling is mostly the same with exception of a few things that were not implemented.
 
 ### Version: 0.5.1
 * Add Home Screen with Hubs - Recently Added, Recently Played

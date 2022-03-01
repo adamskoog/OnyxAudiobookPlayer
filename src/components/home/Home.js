@@ -1,21 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
+import styled from 'styled-components';
+
 import PlexApi from '../../plex/Api';
 
 import Hub from './Hub';
 
-function Home(props) {
+const ErrorMessage = styled.div`
+    margin: 30px;
+`;
+
+const Home = ({ baseUrl, section, userInfo }) => {
  
     const [recentlyAddedInfo, setRecentlyAddedInfo] = useState([]);
     const [recentlyPlayedInfo, setRecentlyPlayedInfo] = useState([]);
 
-    // https://www.npmjs.com/package/react-horizontal-scrolling-menu
     const isMountedRef = useRef(true)
     useEffect(() => () => { isMountedRef.current = false }, [])
 
     useEffect(() => {
-        if (props.userInfo && props.baseUrl && props.section) {
-            PlexApi.getLibraryItems(props.baseUrl, props.section, { 
-                "X-Plex-Token": props.userInfo.authToken,
+        if (userInfo && baseUrl && section) {
+            PlexApi.getLibraryItems(baseUrl, section, { 
+                "X-Plex-Token": userInfo.authToken,
                 "X-Plex-Container-Start": 0,
                 "X-Plex-Container-Size": 10,
                 sort: "addedAt:desc"
@@ -27,12 +32,12 @@ function Home(props) {
         } else {
             setRecentlyAddedInfo([]);
         }
-    }, [props.baseUrl, props.section, props.userInfo]);
+    }, [baseUrl, section, userInfo]);
 
     useEffect(() => {
-        if (props.userInfo && props.baseUrl && props.section) {
-            PlexApi.getLibraryItems(props.baseUrl, props.section, { 
-                "X-Plex-Token": props.userInfo.authToken,
+        if (userInfo && baseUrl && section) {
+            PlexApi.getLibraryItems(baseUrl, section, { 
+                "X-Plex-Token": userInfo.authToken,
                 "X-Plex-Container-Start": 0,
                 "X-Plex-Container-Size": 10,
                 sort: "lastViewedAt:desc"
@@ -44,23 +49,23 @@ function Home(props) {
         } else {
             setRecentlyPlayedInfo([]);
         }
-    }, [props.baseUrl, props.section, props.userInfo]);
+    }, [baseUrl, section, userInfo]);
 
     return (
-        <React.Fragment>
-        {!props.userInfo && (
-            <div>Must login to view library.</div>
+        <>
+        {!userInfo && (
+            <ErrorMessage>Must login to view library.</ErrorMessage>
         )}
-        {(!props.baseUrl || !props.section) && (
-            <div>Failed to load library, please update your settings.</div>
+        {(!baseUrl || !section) && (
+            <ErrorMessage>Failed to load library, please update your settings.</ErrorMessage>
         )}
-        {props.userInfo && props.baseUrl && (
-            <React.Fragment>
-                <Hub title="Recently Added" baseUrl={props.baseUrl} userInfo={props.userInfo} items={recentlyAddedInfo} />
-                <Hub title="Recently Played" baseUrl={props.baseUrl} userInfo={props.userInfo} items={recentlyPlayedInfo} />
-            </React.Fragment>
+        {userInfo && baseUrl && (
+            <>
+                <Hub title="Recently Added" baseUrl={baseUrl} userInfo={userInfo} items={recentlyAddedInfo} />
+                <Hub title="Recently Played" baseUrl={baseUrl} userInfo={userInfo} items={recentlyPlayedInfo} />
+            </>
         )}
-        </React.Fragment>
+        </>
     ); 
 }
 

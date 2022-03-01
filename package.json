@@ -25,7 +25,7 @@
     "yargs": "^17.3.1"
   },
   "scripts": {
-    "start": "npm run build:css && set PORT=3001 && react-scripts start",
+    "start": "set PORT=3001 && react-scripts start",
     "build": "npm run build:css && react-scripts build",
     "build:docker": "npm run build && node serve --port 3001 --host 0.0.0.0",
     "test": "react-scripts test",

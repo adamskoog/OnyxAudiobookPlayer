@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
+import * as Responsive from '../util/responsive';
 import PlexApi from '../../plex/Api';
 
 import { Link } from 'react-router-dom';
@@ -32,9 +33,9 @@ const AlbumImage = styled.img`
     width: 100px;
 
     display: none;
-    @media (min-width: 640px) {
+    ${Responsive.smallMediaQuery(`
         display: block;
-    }
+    `)}
 `;
 const InfoContainer = styled.div`
     margin-left: 0.75rem;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import * as Responsive from '../util/responsive';
 
 import LibraryItem from './LibraryItem';
 import PlexApi from '../../plex/Api';
@@ -9,20 +10,22 @@ const Grid = styled.div`
     grid-gap: 1rem;
     gap: 1rem;
     align-items: center;
+    justify-items: center;
 
     grid-template-columns: repeat(2, minmax(0, 1fr));
 
-    @media (min-width: 640px) {
+    ${Responsive.smallMediaQuery(`
         grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    @media (min-width: 768px) {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    @media (min-width: 1024px) {
+    `)}
+    ${Responsive.mediumMediaQuery(`
+        grid-template-columns: repeat(4, minmax(0, 1fr));;
+    `)}
+    ${Responsive.largeMediaQuery(`
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    `)}
+    ${Responsive.xlMediaQuery(`
         grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
+    `)}
 `;
 
 const ErrorMessage = styled.div`

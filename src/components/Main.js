@@ -42,7 +42,8 @@ const ScrollContent = styled.div`
     max-width: 80rem;
     margin-left: auto;
     margin-right: auto;
-
+    padding-left: .75rem;
+    padding-right: .75rem;
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
 `;

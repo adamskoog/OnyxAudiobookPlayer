@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import PlexApi from '../../plex/Api';
 
 const Container = styled.div`
+    max-width: 200px; /* Match max width of images to keep text aligned. */
     text-align: center;
 `;
 

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-import { Transition } from '@headlessui/react'
+import * as Responsive from '../util/responsive';
 import { Link, useLocation } from 'react-router-dom';
 
-import { ReactComponent as HamburgerSvg } from '../assets/menuHamburger.svg';
+import SettingsMenu from './SettingsMenu';
+
+import { ReactComponent as HamburgerSvg } from '../../assets/menuHamburger.svg';
 
 const NavContainer = styled.nav`
     background-color: rgba(31, 41, 55, 1);
@@ -16,14 +18,14 @@ const Container = styled.div`
     padding-left: 1rem;
     padding-right: 1rem;
 
-    @media (min-width: 640px) {
+    ${Responsive.smallMediaQuery(`
         padding-left: 1.5rem;
         padding-right: 1.5rem;
-    }
-    @media (min-width: 1024px) {
+    `)}
+    ${Responsive.largeMediaQuery(`
         padding-left: 2rem;
-        padding-right: 2rem;       
-    }
+        padding-right: 2rem; 
+    `)}
 `;
 const NavContent = styled.div`
     position: relative;
@@ -43,9 +45,9 @@ const MobileMenuContainer = styled.div`
     padding-right: 0.75rem;
     padding-bottom: 0.5rem;
 
-    @media (min-width: 768px) {
+    ${Responsive.mediumMediaQuery(`
         display: none;
-    }
+    `)}
 `;
 
 const MobileMenuItem = styled(Link)`
@@ -77,9 +79,9 @@ const MobileButtonContainer = styled.div`
     display: flex;
     align-items: center;
 
-    @media (min-width: 640px) {
+    ${Responsive.smallMediaQuery(`
         display: none;
-    }
+    `)}
 `;
 const MobileButton = styled.button`
     display: inline-flex;
@@ -88,6 +90,9 @@ const MobileButton = styled.button`
 
     border-radius: 0.375rem;
     padding: 0.5rem;
+
+    font-size: 1.5rem;
+    line-height: 2rem;
 
     color: rgba(156, 163, 175, 1);
 
@@ -115,10 +120,10 @@ const TitleContainer = styled.div`
     justify-content: center;
     align-items: center;
 
-    @media (min-width: 640px) {
+    ${Responsive.smallMediaQuery(`
         justify-content: flex-start;
         align-items: stretch;
-    }
+    `)}
 `;
 const Title = styled.div`
     display: flex;
@@ -132,12 +137,36 @@ const TitleMenuItem = styled.div`
     display: none;
     margin-left: 2.5rem;
 
-    @media (min-width: 640px) {
+    ${Responsive.smallMediaQuery(`
         display: block;
-    }
+    `)}
 `;
 
 const TitleMenuItemLink = styled(Link)`
+    color: rgba(209, 213, 219, 1);
+
+    padding-top: 0.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-bottom: 0.5rem;
+
+    border-radius: 0.375rem;
+
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+
+    &.active {
+        color: #fff;
+        background-color: rgba(75, 85, 99, 1);
+    }
+    &:hover {
+        color: #fff;
+        background-color: rgba(55, 65, 81, 1);
+    }
+`;
+
+const TitleMenuItemButton = styled.button`
     color: rgba(209, 213, 219, 1);
 
     padding-top: 0.5rem;
@@ -250,40 +279,10 @@ const Header = (props) => {
                     </TitleContainer>
 
                     {!props.userInfo && (
-                        <button className="nav-menu nav-signin text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" onClick={() => props.doUserLogin()}>Login</button>
+                        <TitleMenuItemButton className="nav-menu nav-signin" onClick={() => props.doUserLogin()}>Login</TitleMenuItemButton>
                     )}
-                      <div className="ml-4 flex items-center md:ml-6">
-                          <div className="ml-3 relative">
-                              <div>
-                                  <button onClick={() => setAccountIsOpen(!accountIsOpen)} className="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" id="user-menu" aria-haspopup="true">
-                                  <span className="sr-only">Open user menu</span>
-                                      {props.userInfo && (
-                                      <img className="h-12 w-12 rounded-full" src={props.userInfo.thumb} alt="" />
-                                      )}
-                                  </button>
-                              </div>
 
-                              <Transition
-                                show={accountIsOpen}
-                                enter="transition ease-out duration-100"
-                                enterFrom="transform opacity-0 scale-95"
-                                enterTo="transform opacity-100 scale-100"
-                                leave="transition ease-in duration-75"
-                                leaveFrom="transform opacity-100 scale-100"
-                                leaveTo="transform opacity-0 scale-95">
-                                {(ref) => (
-                                  <div ref={ref} className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 z-50 bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-300" role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
-                                      <div className="py-1">
-                                        <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" to={`/settings`}>Settings</Link>
-                                      </div>
-                                      <div className="py-1">
-                                        <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" role="menuitem" onClick={props.doUserLogout}>Sign Out</div>
-                                      </div>
-                                  </div>
-                                )}
-                              </Transition>
-                          </div>
-                      </div>
+                    <SettingsMenu accountIsOpen={accountIsOpen} setAccountIsOpen={setAccountIsOpen} userInfo={props.userInfo} doUserLogout={props.doUserLogout} />
                 </NavContent>
             </Container>
 

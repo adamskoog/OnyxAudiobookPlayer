@@ -42,6 +42,7 @@ const AlbumItem = ({ trackInfo, playSelectedTrack, updateAlbumInfo }) => {
     return (
         <>
             <TrackCell>
+                {/* TODO: Refactor to component */}
                 {trackStatus(trackInfo) === "" && (<TrackUnplayedSvg />)}
                 {trackStatus(trackInfo) === "in-progress" && (<TrackInProgressSvg />)}
                 {trackStatus(trackInfo) === "complete" && (<TrackCompleteSvg />)}

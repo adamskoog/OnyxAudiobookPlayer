@@ -73,6 +73,12 @@ export const GlobalStyle = createGlobalStyle`
         cursor: pointer;
     }
 
+    body {   
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        background-color: rgba(229, 231, 235, 1);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
 `;
 
 export const NormalizeGlobalStyle = createGlobalStyle`

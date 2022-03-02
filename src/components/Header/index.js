@@ -9,6 +9,8 @@ import { SrOnly } from '../util/common';
 
 import { ReactComponent as HamburgerSvg } from '../../assets/menuHamburger.svg';
 
+const HEADER_HEIGHT = '64px';
+
 const NavContainer = styled.nav`
     background-color: rgba(31, 41, 55, 1);
 `;
@@ -30,7 +32,7 @@ const Container = styled.div`
 `;
 const NavContent = styled.div`
     position: relative;
-    height: 4rem;
+    height: ${HEADER_HEIGHT};
     display: flex;
     justify-content: space-between;
     align-items: center;

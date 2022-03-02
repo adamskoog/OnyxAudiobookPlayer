@@ -17,18 +17,18 @@ import Album from './album/Album';
 import PlexAuthentication from "../plex/Authentication";
 
 const MainContainer = styled.main`
-    position: absolute;
-    top: 64px;
-    left: 0;
-    right: 0;
-    bottom: 0px;
+    height: calc(100vh - 64px);
+
     overflow: hidden;
 
     &.playing {
-        bottom: 100px;
+        height: calc(100vh - 64px - 100px);
     }
     &.menu-open {
-        top: 168px;
+        height: calc(100vh - 168px);
+    }
+    &.playing.menu-open {
+        height: calc(100vh - 168px - 100px);
     }
 `;
 
@@ -37,7 +37,7 @@ const ScrollContainer = styled.div`
     overflow: auto;
 `;
 
-// TODO: handle responsive grid and padding.
+// TODO: handle responsive grid and padding - px-3 sm:px-6 lg:px-8
 const ScrollContent = styled.div`
     max-width: 80rem;
     margin-left: auto;
@@ -95,10 +95,10 @@ const Main = () => {
         <>
             <Loader />
             <Router>
-                <Header containerRef={containerRef} userInfo={user} doUserLogin={doUserLogin} doUserLogout={logout} />
-                <MainContainer role="main" ref={containerRef}>
+                <Header containerRef={containerRef} userInfo={user} doUserLogin={doUserLogin} doUserLogout={() => dispatch(logout())} />
+                <MainContainer ref={containerRef}>
                     <ScrollContainer>
-                        <ScrollContent className="px-3 sm:px-6 lg:px-8">
+                        <ScrollContent>
                             <Switch>
                                 <Route exact path="/" component={() => <Home baseUrl={baseUrl} userInfo={user} section={librarySection} /> } />
                                 <Route exact path="/library" component={() => <Library baseUrl={baseUrl} userInfo={user} section={librarySection} />} />

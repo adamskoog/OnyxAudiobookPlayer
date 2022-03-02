@@ -8,7 +8,7 @@ export const OverflowText = styled.div`
     white-space: nowrap;
 `;
 
-const SrOnly = styled.span`
+export const SrOnly = styled.span`
     position: absolute;
     width: 1px;
     height: 1px;

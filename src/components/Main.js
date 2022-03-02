@@ -34,7 +34,8 @@ const MainContainer = styled.main`
 
 const ScrollContainer = styled.div`
     height: 100%;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden; /* Hack fix for expand button negative padding issue. */
 `;
 
 // TODO: handle responsive grid and padding - px-3 sm:px-6 lg:px-8

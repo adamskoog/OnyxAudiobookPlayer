@@ -5,6 +5,7 @@ import * as Responsive from '../util/responsive';
 import { Link, useLocation } from 'react-router-dom';
 
 import UserMenu from './UserMenu';
+import { SrOnly } from '../util/common';
 
 import { ReactComponent as HamburgerSvg } from '../../assets/menuHamburger.svg';
 
@@ -100,18 +101,6 @@ const MobileButton = styled.button`
         color: #fff;
         background-color: rgba(55, 65, 81, 1);
     }
-`;
-
-const SrOnly = styled.span`
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
 `;
 
 const TitleContainer = styled.div`

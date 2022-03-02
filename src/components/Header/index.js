@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import * as Responsive from '../util/responsive';
 import { Link, useLocation } from 'react-router-dom';
 
-import SettingsMenu from './SettingsMenu';
+import UserMenu from './UserMenu';
 
 import { ReactComponent as HamburgerSvg } from '../../assets/menuHamburger.svg';
 
@@ -193,7 +193,6 @@ const TitleMenuItemButton = styled.button`
 const Header = (props) => {
 
     const TITLE = "Onyx Player";
-    const [accountIsOpen, setAccountIsOpen] = useState(false);
     const [menuIsOpen, setMenuIsOpen] = useState(false);
 
     const location = useLocation();
@@ -221,9 +220,6 @@ const Header = (props) => {
         return "hidden md:hidden";
     }
 
-    const closeAccountMenu = () => {
-        if (accountIsOpen) setAccountIsOpen(false);
-    }
     const closeMainMenu = () => {
         if (menuIsOpen) setMenuIsOpen(false);
     }
@@ -242,12 +238,6 @@ const Header = (props) => {
                 navButtonCss("nav-empty");
         }
     }, [location]);
-
-    useEffect(() => {
-        if (!accountIsOpen) return;
-        document.addEventListener("click", closeAccountMenu);
-        return () => { document.removeEventListener("click", closeAccountMenu); }
-    }, [accountIsOpen]);
 
     useEffect(() => {
         menuCss(menuIsOpen);
@@ -282,7 +272,7 @@ const Header = (props) => {
                         <TitleMenuItemButton className="nav-menu nav-signin" onClick={() => props.doUserLogin()}>Login</TitleMenuItemButton>
                     )}
 
-                    <SettingsMenu accountIsOpen={accountIsOpen} setAccountIsOpen={setAccountIsOpen} userInfo={props.userInfo} doUserLogout={props.doUserLogout} />
+                    <UserMenu userInfo={props.userInfo} doUserLogout={props.doUserLogout} />
                 </NavContent>
             </Container>
 

@@ -15,14 +15,17 @@ const argv = yargs
     .help()
     .alias('help', 'h').argv;
 
+    
+const host = argv.host || '127.0.0.1';
+const port = argv.port || 3001;
+
 // Now we can fire up our express web server.
 const app = express();
+app.set('trust proxy', true);   //'127.0.0.1');
 
 // Utilize the build directory for the application
 app.use(express.static(path.join(__dirname, 'build')));
 
 // Start up the server
-const host = argv.host || '127.0.0.1';
-const port = argv.port || 3001;
 app.listen(port, host);
 console.log(`Listening on port ${port} with host ${host}`);

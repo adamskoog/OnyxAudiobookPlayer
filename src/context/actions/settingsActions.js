@@ -1,5 +1,5 @@
 import * as actionTypes from "./actionTypes";
-import SettingsUtils from "../../utility/settings";
+import * as SettingsUtils from "../../utility/settings";
 import * as PlexApi from "../../plex/Api";
 
 export const loadSettingsValues = () => {
@@ -13,55 +13,32 @@ export const loadSettingsValues = () => {
     };
 }
 
+export const setServerSetting = (serverId) => {
+    return async (dispatch, getState) => {
 
-export const setSettingServer = (serverId) => {
-    return (dispatch, getState) => {
-        let state = getState();
+        // Update the config value on server setting change.
+        SettingsUtils.saveSettingToStorage(SettingsUtils.SETTINGS_KEYS.serverId, serverId);
+        SettingsUtils.saveSettingToStorage(SettingsUtils.SETTINGS_KEYS.libraryId, '');
 
-        let resource = null;
-        const servers = state.settings.servers;
-        if (servers && servers.length !== 0 ) {
-            // We have a server selected -- match to our resource list.
-            resource = SettingsUtils.findResourceMatch(serverId, servers);
-            dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: resource });
-            SettingsUtils.findServerBaseUrl(resource)
-                .then(response => {
-                    SettingsUtils.saveSettingToStorage("settings_serverIdentifier", serverId);
-                    dispatch({ type: actionTypes.SAVE_SETTING_SERVER, payload: { serverIdentifier: serverId } });
-                    dispatch({ type: actionTypes.SET_SERVER, payload: { baseUrl: response.url } });
-
-                    // We have a base url, now we need to populate the library list.
-                    SettingsUtils.saveSettingToStorage("settings_library", "");
-                    dispatch({ type: actionTypes.SAVE_SETTING_LIBRARY, payload: { librarySection: "" } });
-
-                    if (resource) {
-                        dispatch({ type: actionTypes.LOAD_LIBRARY_LIST });
-                        
-                        SettingsUtils.loadServerLibraries(response.url, resource.accessToken)
-                            .then(libresponse => {
-                                dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libresponse });
-                            })
-                            .catch(error => {
-                                dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_ERROR });
-                            });
-                    }
-                });
-        } else {
-            SettingsUtils.saveSettingToStorage("settings_serverIdentifier", serverId);
-            dispatch({ type: actionTypes.SAVE_SETTING_SERVER, payload: { serverIdentifier: serverId } });
-        }
+        dispatch({ type: actionTypes.SAVE_SETTING_SERVER, payload: serverId });
+        dispatch(setActiveServer());
     };
 }
 
-export const setSettingLibrary = (libraryId) => {
-    SettingsUtils.saveSettingToStorage("settings_library", libraryId);
+export const setLibrarySetting = (libraryId) => {
+    SettingsUtils.saveSettingToStorage(SettingsUtils.SETTINGS_KEYS.libraryId, libraryId);
+    
     return {
         type: actionTypes.SAVE_SETTING_LIBRARY,
-        payload: {
-            librarySection: libraryId
-        }
+        payload: libraryId
     };
 }
+
+
+
+
+
+
 
 // Begin refactor of get server flow - we need to do
 // let in these actions, this action will only get the server
@@ -75,7 +52,7 @@ export const getServers = () => {
         // Call our plex api to get the resources.
         if (authToken) {
         const servers = await PlexApi.getResourcesNew(authToken, PlexApi.RESOURCETYPES.server);
-            dispatch({ type: 'settings/serversLoaded', payload: servers })
+            dispatch({ type: actionTypes.LOAD_SERVER_LIST, payload: servers })
             dispatch(setActiveServer());
         }
 
@@ -98,16 +75,16 @@ export const setActiveServer = () => {
         const serverId = state.settings.serverIdentifier;
         const resources = state.settings.servers;
         if (!serverId) {
-            dispatch({ type: 'settings/serverNotSet' });
-            dispatch({ type: 'application/baseUrlNotSet' });
+            dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: null });
+            dispatch({ type: actionTypes.SET_SERVER_URL, payload: null });   
         } else {
             const server = matchServer(serverId, resources);
             if (server) {
-                dispatch({ type: 'settings/setActiveServer', payload: server });
+                dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: server });
                 dispatch(setServerBaseUrl());
             } else {
-                dispatch({ type: 'settings/serverNotSet' });     
-                dispatch({ type: 'application/baseUrlNotSet' });         
+                dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: null });     
+                dispatch({ type: actionTypes.SET_SERVER_URL, payload: null });   
             }
         }
 
@@ -121,7 +98,7 @@ export const setServerBaseUrl = () => {
         const server = state.settings.currentServer;
 
         const baseUrl = await PlexApi.findServerBaseUrl(server);
-        dispatch({ type: 'application/setBaseUrl', payload: baseUrl.uri});
+        dispatch({ type: actionTypes.SET_SERVER_URL, payload: baseUrl.uri});
         dispatch(getLibraries());
     };
 }
@@ -131,12 +108,11 @@ export const getLibraries = () => {
         let state = getState();
 
         const baseUrl = state.application.baseUrl;
-        const authToken = state.application.authToken;
         const resource = state.settings.currentServer;
 
         if (resource) {
-            const libraries = await PlexApi.getLibraries(baseUrl, authToken);
-            dispatch({ type: 'settings/loadLibraries', payload: libraries});
+            const libraries = await PlexApi.getLibraries(baseUrl, resource.accessToken);
+            dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libraries});
         }
     };
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { useSelector, useDispatch } from 'react-redux'
-import { setSettingServer, setSettingLibrary } from "../../context/actions/settingsActions";
+import { setServerSetting, setLibrarySetting } from "../../context/actions/settingsActions";
 
 // Original tailwind styles.
 /* <select className="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"> */
@@ -32,11 +32,11 @@ const Settings = () => {
     const libraries = useSelector(state => state.settings.libraries);
 
     const serverChanged = (e) => {
-        dispatch(setSettingServer(e.target.value));
+        dispatch(setServerSetting(e.target.value));
     }
 
     const libraryChanged = (e) => {
-        dispatch(setSettingLibrary(e.target.value));
+        dispatch(setLibrarySetting(e.target.value));
     }
 
     return (

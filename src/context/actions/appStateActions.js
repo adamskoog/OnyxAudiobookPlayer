@@ -10,15 +10,6 @@ export const setApplicationState = (applicationState) => {
     };
 }
 
-export const setServerInfo = (baseUrl) => {
-    return {
-        type: actionTypes.SET_SERVER,
-        payload: {
-            baseUrl: baseUrl
-        }
-    };
-}
-
 export const getToken = () => {
     
     return (dispatch, getState) => {

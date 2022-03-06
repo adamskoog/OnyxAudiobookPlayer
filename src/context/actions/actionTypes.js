@@ -1,6 +1,6 @@
 export const CHANGE_APP_STATE = "changeApplicationState";
 
-export const SET_SERVER = "setServerInformation";
+export const SET_SERVER_URL = "application/setBaseUrl";
 
 // Main.js -> processLogin
 // User has token, we need to begin the async check

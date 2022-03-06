@@ -1,5 +1,5 @@
 import * as actionTypes from "./actionTypes";
-import PlexAuthentication from "../../plex/Authentication";
+import * as PlexAuthentication from "../../plex/Authentication";
 
 export const setApplicationState = (applicationState) => {
     return {
@@ -32,7 +32,7 @@ export const checkToken = (token) => {
 
         dispatch({ type: actionTypes.CHECK_TOKEN });
 
-        PlexAuthentication.checkToken(token)
+        PlexAuthentication.validateToken(token)
         .then(response => {
             dispatch({ type: actionTypes.TOKEN_VALID, payload: response });
         })

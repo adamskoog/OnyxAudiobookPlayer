@@ -14,7 +14,7 @@ import Loader from './Loader';
 import Library from './library/Library';
 import Album from './album/Album';
 
-import PlexAuthentication from "../plex/Authentication";
+import * as PlexAuthentication from "../plex/Authentication";
 
 const MainContainer = styled.main`
     height: calc(100vh - 64px);

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useSelector } from 'react-redux'
 
 import TimeUtils from '../../utility/time';
-import PlexPlayback from '../../plex/Playback';
+import * as PlexPlayback from '../../plex/Playback';
 
 import TrackMenu from './TrackMenu';
 

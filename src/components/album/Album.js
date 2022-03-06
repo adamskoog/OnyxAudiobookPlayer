@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import AlbumSummary from './AlbumSummary';
 import AlbumItem from './AlbumItem';
 import * as PlexApi from '../../plex/Api';
-import PlexPlayback from '../../plex/Playback';
+import * as PlexPlayback from '../../plex/Playback';
 
 import { ReactComponent as OnDeckPlaySvg } from '../../assets/onDeckPlay.svg';
 

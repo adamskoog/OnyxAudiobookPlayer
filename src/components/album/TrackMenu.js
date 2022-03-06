@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 
 import Menu from '../Menu';
 
-import PlexPlayback from '../../plex/Playback';
+import * as PlexPlayback from '../../plex/Playback';
 
 import { ReactComponent as EllipsesSvg } from '../../assets/menuEllipses.svg';
 

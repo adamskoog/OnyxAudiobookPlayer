@@ -24,6 +24,10 @@ const appStateReducer = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.CHANGE_APP_STATE:
             return Object.assign({}, state, { applicationState: action.payload.applicationState });
+        case 'application/setBaseUrl':
+            return { ...state, baseUrl: action.payload, applicationState: "ready" }
+        case 'application/baseUrlNotSet':
+            return { ...state, baseUrl: null, applicationState: "ready" }
         case actionTypes.SET_SERVER:
             return Object.assign({}, state, { baseUrl: action.payload.baseUrl, applicationState: "ready" });
         case actionTypes.GET_TOKEN:

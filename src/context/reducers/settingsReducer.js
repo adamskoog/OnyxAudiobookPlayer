@@ -24,6 +24,14 @@ const settingsReducer = (state = defaultState, action) => {
             return Object.assign({}, state, { serverIdentifier: action.payload.serverIdentifier });
         case actionTypes.SAVE_SETTING_LIBRARY:
             return Object.assign({}, state, { librarySection: action.payload.librarySection });
+        case 'settings/serversLoaded':
+            return { ...state, servers: action.payload }
+        case 'settings/setActiveServer':
+            return { ...state, currentServer: action.payload }
+        case 'settings/serverNotSet':
+            return { ...state, currentServer: null }
+        case 'settings/loadLibraries':
+            return { ...state, libraries: action.payload }
         case actionTypes.LOAD_SERVER_LIST:
             return state;
         case actionTypes.LOAD_SERVER_LIST_COMPLETE:

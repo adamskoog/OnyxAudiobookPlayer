@@ -1,3 +1,67 @@
+
+const baseParams = {
+    "X-Plex-Product": "Audiobook Player for Plex",
+    "X-Plex-Version": "0.9.1",
+    "X-Plex-Client-Identifier": "616647cf-a68b-4474-8b4f-3ad72ed95cf9"
+};
+
+const getArgs = { 
+    method: "GET", 
+    mode: "cors", 
+    headers: { 
+        "Content-Type": "application/json", 
+        "Accept": "application/json" 
+    }
+};
+
+const formatUrl = (url, args) => {
+    const params = require('qs').stringify(args);
+    if (params && params !== "")
+        return `${url}?${params}`;
+    return url;
+}
+
+export const RESOURCETYPES = {
+    server: "server"
+};
+
+export const getResourcesNew = async (token, resourceType = null) => {
+    const localParams = {
+        includeHttps: 1,
+        includeRelay: 1
+    };
+    const params = Object.assign({}, baseParams, localParams, { "X-Plex-Token": token });
+    const url = formatUrl(`https://plex.tv/api/v2/resources`, params);
+    const response = await fetch(url, getArgs);
+    if (!response.ok) return [];    // If request fails, return empty array. TODO: something better??
+
+    const resources = await response.json();
+    if (!resourceType) return resources;    // return the unfilters resource reponse.
+
+    return resources.filter((resource) => {
+        return resource.provides === resourceType;
+    });
+}
+
+export const findServerBaseUrl = async (resource) => {
+    // TODO: refactor server connection test.
+    const url = await PlexApi.serverConnectionTest(resource.connections, resource.accessToken);
+    return url;
+};
+
+export const getLibraries = async (url, token) => {
+    console.log("url", url, token);
+    const mediaContainer = await PlexApi.getSections(url, token);
+    
+    console.log("mediaContainer", mediaContainer);
+    const sections = mediaContainer.MediaContainer.Directory;
+    if (sections.length === 0)
+        return [];
+    return sections.filter((section) => {
+        return section.type === "artist";
+    });
+}
+
 class PlexApi
 {
     static baseParams = {

@@ -1,5 +1,6 @@
 import * as actionTypes from "./actionTypes";
 import SettingsUtils from "../../utility/settings";
+import * as PlexApi from "../../plex/Api";
 
 export const loadSettingsValues = () => {
     const settings = SettingsUtils.loadSettingsFromStorage();
@@ -11,6 +12,7 @@ export const loadSettingsValues = () => {
         }
     };
 }
+
 
 export const setSettingServer = (serverId) => {
     return (dispatch, getState) => {
@@ -61,59 +63,80 @@ export const setSettingLibrary = (libraryId) => {
     };
 }
 
-export const getServers = (token) => {
-    return (dispatch, getState) => {
+// Begin refactor of get server flow - we need to do
+// let in these actions, this action will only get the server
+// resources from plex.tv.
+export const getServers = () => {
+    return async (dispatch, getState) => {
+        // Get the current state and retrieve the authToken.
         const state = getState();
-        dispatch({ type: actionTypes.LOAD_SERVER_LIST });
+        const authToken = state.application.authToken;
 
-        SettingsUtils.loadServers(token)
-            .then(response => {
+        // Call our plex api to get the resources.
+        if (authToken) {
+        const servers = await PlexApi.getResourcesNew(authToken, PlexApi.RESOURCETYPES.server);
+            dispatch({ type: 'settings/serversLoaded', payload: servers })
+            dispatch(setActiveServer());
+        }
 
-                const serverId = state.settings.serverIdentifier;
-                if (serverId && serverId !== "" ) {
-                    const resource = SettingsUtils.findResourceMatch(serverId, response);
-                    dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: resource });
-
-                    SettingsUtils.findServerBaseUrl(resource)
-                    .then(response => {
-                        dispatch({ type: actionTypes.SET_SERVER, payload: { baseUrl: response.url } });
-
-                        // TODO: This really seems like it needs to be separated, but having it
-                        // not load on initialzation here causes infinite loops.... :(
-                        SettingsUtils.loadServerLibraries(response.url, resource.accessToken)
-                            .then(libresponse => {
-                                dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libresponse });
-                            })
-                            .catch(error => {
-                                dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_ERROR });
-                            });
-                    });
-                }
-                dispatch({ type: actionTypes.LOAD_SERVER_LIST_COMPLETE, payload: response });
-            })
-            .catch(error => {
-                dispatch({ type: actionTypes.LOAD_SERVER_LIST_ERROR });
-            });
-    }
+        // TODO: reset state to no server active???
+    };
 }
 
-export const getLibraries = (serverId) => {
+const matchServer = (serverId, resources) => {
+    for (let i = 0; i < resources.length; i++) {
+        if (serverId === resources[i].clientIdentifier) {
+            return resources[i];
+        }
+    }
+    return null;
+}
+
+export const setActiveServer = () => {
     return (dispatch, getState) => {
+        const state = getState();
+        const serverId = state.settings.serverIdentifier;
+        const resources = state.settings.servers;
+        if (!serverId) {
+            dispatch({ type: 'settings/serverNotSet' });
+            dispatch({ type: 'application/baseUrlNotSet' });
+        } else {
+            const server = matchServer(serverId, resources);
+            if (server) {
+                dispatch({ type: 'settings/setActiveServer', payload: server });
+                dispatch(setServerBaseUrl());
+            } else {
+                dispatch({ type: 'settings/serverNotSet' });     
+                dispatch({ type: 'application/baseUrlNotSet' });         
+            }
+        }
+
+    };
+}
+
+export const setServerBaseUrl = () => {
+    return async (dispatch, getState) => {
+        // Get the current state and retrieve the authToken.
+        const state = getState();
+        const server = state.settings.currentServer;
+
+        const baseUrl = await PlexApi.findServerBaseUrl(server);
+        dispatch({ type: 'application/setBaseUrl', payload: baseUrl.uri});
+        dispatch(getLibraries());
+    };
+}
+
+export const getLibraries = () => {
+    return async (dispatch, getState) => {
         let state = getState();
 
-        if (serverId && serverId !== "") {
-            const resource = SettingsUtils.findResourceMatch(serverId, state.settings.servers);
-            if (resource) {
-                dispatch({ type: actionTypes.LOAD_LIBRARY_LIST });
-                
-                SettingsUtils.loadServerLibraries(state.application.baseUrl, resource.accessToken)
-                    .then(libresponse => {
-                        dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libresponse });
-                    })
-                    .catch(error => {
-                        dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_ERROR });
-                    });
-            }
+        const baseUrl = state.application.baseUrl;
+        const authToken = state.application.authToken;
+        const resource = state.settings.currentServer;
+
+        if (resource) {
+            const libraries = await PlexApi.getLibraries(baseUrl, authToken);
+            dispatch({ type: 'settings/loadLibraries', payload: libraries});
         }
     };
 }

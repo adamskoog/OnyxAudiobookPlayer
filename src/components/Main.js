@@ -68,11 +68,8 @@ const Main = () => {
     };
 
     useEffect(() => {
-        // Cannot load fully if no library section is set.
-        if (authToken) {
-            dispatch(getServers(authToken));
-        }
-    }, [authToken, librarySection]);
+        dispatch(getServers());
+    }, [authToken, dispatch]);
 
     useEffect(() => {    
         if (!user) {
@@ -80,7 +77,7 @@ const Main = () => {
              dispatch(getToken());
         } else
             dispatch(loadSettingsValues());
-    }, [user]);
+    }, [user, dispatch]);
 
     useEffect(() => {
         if (authToken) {
@@ -90,7 +87,7 @@ const Main = () => {
             // We have been redirected and now have an authorization id to handle.
             dispatch(checkAuthId(authId));
         }
-    }, [authToken, authId]);
+    }, [authToken, authId, dispatch]);
 
     return (
         <>

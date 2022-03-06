@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import * as Responsive from '../util/responsive';
 
 import LibraryItem from './LibraryItem';
-import PlexApi from '../../plex/Api';
+import * as PlexApi from '../../plex/Api';
 
 const Grid = styled.div`
     display: grid;

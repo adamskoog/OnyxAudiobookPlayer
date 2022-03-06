@@ -1,4 +1,4 @@
-import PlexApi from './Api';
+import * as PlexApi from './Api';
 import { SETTINGS_KEYS, loadSettingFromStorage, saveSettingToStorage, removeSettingFromStorage } from '../utility/settings';
 
 // Action = GET_TOKEN
@@ -42,7 +42,7 @@ export const validateAuthId = async (authId) => {
     const regInfo = await PlexApi.validatePin(authId);
 
     removeSettingFromStorage(SETTINGS_KEYS.loginRedirectId);
-    saveSettingToStorage(SETTINGS_KEYS.authToken, regInfo.authToken);
+    saveSettingToStorage(SETTINGS_KEYS.token, regInfo.authToken);
 
     return { token: regInfo.authToken };
 };

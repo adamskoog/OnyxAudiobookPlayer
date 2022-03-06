@@ -13,7 +13,7 @@ import StopControl from './controls/Stop';
 
 import throttle from 'lodash/throttle';
 import TimeUtils from '../../utility/time';
-import PlexApi from '../../plex/Api';
+import * as PlexApi from '../../plex/Api';
 
 import { clearPlayQueue, nextTrackInQueue } from "../../context/actions/playQueueActions";
 import { changePlayState, changePlayerTime, PlayState } from "../../context/actions/playerActions";

@@ -1,4 +1,4 @@
-import PlexApi from './Api';
+import * as PlexApi from './Api';
 
 class PlexPlayback
 {

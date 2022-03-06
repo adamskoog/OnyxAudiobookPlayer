@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Link } from 'react-router-dom';
-import PlexApi from '../../plex/Api';
+import * as PlexApi from '../../plex/Api';
 
 import { OverflowText } from '../util/common';
 

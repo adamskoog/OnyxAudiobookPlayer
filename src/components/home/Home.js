@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-import PlexApi from '../../plex/Api';
+import * as PlexApi from '../../plex/Api';
 
 import Hub from './Hub';
 

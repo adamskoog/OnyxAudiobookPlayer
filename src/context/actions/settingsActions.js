@@ -46,6 +46,8 @@ export const setLibrarySetting = (libraryId) => {
 export const getServers = () => {
     return async (dispatch, getState) => {
         // Get the current state and retrieve the authToken.
+        dispatch(loadSettingsValues());
+
         const state = getState();
         const authToken = state.application.authToken;
 

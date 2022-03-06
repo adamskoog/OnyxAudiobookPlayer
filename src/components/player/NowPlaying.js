@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
 import * as Responsive from '../util/responsive';
-import PlexApi from '../../plex/Api';
+import * as PlexApi from '../../plex/Api';
 
 import { Link } from 'react-router-dom';
 import PlayerTime from './controls/PlayerTime';

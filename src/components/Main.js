@@ -14,7 +14,7 @@ import Loader from './Loader';
 import Library from './library/Library';
 import Album from './album/Album';
 
-import * as PlexAuthentication from "../plex/Authentication";
+import { prepareLoginRequest } from "../plex/Authentication";
 
 const MainContainer = styled.main`
     height: calc(100vh - 64px);
@@ -60,23 +60,17 @@ const Main = () => {
 
     const containerRef = useRef(null);
 
-    const doUserLogin = () => {
-        PlexAuthentication.prepareLoginRequest()
-            .then((response) => {
-                window.location.href = response.url;
-            });
+    const doUserLogin = async () => {
+        const response = await prepareLoginRequest();
+        window.location.href = response.url;
     };
-
-    useEffect(() => {
-        dispatch(getServers());
-    }, [authToken, dispatch]);
 
     useEffect(() => {    
         if (!user) {
              // We have no user logged in, check for tokens.
              dispatch(getToken());
         } else
-            dispatch(loadSettingsValues());
+            dispatch(getServers());
     }, [user, dispatch]);
 
     useEffect(() => {

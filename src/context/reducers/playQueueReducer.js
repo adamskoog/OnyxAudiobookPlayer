@@ -18,12 +18,9 @@ const defaultState = {
 const playQueueReducer = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.SET_PLAY_QUEUE:
-            return Object.assign({}, state, action.payload);
+            return { ...state, ...action.payload, currentTrack: action.payload.currentTrack  };
         case actionTypes.CHANGE_TRACK:
-            return Object.assign({}, state, { 
-                index: action.payload.index, 
-                currentTrack: action.payload.currentTrack 
-            });
+            return { ...state, index: action.payload.index };
        default:
             return state;
     };

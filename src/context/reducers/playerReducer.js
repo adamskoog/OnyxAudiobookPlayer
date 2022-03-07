@@ -17,9 +17,9 @@ const defaultState = {
 const playQueueReducer = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.CHANGE_PLAYER_STATE:
-            return Object.assign({}, state, { mode: action.payload });
+            return { ...state, mode: action.payload };
         case actionTypes.UPDATE_PLAYER_TIME:
-            return Object.assign({}, state, { currentTime: action.payload.currentTime, duration: action.payload.duration });
+            return { ...state, currentTime: action.payload.currentTime, duration: action.payload.duration };
         default:
             return state;
     };

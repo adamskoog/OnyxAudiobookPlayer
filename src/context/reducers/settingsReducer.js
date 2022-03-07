@@ -19,18 +19,18 @@ const defaultState = {
 const settingsReducer = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.LOAD_SETTINGS:
+            return { ...state,  };
             return { ...state, serverIdentifier: action.payload.serverIdentifier, librarySection: action.payload.librarySection }
         case actionTypes.SAVE_SETTING_SERVER:
-            return { ...state, serverIdentifier: action.payload, librarySection: '' }
+            return { ...state, serverIdentifier: action.payload, librarySection: '' };
         case actionTypes.SAVE_SETTING_LIBRARY:
-            return { ...state, librarySection: action.payload }
-
+            return { ...state, librarySection: action.payload };
         case actionTypes.LOAD_SERVER_LIST:
-            return { ...state, servers: action.payload }
+            return { ...state, servers: action.payload };
         case actionTypes.UPDATE_SELECTED_SERVER:
-            return { ...state, currentServer: action.payload }
+            return { ...state, currentServer: action.payload };
         case actionTypes.LOAD_LIBRARY_LIST_COMPLETE:
-            return { ...state, libraries: action.payload }
+            return { ...state, libraries: action.payload };
 
         default:
             return state;

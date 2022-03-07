@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 
 import Menu from '../Menu';
 
-import * as PlexPlayback from '../../plex/Playback';
+import { markTrackPlayed, markTrackUnplayed } from '../../plex/Playback';
 
 import { ReactComponent as EllipsesSvg } from '../../assets/menuEllipses.svg';
 
@@ -20,18 +20,14 @@ const MenuButton = styled.button`
     line-height: 1.75rem;
 `;
 
-const markPlayed = (trackInfo, baseUrl, authToken, updateAlbumInfo) => {
-    PlexPlayback.markTrackPlayed(trackInfo , baseUrl, authToken)
-		.then(() => {
-			updateAlbumInfo();
-		});
+const markPlayed = async (trackInfo, baseUrl, authToken, updateAlbumInfo) => {
+    await markTrackPlayed(trackInfo , baseUrl, authToken);
+    updateAlbumInfo();
 };
 
-const markUnplayed = (trackInfo, baseUrl, authToken, updateAlbumInfo) => {
-    PlexPlayback.markTrackUnplayed(trackInfo , baseUrl, authToken)
-        .then(() => {
-            updateAlbumInfo();
-        });
+const markUnplayed = async (trackInfo, baseUrl, authToken, updateAlbumInfo) => {
+    await markTrackUnplayed(trackInfo , baseUrl, authToken)
+    updateAlbumInfo();
 };
 
 const TrackMenu = ({ trackInfo, playSelectedTrack, updateAlbumInfo }) => {

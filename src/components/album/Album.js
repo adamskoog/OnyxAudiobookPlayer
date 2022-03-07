@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { useSelector, useDispatch } from 'react-redux'
+import { setPlayQueue } from "../../context/actions/playQueueActions";
 
-import AlbumSummary from './AlbumSummary';
-import AlbumItem from './AlbumItem';
-import * as PlexApi from '../../plex/Api';
-import * as PlexPlayback from '../../plex/Playback';
+import { getAlbumMetadata, getThumbnailTranscodeUrl } from '../../plex/Api';
+import { getAlbumQueue, updateOnDeck, isTrackOnDeck, findOnDeck } from '../../plex/Playback';
 
 import { ReactComponent as OnDeckPlaySvg } from '../../assets/onDeckPlay.svg';
 
-import { setPlayQueue } from "../../context/actions/playQueueActions";
+import AlbumSummary from './AlbumSummary';
+import AlbumItem from './AlbumItem';
 
 const Container = styled.div`
 `;
@@ -83,41 +83,39 @@ const Album = ({ ratingKey }) => {
     const [onDeck, setOnDeck] = useState(null);
 
     const playOnDeckTrack = (trackInfo) => {
-        dispatch(setPlayQueue(PlexPlayback.getAlbumQueue(trackInfo, album)));
+        dispatch(setPlayQueue(getAlbumQueue(trackInfo, album)));
     }
 
-    const playSelectedTrack = (trackInfo) => {
-        if (!PlexPlayback.isTrackOnDeck(trackInfo, album)) {
-            PlexPlayback.updateOnDeck(trackInfo, album, baseUrl, authToken)
-                .then(() => {
-                    getAlbumMetadata()
-                        .then((info) => {
-                            dispatch(setPlayQueue(PlexPlayback.getAlbumQueue(info.track, info.album)));
-                        });
-                });
+    const playSelectedTrack = async (trackInfo) => {
+        if (!isTrackOnDeck(trackInfo, album)) {
+            await updateOnDeck(trackInfo, album, baseUrl, authToken);
+            const albumInfo = await fetchAlbumMetadata();
+            dispatch(setPlayQueue(getAlbumQueue(albumInfo.track, albumInfo.album)));
         }
         else
             playOnDeckTrack(trackInfo);
     }
 
-    const getAlbumMetadata = () => {
-        return new Promise ((resolve) => {
-            PlexApi.getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": authToken })
-                .then(data => {
-                    if (data.MediaContainer) {
-                        const onDeck = PlexPlayback.findOnDeck(data.MediaContainer);
-                        resolve({ album: data.MediaContainer, track: onDeck });
+    const fetchAlbumMetadata = async () => {
+        const data = await getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": authToken });
+        if (data.MediaContainer) {
+            const onDeck = findOnDeck(data.MediaContainer);
+            
 
-                        setAlbum(data.MediaContainer);
-                        setOnDeck(onDeck);
-                    }
-                });
-        });
+            setAlbum(data.MediaContainer);
+            setOnDeck(onDeck);
+
+            return { album: data.MediaContainer, track: onDeck };
+        }
+        return null;
     }
 
     useEffect(() => {
-        if (authToken && baseUrl && ratingKey)
-            getAlbumMetadata();
+        const fetchMetadata = async () => {
+            if (authToken && baseUrl && ratingKey)
+                fetchAlbumMetadata();
+        }
+        fetchMetadata();
     }, [baseUrl, authToken, ratingKey]);
 
     //https://tailwindcomponents.com/component/button-component-default
@@ -126,7 +124,7 @@ const Album = ({ ratingKey }) => {
         {authToken && (
         <Container>
             <AlbumContainer>
-                <AlbumImage src={PlexApi.getThumbnailTranscodeUrl(200, 200, baseUrl, album.thumb, authToken)} alt="Album Cover" />
+                <AlbumImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, album.thumb, authToken)} alt="Album Cover" />
                 <AlbumInfo>
                     <AlbumTitle>{album.parentTitle}</AlbumTitle>
                     <AlbumAuthor>{album.grandparentTitle}</AlbumAuthor>
@@ -146,7 +144,7 @@ const Album = ({ ratingKey }) => {
                 <TrackCount>{album.size} Track{(album.size > 1) ? "s" : ""}</TrackCount>
                 <Tracks>
                     {album.Metadata.map((track) => (
-                        <AlbumItem key={track.key} trackInfo={track} playSelectedTrack={playSelectedTrack} updateAlbumInfo={getAlbumMetadata} />
+                        <AlbumItem key={track.key} trackInfo={track} playSelectedTrack={playSelectedTrack} updateAlbumInfo={fetchAlbumMetadata} />
                     ))}
                 </Tracks>
             </TrackContainer>

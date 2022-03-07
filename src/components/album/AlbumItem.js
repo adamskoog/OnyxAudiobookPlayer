@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useSelector } from 'react-redux'
 
 import TimeUtils from '../../utility/time';
-import * as PlexPlayback from '../../plex/Playback';
+import { trackIsComplete } from '../../plex/Playback';
 
 import TrackMenu from './TrackMenu';
 
@@ -14,7 +14,7 @@ import { ReactComponent as TrackUnplayedSvg } from '../../assets/trackUnplayed.s
 
 const trackStatus = (trackInfo) => {
     if (trackInfo.viewOffset || trackInfo.viewCount) {
-        if (PlexPlayback.trackIsComplete(trackInfo)) {
+        if (trackIsComplete(trackInfo)) {
             return "complete";
         } else {
             return "in-progress";

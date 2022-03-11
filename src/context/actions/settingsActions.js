@@ -1,6 +1,6 @@
 import * as actionTypes from "./actionTypes";
 import * as SettingsUtils from "../../utility/settings";
-import * as PlexApi from "../../plex/Api";
+import { RESOURCETYPES, getResources, findServerBaseUrl, getLibraries as getPlexLibraries } from "../../plex/Api";
 
 export const loadSettingsValues = () => {
     const settings = SettingsUtils.loadSettingsFromStorage();
@@ -53,7 +53,7 @@ export const getServers = () => {
 
         // Call our plex api to get the resources.
         if (authToken) {
-        const servers = await PlexApi.getResourcesNew(authToken, PlexApi.RESOURCETYPES.server);
+        const servers = await getResources(authToken, RESOURCETYPES.server);
             dispatch({ type: actionTypes.LOAD_SERVER_LIST, payload: servers })
             dispatch(setActiveServer());
         }
@@ -99,7 +99,7 @@ export const setServerBaseUrl = () => {
         const state = getState();
         const server = state.settings.currentServer;
 
-        const baseUrl = await PlexApi.findServerBaseUrl(server);
+        const baseUrl = await findServerBaseUrl(server);
         dispatch({ type: actionTypes.SET_SERVER_URL, payload: baseUrl.uri});
         dispatch(getLibraries());
     };
@@ -113,7 +113,7 @@ export const getLibraries = () => {
         const resource = state.settings.currentServer;
 
         if (resource) {
-            const libraries = await PlexApi.getLibraries(baseUrl, resource.accessToken);
+            const libraries = await getPlexLibraries(baseUrl, resource.accessToken);
             dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libraries});
         }
     };

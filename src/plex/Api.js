@@ -5,9 +5,12 @@ const PLEX_USER_URL = '/api/v2/user';
 const PLEX_PINS_URL = '/api/v2/pins';
 
 const BASE_PARAMS = {
+    "X-Plex-Device-Name": "Onyx",
     "X-Plex-Product": "Onyx Audiobook Player",
     "X-Plex-Version": "0.9.1",
-    "X-Plex-Client-Identifier": "616647cf-a68b-4474-8b4f-3ad72ed95cf9"
+    "X-Plex-Client-Identifier": "616647cf-a68b-4474-8b4f-3ad72ed95cf9",
+    "X-Plex-Platform": "Chrome",  // fill in with found browser....
+    "X-Plex-Device": "Windows",
 };
 
 const BASE_REQUEST = {
@@ -35,7 +38,7 @@ export const LIBRARYTYPES = {
     music: 'artist'
 };
 
-export const getResourcesNew = async (token, resourceType = null) => {
+export const getResources = async (token, resourceType = null) => {
     const localParams = {
         includeHttps: 1,
         includeRelay: 1
@@ -126,18 +129,7 @@ export const validatePin = async (id) => {
     return data;
 }
 
-export const getResources = async (token) => {
-    const localParams = {
-        includeHttps: 1,
-        includeRelay: 1
-    };
-    const params = { ...BASE_PARAMS, ...localParams, 'X-Plex-Token': token };
-    const url = formatUrl(`https://plex.tv/api/v2/resources`, params);
 
-    const response = await fetch(url, GET_REQUEST);
-    const data = await response.json();
-    return data;
-}
 
 const fetchWithTimeout = async (resource, options) => {
     const { timeout = 8000 } = options;

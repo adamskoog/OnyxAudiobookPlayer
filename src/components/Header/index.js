@@ -206,9 +206,8 @@ const Header = (props) => {
         }
         if (main && isOpen) {
             main.classList.add("menu-open");
-            return "block md:hidden z-50";
         }
-        return "hidden md:hidden";
+        return;
     }
 
     const closeMainMenu = () => {

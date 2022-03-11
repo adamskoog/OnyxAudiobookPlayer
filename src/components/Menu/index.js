@@ -14,7 +14,7 @@ const MenuContainer = styled.div`
     right: 0px;
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
-    margin-top: 0.5rem;
+    margin-top: ${(props) => (props.vOffset ? props.vOffset : '0.5rem')};
     border-radius: 0.375rem;
     background-color: rgba(255, 255, 255, 1);
 
@@ -25,7 +25,7 @@ const MenuContainer = styled.div`
     }
 `;
 
-const Menu = ({ labelledby, children, isOpen }) => {
+const Menu = ({ labelledby, children, isOpen, vOffset }) => {
     
     return (
         <Transition
@@ -37,7 +37,7 @@ const Menu = ({ labelledby, children, isOpen }) => {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95">
         {(ref) => (
-            <MenuContainer ref={ref} role="menu" aria-orientation="vertical" aria-labelledby={labelledby}>
+            <MenuContainer ref={ref} role="menu" aria-orientation="vertical" aria-labelledby={labelledby} vOffset={vOffset}>
                 {(children.map((child) => (
                     <MenuItem key={child.title} {...child} />
                 )))}

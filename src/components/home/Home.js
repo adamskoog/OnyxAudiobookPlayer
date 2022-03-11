@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-import * as PlexApi from '../../plex/Api';
+import { getLibraryItems } from '../../plex/Api';
 
 import Hub from './Hub';
 
@@ -19,36 +19,34 @@ const Home = ({ baseUrl, section, userInfo }) => {
 
     useEffect(() => {
         if (userInfo && baseUrl && section) {
-            PlexApi.getLibraryItems(baseUrl, section, { 
-                "X-Plex-Token": userInfo.authToken,
-                "X-Plex-Container-Start": 0,
-                "X-Plex-Container-Size": 10,
-                sort: "addedAt:desc"
-            })
-                .then(data => {
-                    if (data.MediaContainer.Metadata && isMountedRef.current)
-                        setRecentlyAddedInfo(data.MediaContainer.Metadata);
+            const fetchLibraryItems = async () => {
+                const data = await getLibraryItems(baseUrl, section, { 
+                    "X-Plex-Token": userInfo.authToken,
+                    "X-Plex-Container-Start": 0,
+                    "X-Plex-Container-Size": 10,
+                    sort: "addedAt:desc"
                 });
-        } else {
-            setRecentlyAddedInfo([]);
-        }
+                if (data.MediaContainer.Metadata && isMountedRef.current)
+                    setRecentlyAddedInfo(data.MediaContainer.Metadata);
+            }
+            fetchLibraryItems();
+        } else setRecentlyAddedInfo([]);
     }, [baseUrl, section, userInfo]);
 
     useEffect(() => {
         if (userInfo && baseUrl && section) {
-            PlexApi.getLibraryItems(baseUrl, section, { 
-                "X-Plex-Token": userInfo.authToken,
-                "X-Plex-Container-Start": 0,
-                "X-Plex-Container-Size": 10,
-                sort: "lastViewedAt:desc"
-            })
-                .then(data => {
-                    if (data.MediaContainer.Metadata && isMountedRef.current)
-                        setRecentlyPlayedInfo(data.MediaContainer.Metadata);
+            const fetchLibraryItems = async () => {
+                const data = await getLibraryItems(baseUrl, section, { 
+                    "X-Plex-Token": userInfo.authToken,
+                    "X-Plex-Container-Start": 0,
+                    "X-Plex-Container-Size": 10,
+                    sort: "lastViewedAt:desc"
                 });
-        } else {
-            setRecentlyPlayedInfo([]);
-        }
+                if (data.MediaContainer.Metadata && isMountedRef.current)
+                    setRecentlyPlayedInfo(data.MediaContainer.Metadata);
+            }
+            fetchLibraryItems();
+        } else setRecentlyPlayedInfo([]);
     }, [baseUrl, section, userInfo]);
 
     return (

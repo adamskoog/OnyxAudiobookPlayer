@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import * as Responsive from '../util/responsive';
 
+import FilterMenu from './FilterMenu';
 import LibraryItem from './LibraryItem';
-import * as PlexApi from '../../plex/Api';
+import { ScrollContainer, ScrollContent  } from '../util/container';
+import { getLibraryItems } from '../../plex/Api';
 
 const Grid = styled.div`
     display: grid;
@@ -46,13 +48,13 @@ const Library = ({ userInfo, baseUrl, section }) => {
 
     useEffect(() => {
         if (userInfo && baseUrl && section) {
-            PlexApi.getLibraryItems(baseUrl, section, { "X-Plex-Token": userInfo.authToken })
-                .then(data => {
-                    if (data.MediaContainer.Metadata && isMountedRef.current)
-                        setLibraryItems(data.MediaContainer.Metadata);
-                });
-        } else 
-            setLibraryItems([]);
+            const fetchLibraryItems = async () => {
+                const data = await getLibraryItems(baseUrl, section, { "X-Plex-Token": userInfo.authToken });
+                if (data.MediaContainer.Metadata && isMountedRef.current)
+                    setLibraryItems(data.MediaContainer.Metadata);
+            }
+            fetchLibraryItems();
+        } else setLibraryItems([]);
     }, [baseUrl, section, userInfo]);
 
     return (
@@ -64,11 +66,18 @@ const Library = ({ userInfo, baseUrl, section }) => {
             <ErrorMessage>Failed to load library, please update your settings.</ErrorMessage>
         )}
         {userInfo && baseUrl && section && (
-            <Grid>
-                {libraryItems.map((item) => (
-                    <LibraryItem key={item.key} baseUrl={baseUrl} userInfo={userInfo} albumInfo={item} />
-                ))}
-            </Grid>
+            <>
+            <FilterMenu />
+            {/* <ScrollContainer> TODO: determine how to conditionally size the parent to account for this. */}
+            <ScrollContent>
+                <Grid>
+                    {libraryItems.map((item) => (
+                        <LibraryItem key={item.key} baseUrl={baseUrl} userInfo={userInfo} albumInfo={item} />
+                    ))}
+                </Grid>
+            </ScrollContent>
+            {/* </ScrollContainer> */}
+            </>
         )}
         </>
     ); 

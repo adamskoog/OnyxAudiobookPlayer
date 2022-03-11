@@ -38,17 +38,6 @@ const ScrollContainer = styled.div`
     overflow-x: hidden; /* Hack fix for expand button negative padding issue. */
 `;
 
-// TODO: handle responsive grid and padding - px-3 sm:px-6 lg:px-8
-const ScrollContent = styled.div`
-    max-width: 80rem;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: .75rem;
-    padding-right: .75rem;
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
-`;
-
 const Main = () => {
     const dispatch = useDispatch();
 
@@ -90,16 +79,14 @@ const Main = () => {
                 <Header containerRef={containerRef} userInfo={user} doUserLogin={doUserLogin} doUserLogout={() => dispatch(logout())} />
                 <MainContainer ref={containerRef}>
                     <ScrollContainer>
-                        <ScrollContent>
-                            <Switch>
-                                <Route exact path="/" component={() => <Home baseUrl={baseUrl} userInfo={user} section={librarySection} /> } />
-                                <Route exact path="/library" component={() => <Library baseUrl={baseUrl} userInfo={user} section={librarySection} />} />
-                                <Route exact path="/album/:ratingKey" component={(comprops) => 
-                                    <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
-                                }/>
-                                <Route exact path="/settings" component={() => <Settings /> } />
-                            </Switch>
-                        </ScrollContent>
+                        <Switch>
+                            <Route exact path="/" component={() => <Home baseUrl={baseUrl} userInfo={user} section={librarySection} /> } />
+                            <Route exact path="/library" component={() => <Library baseUrl={baseUrl} userInfo={user} section={librarySection} />} />
+                            <Route exact path="/album/:ratingKey" component={(comprops) => 
+                                <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
+                            }/>
+                            <Route exact path="/settings" component={() => <Settings /> } />
+                        </Switch>
                     </ScrollContainer>
                 </MainContainer>
                 <NowPlaying containerRef={containerRef} />               

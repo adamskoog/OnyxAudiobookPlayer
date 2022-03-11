@@ -11,8 +11,9 @@ import NowPlaying from './player/NowPlaying';
 import Settings from './settings/Settings';
 import Home from './home/Home';
 import Loader from './Loader';
-import Library from './library/Library';
+import Library from './library';
 import Album from './album/Album';
+import Artist from './artist';
 
 import { prepareLoginRequest } from "../plex/Authentication";
 
@@ -84,6 +85,9 @@ const Main = () => {
                             <Route exact path="/library" component={() => <Library baseUrl={baseUrl} userInfo={user} section={librarySection} />} />
                             <Route exact path="/album/:ratingKey" component={(comprops) => 
                                 <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
+                            }/>
+                            <Route exact path="/artist/:ratingKey" component={(comprops) => 
+                                <Artist key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
                             }/>
                             <Route exact path="/settings" component={() => <Settings /> } />
                         </Switch>

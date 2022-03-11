@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
+import { ScrollContent  } from '../util/container';
+
 import { getLibraryItems } from '../../plex/Api';
 
 import Hub from './Hub';
@@ -58,10 +60,10 @@ const Home = ({ baseUrl, section, userInfo }) => {
             <ErrorMessage>Failed to load library, please update your settings.</ErrorMessage>
         )}
         {userInfo && baseUrl && (
-            <>
+            <ScrollContent>
                 <Hub title="Recently Added" baseUrl={baseUrl} userInfo={userInfo} items={recentlyAddedInfo} />
                 <Hub title="Recently Played" baseUrl={baseUrl} userInfo={userInfo} items={recentlyPlayedInfo} />
-            </>
+            </ScrollContent>
         )}
         </>
     ); 

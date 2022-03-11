@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 
 import { Link } from 'react-router-dom';
 import { getThumbnailTranscodeUrl } from '../../plex/Api';
@@ -18,16 +19,18 @@ const AlbumCover = styled.img`
     margin-bottom: 0.25rem;
 `;
 
-const LibraryItem = ({ albumInfo, baseUrl, userInfo }) => {
+const ArtistItem = ({ metadata }) => {
+    const user = useSelector(state => state.application.user);
+    const baseUrl = useSelector(state => state.application.baseUrl);
+
     return (
         <Container>
-            <Link to={`/album/${albumInfo.ratingKey}`}>
-                <AlbumCover src={getThumbnailTranscodeUrl(200, 200, baseUrl, albumInfo.thumb, userInfo.authToken)} alt="Album Cover" loading="lazy" />
-                <OverflowText title={albumInfo.title}>{albumInfo.title}</OverflowText>
-                <OverflowText title={albumInfo.parentTitle}>{albumInfo.parentTitle}</OverflowText>
+            <Link to={`/artist/${metadata.ratingKey}`}>
+                <AlbumCover src={getThumbnailTranscodeUrl(200, 200, baseUrl, metadata.thumb, user.authToken)} alt={metadata.title} loading="lazy" />
+                <OverflowText title={metadata.title}>{metadata.title}</OverflowText>
             </Link>
         </Container>
     ); 
 }
 
-export default LibraryItem;
+export default ArtistItem;

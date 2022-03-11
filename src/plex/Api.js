@@ -227,15 +227,62 @@ export const getThumbnailTranscodeUrl = (h, w, baseUrl, thumb, token) => {
     return formatUrl(`${baseUrl}/photo/:/transcode`, params);
 }
 
-export const getLibraryItems = async (baseUrl, section, args) => {
+export const MUSIC_LIBRARY_DISPAY_TYPE = {
+    artist: { title: 'Author', key: 8 },
+    album: { title: 'Book', key: 9 }
+};
+
+export const SORT_ORDER = {
+    ascending: 'Ascending',
+    descending: 'Decending'
+}
+
+// TODO: this whole thing needs to be cleaned up and refactored. It's really rough.
+export const createLibrarySortQuery = ({ order, display } ) => {
+    let args = {};
+
+    // Set the default value for display
+    if (!display)
+        args.type = MUSIC_LIBRARY_DISPAY_TYPE.album.key;
+    else {
+        if (display === MUSIC_LIBRARY_DISPAY_TYPE.album.title)
+            args.type = MUSIC_LIBRARY_DISPAY_TYPE.album.key
+        else
+            args.type = MUSIC_LIBRARY_DISPAY_TYPE.artist.key
+    }
+
+    if (!order)
+        // set a default order based on the album type.
+        if (args.type === MUSIC_LIBRARY_DISPAY_TYPE.album.key)
+            args.order = 'artist.titleSort,album.titleSort,album.index,album.id,album.originallyAvailableAt';
+        else
+            args.order = 'titleSort';
+    else {
+        let desc = '';
+        if (order === SORT_ORDER.descending)
+            desc = ':desc';
+        if (args.type === MUSIC_LIBRARY_DISPAY_TYPE.album.key)
+            args.order = `artist.titleSort${desc},album.titleSort,album.index,album.id,album.originallyAvailableAt`;
+        else
+            args.order = `titleSort${desc}`;
+    }
+
+    return args;
+};
+
+export const getLibraryItems = async (baseUrl, section, args, sortArgs) => {
+
+    if (!sortArgs) {
+        sortArgs = createLibrarySortQuery({ order: null, display: null });
+    }
 
     const localParams = {
-        type: 9,
+        type: sortArgs.type,
         includeAdvanced: 1,
         includeMeta: 1,
         includeCollections: 1,
         includeExternalMedia: 1,
-        sort: "artist.titleSort,album.titleSort,album.index,album.id,album.originallyAvailableAt"
+        sort: sortArgs.order
     };
     const params = { ...BASE_PARAMS, ...localParams, ...args };
     const url = formatUrl(`${baseUrl}/library/sections/${section}/all`, params);
@@ -266,8 +313,8 @@ export const scrobble = async (baseUrl, key, token) => {
     // params and does effectively the same thing however.
     const params = { ...BASE_PARAMS, ...localParams };
     const url = formatUrl(`${baseUrl}/:/scrobble`, params);
-
-    const response = await fetch(url, GET_REQUEST);
+    //const response = 
+    await fetch(url, GET_REQUEST);
     //const data = await response.json();
 
     // we don't need to do anything, need to handle error.
@@ -283,7 +330,8 @@ export const unscrobble = async (baseUrl, key, token) => {
     const params = { ...BASE_PARAMS, ...localParams };
     const url = formatUrl(`${baseUrl}/:/unscrobble`, params);
 
-    const response = await fetch(url, GET_REQUEST);
+    //const response = 
+    await fetch(url, GET_REQUEST);
     //const data = await response.json();
 
     // we don't need to do anything, need to handle error.

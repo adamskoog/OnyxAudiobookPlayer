@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 import { useSelector, useDispatch } from 'react-redux'
 import { setPlayQueue } from "../../context/actions/playQueueActions";
@@ -9,6 +10,7 @@ import { getAlbumQueue, updateOnDeck, isTrackOnDeck, findOnDeck } from '../../pl
 
 import { ReactComponent as OnDeckPlaySvg } from '../../assets/onDeckPlay.svg';
 
+import { ScrollContent  } from '../util/container';
 import AlbumSummary from './AlbumSummary';
 import AlbumItem from './AlbumItem';
 
@@ -100,8 +102,6 @@ const Album = ({ ratingKey }) => {
         const data = await getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": authToken });
         if (data.MediaContainer) {
             const onDeck = findOnDeck(data.MediaContainer);
-            
-
             setAlbum(data.MediaContainer);
             setOnDeck(onDeck);
 
@@ -122,12 +122,15 @@ const Album = ({ ratingKey }) => {
     return (
         <>
         {authToken && (
+        <ScrollContent>
         <Container>
             <AlbumContainer>
                 <AlbumImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, album.thumb, authToken)} alt="Album Cover" />
                 <AlbumInfo>
                     <AlbumTitle>{album.parentTitle}</AlbumTitle>
-                    <AlbumAuthor>{album.grandparentTitle}</AlbumAuthor>
+                    <Link to={`/artist/${album.grandparentRatingKey}`}>
+                        <AlbumAuthor>{album.grandparentTitle}</AlbumAuthor>
+                    </Link>
                     <AlbumYear>{album.parentYear}</AlbumYear>
                     {onDeck && (
                     <OnDeck>
@@ -149,6 +152,7 @@ const Album = ({ ratingKey }) => {
                 </Tracks>
             </TrackContainer>
         </Container>
+        </ScrollContent>
         )}
         </>
     ); 

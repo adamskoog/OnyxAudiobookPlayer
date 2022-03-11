@@ -49,3 +49,10 @@ export const CHANGE_TRACK = "player/changeTrack";
 
 export const CHANGE_PLAYER_STATE = "player/changePlayerState";
 export const UPDATE_PLAYER_TIME = "player/updatePlayerTime";
+
+
+// Library
+export const SET_LIBRARY_LOADING = "libary/setLoading";
+export const SET_LIBRARY_DISPLAY_TYPE = "libary/setDisplayType";
+export const SET_LIBRARY_SORT_TYPE = "libary/setSortOrder";
+export const SET_LIBRARY_ITEMS = "libary/setLibraryItems";

@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { ReactComponent as ChevronDownArrow } from '../../assets/chevronDownArrow.svg';
+import { SORT_ORDER, MUSIC_LIBRARY_DISPAY_TYPE } from '../../plex/Api';
+
+import { setLibrarySortOrder, setLibraryDisplayType } from '../../context/actions/libraryActions';
 
 import Menu from '../Menu';
 
@@ -26,9 +30,6 @@ const InnerContainer = styled.div`
     padding-bottom: .75rem;
 `;
 
-const ChevronDownArrowStyled = styled(ChevronDownArrow)`
-    fill: #ffffff;
-`;
 const FilterText = styled.span`
     padding-left: 1.5rem;
     padding-right: .5rem;
@@ -38,24 +39,34 @@ const FilterItem = styled.div`
     position: relative;
 `;
 const FilterButton = styled.button`
+    fill: #ffffff;
+    overflow: hidden;
+
+    transform: rotate(0deg);
+    transition: all 0.2s ease-out;
+    transform: ${(props) => (props.rotate ? 'rotate(-180deg)' : '')};
+
+    &:focus {
+        outline: none;
+    }
 `;
 
 const FilterMenu = () => {
-    // TODO: these first 2 need to be global state to affect
-    // what is being sorted in the library view.
-    const [displayOption, setDisplayOption] = useState('Book');
-    const [sortOption, setSortOption] = useState('Ascending');
+    const dispatch = useDispatch();
+
+    const displayType = useSelector(state => state.library.displayType);
+    const sortType = useSelector(state => state.library.sortType);
 
     const [displayMenuIsOpen, setDisplayMenuIsOpen] = useState(false);
     const displayMenuItems = [
-        { title: 'Book', callback: () => setDisplayOption('Book') },
-        { title: 'Author', callback: () => setDisplayOption('Author') }
+        { title: MUSIC_LIBRARY_DISPAY_TYPE.artist.title, callback: () => dispatch(setLibraryDisplayType(MUSIC_LIBRARY_DISPAY_TYPE.artist.title)) },
+        { title: MUSIC_LIBRARY_DISPAY_TYPE.album.title, callback: () => dispatch(setLibraryDisplayType(MUSIC_LIBRARY_DISPAY_TYPE.album.title)) }
     ];
 
     const [sortMenuIsOpen, setSortMenuIsOpen] = useState(false);
     const sortMenuItems = [
-        { title: 'Ascending', callback: () => setSortOption('Ascending') },
-        { title: 'Descending', callback: () => setSortOption('Descending') }
+        { title: SORT_ORDER.ascending, callback: () => dispatch(setLibrarySortOrder(SORT_ORDER.ascending)) },
+        { title: SORT_ORDER.descending, callback: () => dispatch(setLibrarySortOrder(SORT_ORDER.descending)) }
     ];
 
     useEffect(() => {
@@ -84,13 +95,13 @@ const FilterMenu = () => {
         <Container>
             <InnerContainer>
                 <FilterItem>
-                    <FilterText>Display: {displayOption}</FilterText>
-                    <FilterButton onClick={() => setDisplayMenuIsOpen(!displayMenuIsOpen)} id="display-menu" aria-haspopup="true"><ChevronDownArrowStyled /></FilterButton>
+                    <FilterText>Display: {displayType}</FilterText>
+                    <FilterButton rotate={displayMenuIsOpen} onClick={() => setDisplayMenuIsOpen(!displayMenuIsOpen)} id="display-menu" aria-haspopup="true"><ChevronDownArrow /></FilterButton>
                     <Menu isOpen={displayMenuIsOpen} labelledby={'display-menu'} children={displayMenuItems} vOffset={'2rem'}/>
                 </FilterItem>
                 <FilterItem>
-                    <FilterText>Order by: {sortOption}</FilterText>
-                    <FilterButton onClick={() => setSortMenuIsOpen(!sortMenuIsOpen)} id="sort-order-menu" aria-haspopup="true"><ChevronDownArrowStyled /></FilterButton>
+                    <FilterText>Order by: {sortType}</FilterText>
+                    <FilterButton rotate={sortMenuIsOpen} onClick={() => setSortMenuIsOpen(!sortMenuIsOpen)} id="sort-order-menu" aria-haspopup="true"><ChevronDownArrow /></FilterButton>
                     <Menu isOpen={sortMenuIsOpen} labelledby={'sort-order-menu'} children={sortMenuItems} vOffset={'2rem'} />
                 </FilterItem>
             </InnerContainer>

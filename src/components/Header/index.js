@@ -6,10 +6,9 @@ import { Link, useLocation } from 'react-router-dom';
 
 import UserMenu from './UserMenu';
 import { SrOnly } from '../util/common';
+import { HEADER_HEIGHT } from '../util/global';
 
 import { ReactComponent as HamburgerSvg } from '../../assets/menuHamburger.svg';
-
-const HEADER_HEIGHT = '64px';
 
 const NavContainer = styled.nav`
     background-color: rgba(31, 41, 55, 1);

@@ -1,5 +1,8 @@
 import { createGlobalStyle } from 'styled-components';
 
+export const HEADER_HEIGHT = '64px';
+export const PLAYER_HEIGHT = '100px';
+
 export const GlobalStyle = createGlobalStyle`
 
     body {

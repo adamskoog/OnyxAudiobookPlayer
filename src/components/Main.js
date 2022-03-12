@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
-import { BrowserRouter as Router, Switch, Route  } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route  } from 'react-router-dom';
 
 import { logout, getToken, checkToken, checkAuthId } from "../context/actions/appStateActions";
 import { getServers } from "../context/actions/settingsActions";
@@ -81,17 +81,13 @@ const Main = () => {
                 <Header containerRef={containerRef} userInfo={user} doUserLogin={doUserLogin} doUserLogout={() => dispatch(logout())} />
                 <MainContainer ref={containerRef}>
                     <ScrollContainer>
-                        <Switch>
-                            <Route exact path="/" component={() => <Home baseUrl={baseUrl} userInfo={user} section={librarySection} /> } />
-                            <Route exact path="/library" component={() => <Library baseUrl={baseUrl} userInfo={user} section={librarySection} />} />
-                            <Route exact path="/album/:ratingKey" component={(comprops) => 
-                                <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
-                            }/>
-                            <Route exact path="/artist/:ratingKey" component={(comprops) => 
-                                <Artist key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
-                            }/>
-                            <Route exact path="/settings" component={() => <Settings /> } />
-                        </Switch>
+                        <Routes>
+                            <Route path="/" element={<Home baseUrl={baseUrl} userInfo={user} section={librarySection} />} />
+                            <Route exact path="/library" element={<Library baseUrl={baseUrl} userInfo={user} section={librarySection} />} />
+                            <Route exact path="/album/:ratingKey" element={<Album />}/>
+                            <Route exact path="/artist/:ratingKey" element={<Artist />}/>
+                            <Route exact path="/settings" element={<Settings />} />
+                        </Routes>
                     </ScrollContainer>
                 </MainContainer>
                 <NowPlaying containerRef={containerRef} />               

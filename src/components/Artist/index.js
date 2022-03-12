@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-
-import { useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import { getAlbumMetadata, getThumbnailTranscodeUrl } from '../../plex/Api';
 
@@ -73,12 +73,14 @@ const AlbumCount = styled.div`
 `;
 
 
-const Artist = ({ ratingKey }) => {
+const Artist = () => {
 
     const authToken = useSelector(state => state.application.authToken);
     const baseUrl = useSelector(state => state.application.baseUrl);
 
     const [artist, setArtist] = useState({ Metadata: [] });
+
+    const { ratingKey } = useParams();
 
     const fetchArtistMetadata = async () => {
         const data = await getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": authToken });

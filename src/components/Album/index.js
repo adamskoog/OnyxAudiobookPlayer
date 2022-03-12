@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 import { useSelector, useDispatch } from 'react-redux'
 import { setPlayQueue } from "../../context/actions/playQueueActions";
@@ -75,7 +75,7 @@ const TrackCount = styled.div`
     margin-bottom: 0.5rem;
 `;
 
-const Album = ({ ratingKey }) => {
+const Album = () => {
 
     const dispatch = useDispatch();
 
@@ -84,6 +84,8 @@ const Album = ({ ratingKey }) => {
 
     const [album, setAlbum] = useState({ Metadata: [] });
     const [onDeck, setOnDeck] = useState(null);
+
+    const { ratingKey } = useParams();
 
     const playOnDeckTrack = (trackInfo) => {
         dispatch(setPlayQueue(getAlbumQueue(trackInfo, album)));

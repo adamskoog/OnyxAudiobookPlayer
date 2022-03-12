@@ -1,5 +1,5 @@
 import * as actionTypes from "./actionTypes";
-import PlexAuthentication from "../../plex/Authentication";
+import { getAuthTokenFromStorage, getAuthenticationId, validateToken, validateAuthId, logout as authLogout } from "../../plex/Authentication";
 
 export const setApplicationState = (applicationState) => {
     return {
@@ -10,20 +10,11 @@ export const setApplicationState = (applicationState) => {
     };
 }
 
-export const setServerInfo = (baseUrl) => {
-    return {
-        type: actionTypes.SET_SERVER,
-        payload: {
-            baseUrl: baseUrl
-        }
-    };
-}
-
 export const getToken = () => {
     
     return (dispatch, getState) => {
-        const token = PlexAuthentication.getAuthTokenFromStorage();
-        const authId = PlexAuthentication.getAuthenticationId();
+        const token = getAuthTokenFromStorage();
+        const authId = getAuthenticationId();
 
         dispatch({         
             type: actionTypes.GET_TOKEN,
@@ -37,40 +28,33 @@ export const getToken = () => {
 
 export const checkToken = (token) => {
     
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
 
         dispatch({ type: actionTypes.CHECK_TOKEN });
 
-        PlexAuthentication.checkToken(token)
-        .then(response => {
-            dispatch({ type: actionTypes.TOKEN_VALID, payload: response });
-        })
-        .catch(error => {
-            dispatch({ type: actionTypes.TOKEN_INVALID });
-        });
+        const response = await validateToken(token);
+        dispatch({ type: actionTypes.TOKEN_VALID, payload: response });
+
+        // on error: dispatch({ type: actionTypes.TOKEN_INVALID });
     };
 }
 
 export const checkAuthId = (id) => {
     
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
 
         dispatch({ type: actionTypes.LOGIN_REQUEST });
 
-        PlexAuthentication.validateAuthId(id)
-        .then(response => {
-            dispatch({ type: actionTypes.LOGIN_REQUEST_VALIDATED, payload: { authToken: response.token }});
-        })
-        .catch(error => {
-            dispatch({ type: actionTypes.LOGIN_REQUEST_NOT_VALID });
-        });
+        const response = await validateAuthId(id);
+        dispatch({ type: actionTypes.LOGIN_REQUEST_VALIDATED, payload: { authToken: response.token }});
+
+        // on error: dispatch({ type: actionTypes.LOGIN_REQUEST_NOT_VALID });
     };
 }
 
 export const logout = () => {
-    
     return (dispatch, getState) => {
-        PlexAuthentication.logout();
+        authLogout();
 
         dispatch({         
             type: actionTypes.USER_LOGGED_OUT,

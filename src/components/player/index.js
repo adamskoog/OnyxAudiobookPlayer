@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
 import * as Responsive from '../util/responsive';
-import PlexApi from '../../plex/Api';
+import { getThumbnailTranscodeUrl } from '../../plex/Api';
 
 import { Link } from 'react-router-dom';
 import PlayerTime from './controls/PlayerTime';
-import AudioPlayer from './Player';
+import AudioPlayer from './AudioPlayer';
 
 const Container = styled.div`
     position: absolute;
@@ -62,7 +62,7 @@ const NowPlaying = (props) => {
         
     const getThumbnailUrl = () => {
         if (!currentTrack) return "";
-        return PlexApi.getThumbnailTranscodeUrl(100, 100, baseUrl, currentTrack.thumb, authToken);
+        return getThumbnailTranscodeUrl(100, 100, baseUrl, currentTrack.thumb, authToken);
     };
 
     const getPlayInfoAttr = (attr) => {

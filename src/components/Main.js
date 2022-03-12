@@ -4,17 +4,19 @@ import { useSelector, useDispatch } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route  } from 'react-router-dom';
 
 import { logout, getToken, checkToken, checkAuthId } from "../context/actions/appStateActions";
-import { loadSettingsValues, getServers } from "../context/actions/settingsActions";
+import { getServers } from "../context/actions/settingsActions";
+
+import { prepareLoginRequest } from "../plex/Authentication";
 
 import Header from './Header';
-import NowPlaying from './player/NowPlaying';
-import Settings from './settings/Settings';
-import Home from './home/Home';
+import NowPlaying from './Player';
+import Settings from './Settings';
+import Home from './Home';
 import Loader from './Loader';
-import Library from './library/Library';
-import Album from './album/Album';
+import Library from './Library';
+import Album from './Album';
+import Artist from './Artist';
 
-import PlexAuthentication from "../plex/Authentication";
 
 const MainContainer = styled.main`
     height: calc(100vh - 64px);
@@ -38,17 +40,6 @@ const ScrollContainer = styled.div`
     overflow-x: hidden; /* Hack fix for expand button negative padding issue. */
 `;
 
-// TODO: handle responsive grid and padding - px-3 sm:px-6 lg:px-8
-const ScrollContent = styled.div`
-    max-width: 80rem;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: .75rem;
-    padding-right: .75rem;
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
-`;
-
 const Main = () => {
     const dispatch = useDispatch();
 
@@ -60,27 +51,18 @@ const Main = () => {
 
     const containerRef = useRef(null);
 
-    const doUserLogin = () => {
-        PlexAuthentication.prepareLoginRequest()
-            .then((response) => {
-                window.location.href = response.url;
-            });
+    const doUserLogin = async () => {
+        const response = await prepareLoginRequest();
+        window.location.href = response.url;
     };
-
-    useEffect(() => {
-        // Cannot load fully if no library section is set.
-        if (authToken) {
-            dispatch(getServers(authToken));
-        }
-    }, [authToken, librarySection]);
 
     useEffect(() => {    
         if (!user) {
              // We have no user logged in, check for tokens.
              dispatch(getToken());
         } else
-            dispatch(loadSettingsValues());
-    }, [user]);
+            dispatch(getServers());
+    }, [user, dispatch]);
 
     useEffect(() => {
         if (authToken) {
@@ -90,7 +72,7 @@ const Main = () => {
             // We have been redirected and now have an authorization id to handle.
             dispatch(checkAuthId(authId));
         }
-    }, [authToken, authId]);
+    }, [authToken, authId, dispatch]);
 
     return (
         <>
@@ -99,16 +81,17 @@ const Main = () => {
                 <Header containerRef={containerRef} userInfo={user} doUserLogin={doUserLogin} doUserLogout={() => dispatch(logout())} />
                 <MainContainer ref={containerRef}>
                     <ScrollContainer>
-                        <ScrollContent>
-                            <Switch>
-                                <Route exact path="/" component={() => <Home baseUrl={baseUrl} userInfo={user} section={librarySection} /> } />
-                                <Route exact path="/library" component={() => <Library baseUrl={baseUrl} userInfo={user} section={librarySection} />} />
-                                <Route exact path="/album/:ratingKey" component={(comprops) => 
-                                    <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
-                                }/>
-                                <Route exact path="/settings" component={() => <Settings /> } />
-                            </Switch>
-                        </ScrollContent>
+                        <Switch>
+                            <Route exact path="/" component={() => <Home baseUrl={baseUrl} userInfo={user} section={librarySection} /> } />
+                            <Route exact path="/library" component={() => <Library baseUrl={baseUrl} userInfo={user} section={librarySection} />} />
+                            <Route exact path="/album/:ratingKey" component={(comprops) => 
+                                <Album key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
+                            }/>
+                            <Route exact path="/artist/:ratingKey" component={(comprops) => 
+                                <Artist key={comprops.match.params.ratingKey} ratingKey={comprops.match.params.ratingKey} />
+                            }/>
+                            <Route exact path="/settings" component={() => <Settings /> } />
+                        </Switch>
                     </ScrollContainer>
                 </MainContainer>
                 <NowPlaying containerRef={containerRef} />               

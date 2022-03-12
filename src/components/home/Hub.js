@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import LibraryItem from '../library/LibraryItem';
+import LibraryItem from '../Library/AlbumItem';
 
 import { ReactComponent as HubScrollLeftSvg } from '../../assets/hubScrollLeft.svg';
 import { ReactComponent as HubScrollRightSvg } from '../../assets/hubScrollRight.svg';
@@ -200,7 +200,7 @@ const Hub = ({ title, items, baseUrl, userInfo }) => {
             <HubContainer ref={containerRef}>
                 <HubContents ref={contentRef}>            
                     {items.map((item) => (
-                        <LibraryItem key={item.ratingKey} baseUrl={baseUrl} userInfo={userInfo} albumInfo={item} />
+                        <LibraryItem key={item.ratingKey} metadata={item} showAuthor={true} />
                     ))}
                 </HubContents>
             </HubContainer>

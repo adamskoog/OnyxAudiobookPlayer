@@ -13,7 +13,7 @@ import StopControl from './controls/Stop';
 
 import throttle from 'lodash/throttle';
 import TimeUtils from '../../utility/time';
-import PlexApi from '../../plex/Api';
+import { updateTimeline as updateTimelineApi, formatUrl } from '../../plex/Api';
 
 import { clearPlayQueue, nextTrackInQueue } from "../../context/actions/playQueueActions";
 import { changePlayState, changePlayerTime, PlayState } from "../../context/actions/playerActions";
@@ -122,7 +122,7 @@ function AudioPlayer() {
             "X-Plex-Token": authToken
         };
         //console.log("updateTimeline", args);
-        PlexApi.updateTimeline(baseUrl, args)
+        updateTimelineApi(baseUrl, args)
             .then(data => { /*console.log("data", data); TODO: This doesn't seem to return anything, and errors out often.*/ });
     };
 
@@ -172,7 +172,7 @@ function AudioPlayer() {
             // Probably need to handle multiparts in some way? Even if it's just a warning?
             if (currentTrack.Part[0]) {
                 //console.log("START: Add source and start playing.", currentTrack);
-                const src = PlexApi.formatUrl(`${baseUrl}${currentTrack.Part[0].key}`, { "X-Plex-Token": authToken });
+                const src = formatUrl(`${baseUrl}${currentTrack.Part[0].key}`, { "X-Plex-Token": authToken });
 
                 // get the reference to the audio tag.
                 playerElement.src = src;

@@ -1,71 +1,54 @@
-import PlexApi from './Api';
+import { checkToken, signIn, validatePin } from './Api';
+import { SETTINGS_KEYS, loadSettingFromStorage, saveSettingToStorage, removeSettingFromStorage } from '../utility/settings';
 
-class PlexAuthentication
-{
-    // Action = GET_TOKEN
-    static getAuthTokenFromStorage = () => {
-        // Attempt to get the token from browser local storage.
-        let token = localStorage.getItem("authToken");
-        if (token && token !== "")
-            return token;
-        return null;
+// Action = GET_TOKEN
+export const getAuthTokenFromStorage = () => {
+    // Attempt to get the token from browser local storage.
+    let token = loadSettingFromStorage(SETTINGS_KEYS.token);
+    if (token && token !== "")
+        return token;
+    return null;
+}
+// previously 'checkToken'
+// Main.js -> processLogin
+// Action = CHECK_TOKEN
+export const validateToken = async (token) => {
+
+    const userInfo = await checkToken(token);
+
+    if (userInfo.message) {
+        logout();
+        return { message: userInfo.message };
     }
-
-    // Main.js -> processLogin
-    // Action = CHECK_TOKEN
-    static checkToken = (token) => {
-        return new Promise((resolve, reject) => {
-            PlexApi.checkToken(token)
-                .then(userInfo => {
-                    if (userInfo.message) {
-                        // Remove the token from storage.
-                        localStorage.removeItem("authToken");
-
-                        // Send rejection of promise including the error message
-                        // from the authentication server: TOKEN_INVALID
-                        reject({ message: userInfo.message });
-                    } else {
-                        // We were able to validate the token: TOKEN_VALID
-                        resolve({ user: userInfo });
-                    }
-                });
-        });
-    }
-
-    static getAuthenticationId = () => {
-        let authId = localStorage.getItem("login_redirect_id");
-        if (authId && authId !== "")
-            return authId;
-        return null;
-    }
-
-    static prepareLoginRequest = () => {
-        return new Promise((resolve, reject) => {
-            PlexApi.signIn()
-                .then(redirectInfo => {
-                    localStorage.setItem("login_redirect_id", redirectInfo.id);
-                    resolve({ url: redirectInfo.redirectUrl });
-                });
-        });
-    };
-
-    static validateAuthId(authId) {
-        return new Promise((resolve, reject) => {
-
-            // We need to clear the id and process the auth redirection.
-            PlexApi.validatePin(authId)
-                .then(regInfo => {
-                    localStorage.removeItem("login_redirect_id");
-                    localStorage.setItem("authToken", regInfo.authToken);
-                    resolve({ token: regInfo.authToken });
-                });
-        });
-    };
-
-    static logout() {
-        // Might need to do more here, clear settings??
-        localStorage.removeItem("authToken");
-    }
+    return { user: userInfo };
 }
 
-export default PlexAuthentication;
+export const getAuthenticationId = () => {
+    let authId = loadSettingFromStorage(SETTINGS_KEYS.loginRedirectId);
+    if (authId && authId !== "")
+        return authId;
+    return null;
+}
+
+export const prepareLoginRequest = async () => {
+    const redirectInfo = await signIn();
+
+    saveSettingToStorage(SETTINGS_KEYS.loginRedirectId, redirectInfo.id);
+
+    return { url: redirectInfo.redirectUrl };
+};
+
+export const validateAuthId = async (authId) => {
+    const regInfo = await validatePin(authId);
+
+    removeSettingFromStorage(SETTINGS_KEYS.loginRedirectId);
+    saveSettingToStorage(SETTINGS_KEYS.token, regInfo.authToken);
+    saveSettingToStorage(SETTINGS_KEYS.clientIdentifier, '616647cf-a68b-4474-8b4f-3ad72ed95cf9');
+
+    return { token: regInfo.authToken };
+};
+
+export const logout = () => {
+    // Might need to do more here, clear settings??
+    removeSettingFromStorage(SETTINGS_KEYS.token);
+}

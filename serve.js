@@ -1,27 +1,14 @@
 const express = require('express');
 const path = require("path");
-const fs = require("fs");
-const yargs = require('yargs');
-
-// First we need to parse our command line args.
-const argv = yargs
-    .option('port', {
-        description: 'The port number to use - default: 3001',
-        type: 'number'
-    })
-    .option('host', {
-        description: 'The host ip/name - default: 127.0.0.1'
-    })
-    .help()
-    .alias('help', 'h').argv;
-
+//const fs = require("fs");
     
-const host = argv.host || '127.0.0.1';
-const port = argv.port || 3001;
+const host = process.env.HOST || '0.0.0.0';
+const port = process.env.PORT || 3001;
+const urlBase = proces.env.BASE_URL || '';
 
 // Now we can fire up our express web server.
 const app = express();
-app.set('trust proxy', true);   //'127.0.0.1');
+app.set('trust proxy', true);
 
 // Utilize the build directory for the application
 app.use(express.static(path.join(__dirname, 'build')));

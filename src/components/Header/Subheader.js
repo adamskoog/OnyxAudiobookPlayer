@@ -28,6 +28,12 @@ const Item = styled.div`
     min-height: 1.25rem;
 `;
 
+const RightItem = styled(Item)`
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 1rem;
+`;
+
 const Subheader = ({ hideServer, children }) => {
 
     const [displayName, setDisplayName] = useState('');
@@ -35,6 +41,7 @@ const Subheader = ({ hideServer, children }) => {
     const server = useSelector(state => state.settings.currentServer);
     const librarySection = useSelector(state => state.settings.librarySection);
     const libraries = useSelector(state => state.settings.libraries);
+
     useEffect(() => {
         if (!!hideServer) setDisplayName('');
         else if (server) {
@@ -51,13 +58,13 @@ const Subheader = ({ hideServer, children }) => {
                 setDisplayName(`${server.name}: Library Not Set`);
         } else
             setDisplayName('Server: Not Set');
-    }, [server]);
+    }, [server, librarySection, libraries]);
 
     return (
         <Container>
             <InnerContainer>
                 <Item>{displayName}</Item>
-                <Item>{children}</Item>
+                <RightItem>{children}</RightItem>
             </InnerContainer>
         </Container>
     ); 

@@ -10,21 +10,24 @@ import { setLibrarySortOrder, setLibraryDisplayType } from '../../context/action
 import Subheader from '../Header/Subheader';
 import Menu from '../Menu';
 
-const FilterText = styled.span`
-    padding-left: 1.5rem;
-    padding-right: .5rem;
-`;
+
 const FilterItem = styled.div`
     display: flex;
+    justify-content: flex-end;
+    gap: .5rem;
+
     position: relative;
+`;
+
+const FilterText = styled.span`
 `;
 const FilterButton = styled.button`
     fill: #ffffff;
-    overflow: hidden;
 
+    overflow: hidden;
     transform: rotate(0deg);
     transition: all 0.2s ease-out;
-    transform: ${(props) => (props.rotate ? 'rotate(-180deg)' : '')};
+    transform: ${(props) => (props.showRotate ? 'rotate(180deg)' : '')};
 
     &:focus {
         outline: none;
@@ -75,12 +78,12 @@ const FilterMenu = () => {
         <Subheader>
             <FilterItem>
                 <FilterText>Display: {displayType}</FilterText>
-                <FilterButton rotate={displayMenuIsOpen} onClick={() => setDisplayMenuIsOpen(!displayMenuIsOpen)} id="display-menu" aria-haspopup="true"><ChevronDownArrow /></FilterButton>
+                <FilterButton showRotate={displayMenuIsOpen} onClick={() => setDisplayMenuIsOpen(!displayMenuIsOpen)} id="display-menu" aria-haspopup="true"><ChevronDownArrow /></FilterButton>
                 <Menu isOpen={displayMenuIsOpen} labelledby={'display-menu'} children={displayMenuItems} vOffset={'2rem'}/>
             </FilterItem>
             <FilterItem>
-                <FilterText>Order by: {sortType}</FilterText>
-                <FilterButton rotate={sortMenuIsOpen} onClick={() => setSortMenuIsOpen(!sortMenuIsOpen)} id="sort-order-menu" aria-haspopup="true"><ChevronDownArrow /></FilterButton>
+                <FilterText>Order: {sortType}</FilterText>
+                <FilterButton showRotate={sortMenuIsOpen} onClick={() => setSortMenuIsOpen(!sortMenuIsOpen)} id="sort-order-menu" aria-haspopup="true"><ChevronDownArrow /></FilterButton>
                 <Menu isOpen={sortMenuIsOpen} labelledby={'sort-order-menu'} children={sortMenuItems} vOffset={'2rem'} />
             </FilterItem>
         </Subheader>

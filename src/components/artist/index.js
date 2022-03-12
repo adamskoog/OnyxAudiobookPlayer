@@ -5,7 +5,8 @@ import { useSelector } from 'react-redux'
 
 import { getAlbumMetadata, getThumbnailTranscodeUrl } from '../../plex/Api';
 
-import AlbumItem from '../library/AlbumItem';
+import Subheader from '../Header/Subheader';
+import AlbumItem from '../Library/AlbumItem';
 
 import { ScrollContent  } from '../util/container';
 import * as Responsive from '../util/responsive';
@@ -97,6 +98,8 @@ const Artist = ({ ratingKey }) => {
     return (
         <>
         {authToken && (
+        <>
+        <Subheader></Subheader>
         <ScrollContent>
             <Container>
                 <ArtistImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, artist.thumb, authToken)} alt={artist.parentTitle} />
@@ -114,6 +117,7 @@ const Artist = ({ ratingKey }) => {
                 </Albums>
             </AlbumContainer>
         </ScrollContent>
+        </>
         )}
         </>
     ); 

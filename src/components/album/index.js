@@ -11,6 +11,7 @@ import { getAlbumQueue, updateOnDeck, isTrackOnDeck, findOnDeck } from '../../pl
 import { ReactComponent as OnDeckPlaySvg } from '../../assets/onDeckPlay.svg';
 
 import { ScrollContent  } from '../util/container';
+import Subheader from '../Header/Subheader';
 import AlbumSummary from './AlbumSummary';
 import AlbumItem from './AlbumItem';
 
@@ -122,6 +123,8 @@ const Album = ({ ratingKey }) => {
     return (
         <>
         {authToken && (
+        <>
+        <Subheader></Subheader>
         <ScrollContent>
         <Container>
             <AlbumContainer>
@@ -153,6 +156,7 @@ const Album = ({ ratingKey }) => {
             </TrackContainer>
         </Container>
         </ScrollContent>
+        </>
         )}
         </>
     ); 

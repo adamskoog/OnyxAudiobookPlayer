@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import LibraryItem from '../library/AlbumItem';
+import LibraryItem from '../Library/AlbumItem';
 
 import { ReactComponent as HubScrollLeftSvg } from '../../assets/hubScrollLeft.svg';
 import { ReactComponent as HubScrollRightSvg } from '../../assets/hubScrollRight.svg';

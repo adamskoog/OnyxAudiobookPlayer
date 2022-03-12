@@ -7,7 +7,7 @@ import { getThumbnailTranscodeUrl } from '../../plex/Api';
 
 import { Link } from 'react-router-dom';
 import PlayerTime from './controls/PlayerTime';
-import AudioPlayer from './Player';
+import AudioPlayer from './AudioPlayer';
 
 const Container = styled.div`
     position: absolute;

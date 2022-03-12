@@ -4,18 +4,19 @@ import { useSelector, useDispatch } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route  } from 'react-router-dom';
 
 import { logout, getToken, checkToken, checkAuthId } from "../context/actions/appStateActions";
-import { loadSettingsValues, getServers } from "../context/actions/settingsActions";
-
-import Header from './Header';
-import NowPlaying from './player/NowPlaying';
-import Settings from './settings/Settings';
-import Home from './home/Home';
-import Loader from './Loader';
-import Library from './library';
-import Album from './album/Album';
-import Artist from './artist';
+import { getServers } from "../context/actions/settingsActions";
 
 import { prepareLoginRequest } from "../plex/Authentication";
+
+import Header from './Header';
+import NowPlaying from './Player';
+import Settings from './Settings';
+import Home from './Home';
+import Loader from './Loader';
+import Library from './Library';
+import Album from './Album';
+import Artist from './Artist';
+
 
 const MainContainer = styled.main`
     height: calc(100vh - 64px);

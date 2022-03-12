@@ -4,6 +4,9 @@ import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux'
 import { setServerSetting, setLibrarySetting } from "../../context/actions/settingsActions";
 
+import Subheader from '../Header/Subheader';
+import { ScrollContent  } from '../util/container';
+
 // Original tailwind styles.
 /* <select className="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"> */
 
@@ -40,20 +43,23 @@ const Settings = () => {
     }
 
     return (
-        <div>
-            <SelectControl value={serverIdentifier} onChange={serverChanged}>
-                <option value="" disabled hidden>Select a Server</option>
-                {(resources.map((resource) => (
-                    <option key={resource.clientIdentifier} value={resource.clientIdentifier}>{resource.name}</option>
-                )))}
-            </SelectControl>
-            <SelectControl value={librarySection} onChange={libraryChanged}>
-                <option value="" disabled hidden>Select a Library</option>
-                {(libraries.map((library) => (
-                    <option key={library.key} value={library.key}>{library.title}</option>
-                )))}
-            </SelectControl>
-        </div>
+        <>
+            <Subheader hideServer={true}></Subheader>
+            <ScrollContent>
+                <SelectControl value={serverIdentifier} onChange={serverChanged}>
+                    <option value="" disabled hidden>Select a Server</option>
+                    {(resources.map((resource) => (
+                        <option key={resource.clientIdentifier} value={resource.clientIdentifier}>{resource.name}</option>
+                    )))}
+                </SelectControl>
+                <SelectControl value={librarySection} onChange={libraryChanged}>
+                    <option value="" disabled hidden>Select a Library</option>
+                    {(libraries.map((library) => (
+                        <option key={library.key} value={library.key}>{library.title}</option>
+                    )))}
+                </SelectControl>
+            </ScrollContent>
+        </>
     );
 }
 

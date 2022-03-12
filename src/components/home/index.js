@@ -5,6 +5,7 @@ import { ScrollContent  } from '../util/container';
 
 import { getLibraryItems } from '../../plex/Api';
 
+import Subheader from '../Header/Subheader';
 import Hub from './Hub';
 
 const ErrorMessage = styled.div`
@@ -60,10 +61,13 @@ const Home = ({ baseUrl, section, userInfo }) => {
             <ErrorMessage>Failed to load library, please update your settings.</ErrorMessage>
         )}
         {userInfo && baseUrl && (
+            <>
+            <Subheader></Subheader>
             <ScrollContent>
                 <Hub title="Recently Added" baseUrl={baseUrl} userInfo={userInfo} items={recentlyAddedInfo} />
                 <Hub title="Recently Played" baseUrl={baseUrl} userInfo={userInfo} items={recentlyPlayedInfo} />
             </ScrollContent>
+            </>
         )}
         </>
     ); 

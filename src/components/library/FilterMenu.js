@@ -7,28 +7,8 @@ import { SORT_ORDER, MUSIC_LIBRARY_DISPAY_TYPE } from '../../plex/Api';
 
 import { setLibrarySortOrder, setLibraryDisplayType } from '../../context/actions/libraryActions';
 
+import Subheader from '../Header/Subheader';
 import Menu from '../Menu';
-
-const Container = styled.div`
-    background-color: rgba(75,85,99,1);
-    color: #fff;
-    box-shadow: 0 5px 15px 15px rgba(75,85,99, 0.4);
-    margin-bottom: 15px;
-`;
-
-const InnerContainer = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-
-    max-width: 80rem;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    padding-top: .75rem;
-    padding-bottom: .75rem;
-`;
 
 const FilterText = styled.span`
     padding-left: 1.5rem;
@@ -92,20 +72,18 @@ const FilterMenu = () => {
     }, [sortMenuIsOpen]);
 
     return (
-        <Container>
-            <InnerContainer>
-                <FilterItem>
-                    <FilterText>Display: {displayType}</FilterText>
-                    <FilterButton rotate={displayMenuIsOpen} onClick={() => setDisplayMenuIsOpen(!displayMenuIsOpen)} id="display-menu" aria-haspopup="true"><ChevronDownArrow /></FilterButton>
-                    <Menu isOpen={displayMenuIsOpen} labelledby={'display-menu'} children={displayMenuItems} vOffset={'2rem'}/>
-                </FilterItem>
-                <FilterItem>
-                    <FilterText>Order by: {sortType}</FilterText>
-                    <FilterButton rotate={sortMenuIsOpen} onClick={() => setSortMenuIsOpen(!sortMenuIsOpen)} id="sort-order-menu" aria-haspopup="true"><ChevronDownArrow /></FilterButton>
-                    <Menu isOpen={sortMenuIsOpen} labelledby={'sort-order-menu'} children={sortMenuItems} vOffset={'2rem'} />
-                </FilterItem>
-            </InnerContainer>
-        </Container>
+        <Subheader>
+            <FilterItem>
+                <FilterText>Display: {displayType}</FilterText>
+                <FilterButton rotate={displayMenuIsOpen} onClick={() => setDisplayMenuIsOpen(!displayMenuIsOpen)} id="display-menu" aria-haspopup="true"><ChevronDownArrow /></FilterButton>
+                <Menu isOpen={displayMenuIsOpen} labelledby={'display-menu'} children={displayMenuItems} vOffset={'2rem'}/>
+            </FilterItem>
+            <FilterItem>
+                <FilterText>Order by: {sortType}</FilterText>
+                <FilterButton rotate={sortMenuIsOpen} onClick={() => setSortMenuIsOpen(!sortMenuIsOpen)} id="sort-order-menu" aria-haspopup="true"><ChevronDownArrow /></FilterButton>
+                <Menu isOpen={sortMenuIsOpen} labelledby={'sort-order-menu'} children={sortMenuItems} vOffset={'2rem'} />
+            </FilterItem>
+        </Subheader>
     ); 
 }
 

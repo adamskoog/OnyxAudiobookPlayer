@@ -17,7 +17,7 @@ const Grid = styled.div`
     display: grid;
     grid-gap: 1rem;
     gap: 1rem;
-    align-items: center;
+    align-items: start;
     justify-items: center;
 
     grid-template-columns: repeat(2, minmax(0, 1fr));

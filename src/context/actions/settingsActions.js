@@ -113,9 +113,7 @@ export const getLibraries = () => {
         const resource = state.settings.currentServer;
 
         if (resource) {
-            console.log("getting libraries");
             const libraries = await getPlexLibraries(baseUrl, resource.accessToken);
-            console.log("have libraries", libraries);
             dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libraries});
         }
     };

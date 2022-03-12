@@ -29,7 +29,6 @@ const settingsReducer = (state = defaultState, action) => {
         case actionTypes.UPDATE_SELECTED_SERVER:
             return { ...state, currentServer: action.payload };
         case actionTypes.LOAD_LIBRARY_LIST_COMPLETE:
-            console.log("reducer", action.payload);
             return { ...state, libraries: action.payload };
 
         default:

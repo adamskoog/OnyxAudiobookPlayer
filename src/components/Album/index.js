@@ -14,12 +14,22 @@ import { ScrollContent  } from '../util/container';
 import Subheader from '../Header/Subheader';
 import AlbumSummary from './AlbumSummary';
 import AlbumItem from './AlbumItem';
+import * as Responsive from '../util/responsive';
 
 const Container = styled.div`
 `;
 const AlbumContainer = styled.div`
     display: flex;
     gap: 1.75rem;
+
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+
+    ${Responsive.smallMediaQuery(`
+        flex-direction: row;
+        align-items: stretch;
+    `)}
 `;
 const AlbumImage = styled.img`
     height: 200px;

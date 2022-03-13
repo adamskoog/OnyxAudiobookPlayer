@@ -19,7 +19,9 @@ const Container = styled.div`
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-
+    align-items: center;
+    justify-content: space-evenly;
+    
     color: #fff;
     background-color: rgba(31, 41, 55, 1);
     
@@ -38,10 +40,16 @@ const AlbumImage = styled.img`
     `)}
 `;
 const InfoContainer = styled.div`
-    margin-left: 0.75rem;
-    margin-right: 0.75rem;
+    margin-left: 0.45rem;
+    margin-right: 0.45rem;
+    max-width: 120px; 
 
-    max-width: 180px;
+    ${Responsive.mediumMediaQuery(`
+        margin-left: 0.75rem;
+        margin-right: 0.75rem;
+        max-width: 180px; 
+    `)}
+    
 `;
 const TextBlock = styled.div`
     overflow: hidden;

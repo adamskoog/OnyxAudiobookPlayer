@@ -24,10 +24,6 @@ const Container = styled.div`
         padding-left: 1.5rem;
         padding-right: 1.5rem;
     `)}
-    ${Responsive.largeMediaQuery(`
-        padding-left: 2rem;
-        padding-right: 2rem; 
-    `)}
 `;
 const NavContent = styled.div`
     position: relative;

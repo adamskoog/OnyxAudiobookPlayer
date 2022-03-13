@@ -7,6 +7,7 @@ import { getAlbumMetadata, getThumbnailTranscodeUrl } from '../../plex/Api';
 
 import Subheader from '../Header/Subheader';
 import AlbumItem from '../Library/AlbumItem';
+import AlbumSummary from '../Album/AlbumSummary';
 
 import { ScrollContent  } from '../util/container';
 import * as Responsive from '../util/responsive';
@@ -14,6 +15,15 @@ import * as Responsive from '../util/responsive';
 const Container = styled.div`
     display: flex;
     gap: 1.75rem;
+
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+
+    ${Responsive.smallMediaQuery(`
+        flex-direction: row;
+        align-items: stretch;
+    `)}
 `;
 const ArtistImage = styled.img`
     height: 200px;
@@ -35,23 +45,17 @@ const ArtistName = styled.div`
     line-height: 1.125rem;
 `;
 
-const ArtistSummary = styled.div`
-    margin-top: 2rem;
-    max-width: 600px;
-
-    font-size: 1.25rem;
-    line-height: 1.125rem;
-`;
-
 const AlbumContainer = styled.div`
-    margin-top: 4rem;
 `;
 const Albums = styled.div`
     display: grid;
     grid-gap: 1rem;
     gap: 1rem;
-    align-items: center;
+    align-items: start;
     justify-items: center;
+
+    border-top: solid 1px black;
+    padding-top: .8rem;
 
     grid-template-columns: repeat(2, minmax(0, 1fr));
 
@@ -107,7 +111,7 @@ const Artist = () => {
                 <ArtistImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, artist.thumb, accessToken)} alt={artist.parentTitle} />
                 <ArtistInfo>
                     <ArtistName>{artist.parentTitle}</ArtistName>
-                    <ArtistSummary>{artist.summary}</ArtistSummary>
+                    <AlbumSummary summary={artist.summary} />
                 </ArtistInfo>
             </Container>
             <AlbumContainer>

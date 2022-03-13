@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
 import * as Responsive from '../util/responsive';
-import { getThumbnailTranscodeUrl } from '../../plex/Api';
+import PlexImage from '../util/PlexImage';
 
 import { Link } from 'react-router-dom';
 import PlayerTime from './controls/PlayerTime';
@@ -30,16 +30,17 @@ const Container = styled.div`
         height: 100px;
     }
 `;
-const AlbumImage = styled.img`
-    height: 100px;
-    width: 100px;
-
+const AlbumImageContainer = styled.div`
     display: none;
     ${Responsive.smallMediaQuery(`
         display: block;
     `)}
 `;
 const InfoContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+
     margin-left: 0.45rem;
     margin-right: 0.45rem;
     max-width: 120px; 
@@ -63,33 +64,15 @@ const NowPlaying = (props) => {
 
     const containerRef = useRef(null);
 
-    const accessToken = useSelector(state => state.settings.accessToken);
-    const baseUrl = useSelector(state => state.application.baseUrl);
     const playState = useSelector(state => state.player.mode);
     const currentTrack = useSelector(state => state.playQueue.currentTrack);
-        
-    const getThumbnailUrl = () => {
-        if (!currentTrack) return "";
-        return getThumbnailTranscodeUrl(100, 100, baseUrl, currentTrack.thumb, accessToken);
-    };
-
-    const getPlayInfoAttr = (attr) => {
-        if (!currentTrack) return "";
-        return currentTrack[attr];
-    };
     
-    useEffect(() => {
-        const main = props.containerRef.current;
-        const player = containerRef.current;
-        if (playState === "stopped") {
-            main.classList.remove("playing");
-            player.classList.remove("playing");
-        } else {
-            main.classList.add("playing");
-            player.classList.add("playing");
-        }
-    }, [accessToken]);
-
+    const [trackThumbUrl, setTrackThumbUrl] = useState(null);
+    const [trackTitle, setTrackTitle] = useState('');
+    const [albumTitle, setAlbumTitle] = useState('');
+    const [albumKey, setAlbumKey] = useState('');
+    const [artistName, setArtistName] = useState('');
+   
     useEffect(() => {
         const main = props.containerRef.current;
         const player = containerRef.current;
@@ -102,13 +85,33 @@ const NowPlaying = (props) => {
         }
     }, [playState, props.containerRef]);
 
+    useEffect(() => {
+        if (currentTrack) {
+            setTrackThumbUrl(currentTrack.thumb);
+            setTrackTitle(currentTrack.title);
+            setAlbumTitle(currentTrack.parentTitle);
+            setAlbumKey(currentTrack.ratingKey);
+            setArtistName(currentTrack.grandparentTitle);
+        } else {
+            setTrackThumbUrl(null);
+            setTrackTitle('');
+            setAlbumTitle('');
+            setAlbumKey('');
+            setArtistName('');
+        }
+    }, [currentTrack]);
+
     return (
         <Container ref={containerRef}>
-            <AlbumImage src={getThumbnailUrl()} alt="album art" />
+            <AlbumImageContainer>
+                <PlexImage width={100} height={100} url={trackThumbUrl} alt={trackTitle} hideRadius={true} />
+            </AlbumImageContainer>
             <InfoContainer>
-                <TextBlock>{getPlayInfoAttr("title")}</TextBlock>
-                <TextBlock fontColor={"rgba(209, 213, 219, 1)"}><Link to={`/album/${getPlayInfoAttr("parentRatingKey")}`}>{getPlayInfoAttr("parentTitle")}</Link></TextBlock>
-                <TextBlock fontColor={"rgba(209, 213, 219, 1)"}>{getPlayInfoAttr("grandparentTitle")}</TextBlock>
+                <TextBlock>{trackTitle}</TextBlock>
+                <TextBlock fontColor={"rgba(209, 213, 219, 1)"}>
+                    <Link to={`/album/${albumKey}`}>{albumTitle}</Link>
+                </TextBlock>
+                <TextBlock fontColor={"rgba(209, 213, 219, 1)"}>{artistName}</TextBlock>
                 <PlayerTime />
             </InfoContainer>
             <AudioPlayer />

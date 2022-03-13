@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux'
 import { setPlayQueue } from "../../context/actions/playQueueActions";
 
-import { getAlbumMetadata, getThumbnailTranscodeUrl } from '../../plex/Api';
+import { getAlbumMetadata } from '../../plex/Api';
 import { getAlbumQueue, updateOnDeck, isTrackOnDeck, findOnDeck } from '../../plex/Playback';
 
 import { ReactComponent as OnDeckPlaySvg } from '../../assets/onDeckPlay.svg';
@@ -15,6 +15,8 @@ import Subheader from '../Header/Subheader';
 import AlbumSummary from './AlbumSummary';
 import AlbumItem from './AlbumItem';
 import * as Responsive from '../util/responsive';
+
+import PlexImage from '../util/PlexImage';
 
 const Container = styled.div`
 `;
@@ -30,12 +32,6 @@ const AlbumContainer = styled.div`
         flex-direction: row;
         align-items: stretch;
     `)}
-`;
-const AlbumImage = styled.img`
-    height: 200px;
-    width: 200px;
-    display: inline-block;
-    border-radius: 0.375rem;
 `;
 const AlbumInfo = styled.div`
     flex-grow: 1;
@@ -140,7 +136,7 @@ const Album = () => {
         <ScrollContent>
         <Container>
             <AlbumContainer>
-                <AlbumImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, album.thumb, accessToken)} alt="Album Cover" />
+                <PlexImage width={200} height={200} url={album.thumb} alt={`${album.parentTitle} Cover`} />
                 <AlbumInfo>
                     <AlbumTitle>{album.parentTitle}</AlbumTitle>
                     <Link to={`/artist/${album.grandparentRatingKey}`}>

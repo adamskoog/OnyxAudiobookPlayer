@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-import { getAlbumMetadata, getThumbnailTranscodeUrl } from '../../plex/Api';
+import { getAlbumMetadata } from '../../plex/Api';
 
 import Subheader from '../Header/Subheader';
 import AlbumItem from '../Library/AlbumItem';
@@ -11,6 +11,7 @@ import AlbumSummary from '../Album/AlbumSummary';
 
 import { ScrollContent  } from '../util/container';
 import * as Responsive from '../util/responsive';
+import PlexImage from '../util/PlexImage';
 
 const Container = styled.div`
     display: flex;
@@ -24,12 +25,6 @@ const Container = styled.div`
         flex-direction: row;
         align-items: stretch;
     `)}
-`;
-const ArtistImage = styled.img`
-    height: 200px;
-    width: 200px;
-    display: inline-block;
-    border-radius: 0.375rem;
 `;
 const ArtistInfo = styled.div`
     flex-grow: 1;
@@ -46,6 +41,9 @@ const ArtistName = styled.div`
 `;
 
 const AlbumContainer = styled.div`
+    ${Responsive.smallMediaQuery(`
+        margin-top: 3rem;
+    `)}
 `;
 const Albums = styled.div`
     display: grid;
@@ -86,17 +84,14 @@ const Artist = () => {
 
     const { ratingKey } = useParams();
 
-    const fetchArtistMetadata = async () => {
-        const data = await getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": accessToken });
-        if (data.MediaContainer) {
-            setArtist(data.MediaContainer);
-        }
-    }
-
     useEffect(() => {
         const fetchMetadata = async () => {
-            if (accessToken && baseUrl && ratingKey)
-                fetchArtistMetadata();
+            if (accessToken && baseUrl && ratingKey) {
+                const data = await getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": accessToken });
+                if (data.MediaContainer) {
+                    setArtist(data.MediaContainer);
+                }
+            }
         }
         fetchMetadata();
     }, [baseUrl, accessToken, ratingKey]);
@@ -108,7 +103,7 @@ const Artist = () => {
         <Subheader></Subheader>
         <ScrollContent>
             <Container>
-                <ArtistImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, artist.thumb, accessToken)} alt={artist.parentTitle} />
+                <PlexImage width={200} height={200} url={artist.thumb} alt={`${artist.parentTitle}`} />
                 <ArtistInfo>
                     <ArtistName>{artist.parentTitle}</ArtistName>
                     <AlbumSummary summary={artist.summary} />

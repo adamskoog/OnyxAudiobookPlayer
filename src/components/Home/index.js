@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 
 import { ScrollContent  } from '../util/container';
 
@@ -12,8 +13,13 @@ const ErrorMessage = styled.div`
     margin: 30px;
 `;
 
-const Home = ({ baseUrl, section, userInfo }) => {
+const Home = () => {
  
+    const userInfo = useSelector(state => state.application.user);
+    const baseUrl = useSelector(state => state.application.baseUrl);
+    const section = useSelector(state => state.settings.librarySection);
+    const currentServer = useSelector(state => state.settings.currentServer)
+
     const [recentlyAddedInfo, setRecentlyAddedInfo] = useState([]);
     const [recentlyPlayedInfo, setRecentlyPlayedInfo] = useState([]);
 
@@ -21,10 +27,10 @@ const Home = ({ baseUrl, section, userInfo }) => {
     useEffect(() => () => { isMountedRef.current = false }, [])
 
     useEffect(() => {
-        if (userInfo && baseUrl && section) {
+        if (baseUrl && section) {
             const fetchLibraryItems = async () => {
                 const data = await getLibraryItems(baseUrl, section, { 
-                    "X-Plex-Token": userInfo.authToken,
+                    "X-Plex-Token": currentServer.accessToken,
                     "X-Plex-Container-Start": 0,
                     "X-Plex-Container-Size": 10,
                     sort: "addedAt:desc"
@@ -34,13 +40,13 @@ const Home = ({ baseUrl, section, userInfo }) => {
             }
             fetchLibraryItems();
         } else setRecentlyAddedInfo([]);
-    }, [baseUrl, section, userInfo]);
+    }, [baseUrl, section]);
 
     useEffect(() => {
-        if (userInfo && baseUrl && section) {
+        if (baseUrl && section) {
             const fetchLibraryItems = async () => {
                 const data = await getLibraryItems(baseUrl, section, { 
-                    "X-Plex-Token": userInfo.authToken,
+                    "X-Plex-Token": currentServer.accessToken,
                     "X-Plex-Container-Start": 0,
                     "X-Plex-Container-Size": 10,
                     sort: "lastViewedAt:desc"
@@ -50,7 +56,7 @@ const Home = ({ baseUrl, section, userInfo }) => {
             }
             fetchLibraryItems();
         } else setRecentlyPlayedInfo([]);
-    }, [baseUrl, section, userInfo]);
+    }, [baseUrl, section]);
 
     return (
         <>

@@ -14,7 +14,11 @@ const AlbumCoverContainer = styled.div`
     margin-bottom: 0.25rem;
     overflow:hidden;
 `;
-const AlbumText = styled.div``;
+const AlbumText = styled.div`
+    font-weight: 500;
+`;
+const ArtistText = styled.div`
+`
 
 const AlbumItem = ({ metadata, showAuthor }) => {
     return (
@@ -25,7 +29,7 @@ const AlbumItem = ({ metadata, showAuthor }) => {
                 </AlbumCoverContainer>
                 <AlbumText title={metadata.title}>{metadata.title}</AlbumText>
                 {showAuthor && (
-                    <AlbumText title={metadata.parentTitle}>{metadata.parentTitle}</AlbumText>
+                    <ArtistText title={metadata.parentTitle}>{metadata.parentTitle}</ArtistText>
                 )}
             </Container>
         </Link>

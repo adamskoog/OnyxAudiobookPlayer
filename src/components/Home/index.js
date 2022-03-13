@@ -64,8 +64,12 @@ const Home = ({ baseUrl, section, userInfo }) => {
             <>
             <Subheader></Subheader>
             <ScrollContent>
+                {recentlyAddedInfo.length > 0 && (
                 <Hub title="Recently Added" baseUrl={baseUrl} userInfo={userInfo} items={recentlyAddedInfo} />
+                )}
+                {recentlyPlayedInfo.length > 0 && (
                 <Hub title="Recently Played" baseUrl={baseUrl} userInfo={userInfo} items={recentlyPlayedInfo} />
+                )}
             </ScrollContent>
             </>
         )}

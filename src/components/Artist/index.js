@@ -75,7 +75,9 @@ const AlbumCount = styled.div`
 
 const Artist = () => {
 
-    const authToken = useSelector(state => state.application.authToken);
+    //const authToken = useSelector(state => state.application.authToken);
+    const currentServer = useSelector(state => state.settings.currentServer);
+    const authToken = currentServer.accessToken;
     const baseUrl = useSelector(state => state.application.baseUrl);
 
     const [artist, setArtist] = useState({ Metadata: [] });

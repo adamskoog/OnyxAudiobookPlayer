@@ -79,7 +79,8 @@ const Album = () => {
 
     const dispatch = useDispatch();
 
-    const authToken = useSelector(state => state.application.authToken);
+    //const authToken = useSelector(state => state.application.authToken);
+    const currentServer = useSelector(state => state.settings.currentServer);
     const baseUrl = useSelector(state => state.application.baseUrl);
 
     const [album, setAlbum] = useState({ Metadata: [] });
@@ -93,6 +94,7 @@ const Album = () => {
 
     const playSelectedTrack = async (trackInfo) => {
         if (!isTrackOnDeck(trackInfo, album)) {
+            const authToken = currentServer.accessToken;
             await updateOnDeck(trackInfo, album, baseUrl, authToken);
             const albumInfo = await fetchAlbumMetadata();
             dispatch(setPlayQueue(getAlbumQueue(albumInfo.track, albumInfo.album)));
@@ -102,6 +104,7 @@ const Album = () => {
     }
 
     const fetchAlbumMetadata = async () => {
+        const authToken = currentServer.accessToken;
         const data = await getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": authToken });
         if (data.MediaContainer) {
             const onDeck = findOnDeck(data.MediaContainer);
@@ -115,22 +118,22 @@ const Album = () => {
 
     useEffect(() => {
         const fetchMetadata = async () => {
-            if (authToken && baseUrl && ratingKey)
+            if (currentServer && baseUrl && ratingKey)
                 fetchAlbumMetadata();
         }
         fetchMetadata();
-    }, [baseUrl, authToken, ratingKey]);
+    }, [baseUrl, currentServer, ratingKey]);
 
     //https://tailwindcomponents.com/component/button-component-default
     return (
         <>
-        {authToken && (
+        {currentServer && (
         <>
         <Subheader></Subheader>
         <ScrollContent>
         <Container>
             <AlbumContainer>
-                <AlbumImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, album.thumb, authToken)} alt="Album Cover" />
+                <AlbumImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, album.thumb, currentServer.accessToken)} alt="Album Cover" />
                 <AlbumInfo>
                     <AlbumTitle>{album.parentTitle}</AlbumTitle>
                     <Link to={`/artist/${album.grandparentRatingKey}`}>

@@ -36,7 +36,8 @@ function AudioPlayer() {
 
     const dispatch = useDispatch();
     
-    const authToken = useSelector(state => state.application.authToken);
+    //const authToken = useSelector(state => state.application.authToken);
+    const currentServer = useSelector(state => state.settings.currentServer);
     const baseUrl = useSelector(state => state.application.baseUrl);
     const queueId = useSelector(state => state.playQueue.id);
     const queue = useSelector(state => state.playQueue.queue);
@@ -112,6 +113,7 @@ function AudioPlayer() {
         // we need a way to update the album info if the user is looking at the album
         // page, It should keep the on deck updated.
         // Should this be done while playing, or only when user pauses/kills the stream.
+        const authToken = currentServer.accessToken;
         let args = {
             ratingKey: trackInfo.ratingKey,
             key: trackInfo.key,
@@ -172,6 +174,7 @@ function AudioPlayer() {
             // Probably need to handle multiparts in some way? Even if it's just a warning?
             if (currentTrack.Part[0]) {
                 //console.log("START: Add source and start playing.", currentTrack);
+                const authToken = currentServer.accessToken;
                 const src = formatUrl(`${baseUrl}${currentTrack.Part[0].key}`, { "X-Plex-Token": authToken });
 
                 // get the reference to the audio tag.
@@ -184,7 +187,7 @@ function AudioPlayer() {
                 playTrack();
             }
         }
-    }, [queueId, queueIndex]);
+    }, [queueId, queueIndex, currentServer]);
 
     return (
         <>

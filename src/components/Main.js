@@ -74,10 +74,16 @@ const Main = () => {
         }
     }, [authToken, authId, dispatch]);
 
+    // Determine if we are passing in an environment variable for
+    // a different base url (in case of proxy to a sub directory).
+    let appBaseUrl = '';
+    if (window._env_)
+        appBaseUrl = window._env_.BASEURL || '';
+
     return (
         <>
             <Loader />
-            <Router>
+            <Router basename={appBaseUrl}>
                 <Header containerRef={containerRef} userInfo={user} doUserLogin={doUserLogin} doUserLogout={() => dispatch(logout())} />
                 <MainContainer ref={containerRef}>
                     <ScrollContainer>

@@ -20,27 +20,27 @@ const MenuButton = styled.button`
     line-height: 1.75rem;
 `;
 
-const markPlayed = async (trackInfo, baseUrl, authToken, updateAlbumInfo) => {
-    await markTrackPlayed(trackInfo , baseUrl, authToken);
+const markPlayed = async (trackInfo, baseUrl, accessToken, updateAlbumInfo) => {
+    await markTrackPlayed(trackInfo , baseUrl, accessToken);
     updateAlbumInfo();
 };
 
-const markUnplayed = async (trackInfo, baseUrl, authToken, updateAlbumInfo) => {
-    await markTrackUnplayed(trackInfo , baseUrl, authToken)
+const markUnplayed = async (trackInfo, baseUrl, accessToken, updateAlbumInfo) => {
+    await markTrackUnplayed(trackInfo , baseUrl, accessToken)
     updateAlbumInfo();
 };
 
 const TrackMenu = ({ trackInfo, playSelectedTrack, updateAlbumInfo }) => {
 
-    const authToken = useSelector(state => state.application.authToken);
+    const accessToken = useSelector(state => state.settings.accessToken);
     const baseUrl = useSelector(state => state.application.baseUrl);
 
     const [isOpen, setIsOpen] = useState(false);
 
     const menuItems = [
         { title: 'Play', callback: () => playSelectedTrack(trackInfo) },
-        { title: 'Mark as Played', callback: () => markPlayed(trackInfo, baseUrl, authToken, updateAlbumInfo) },
-        { title: 'Mark as Unplayed', callback: () => markUnplayed(trackInfo, baseUrl, authToken, updateAlbumInfo) },
+        { title: 'Mark as Played', callback: () => markPlayed(trackInfo, baseUrl, accessToken, updateAlbumInfo) },
+        { title: 'Mark as Unplayed', callback: () => markUnplayed(trackInfo, baseUrl, accessToken, updateAlbumInfo) },
     ];
 
     useEffect(() => {

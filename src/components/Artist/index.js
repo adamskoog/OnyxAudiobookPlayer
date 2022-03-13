@@ -75,9 +75,7 @@ const AlbumCount = styled.div`
 
 const Artist = () => {
 
-    //const authToken = useSelector(state => state.application.authToken);
-    const currentServer = useSelector(state => state.settings.currentServer);
-    const authToken = currentServer.accessToken;
+    const accessToken = useSelector(state => state.settings.accessToken);
     const baseUrl = useSelector(state => state.application.baseUrl);
 
     const [artist, setArtist] = useState({ Metadata: [] });
@@ -85,7 +83,7 @@ const Artist = () => {
     const { ratingKey } = useParams();
 
     const fetchArtistMetadata = async () => {
-        const data = await getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": authToken });
+        const data = await getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": accessToken });
         if (data.MediaContainer) {
             setArtist(data.MediaContainer);
         }
@@ -93,20 +91,20 @@ const Artist = () => {
 
     useEffect(() => {
         const fetchMetadata = async () => {
-            if (authToken && baseUrl && ratingKey)
+            if (accessToken && baseUrl && ratingKey)
                 fetchArtistMetadata();
         }
         fetchMetadata();
-    }, [baseUrl, authToken, ratingKey]);
+    }, [baseUrl, accessToken, ratingKey]);
 
     return (
         <>
-        {authToken && (
+        {accessToken && (
         <>
         <Subheader></Subheader>
         <ScrollContent>
             <Container>
-                <ArtistImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, artist.thumb, authToken)} alt={artist.parentTitle} />
+                <ArtistImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, artist.thumb, accessToken)} alt={artist.parentTitle} />
                 <ArtistInfo>
                     <ArtistName>{artist.parentTitle}</ArtistName>
                     <ArtistSummary>{artist.summary}</ArtistSummary>

@@ -79,8 +79,7 @@ const Album = () => {
 
     const dispatch = useDispatch();
 
-    //const authToken = useSelector(state => state.application.authToken);
-    const currentServer = useSelector(state => state.settings.currentServer);
+    const accessToken = useSelector(state => state.settings.accessToken);
     const baseUrl = useSelector(state => state.application.baseUrl);
 
     const [album, setAlbum] = useState({ Metadata: [] });
@@ -94,8 +93,7 @@ const Album = () => {
 
     const playSelectedTrack = async (trackInfo) => {
         if (!isTrackOnDeck(trackInfo, album)) {
-            const authToken = currentServer.accessToken;
-            await updateOnDeck(trackInfo, album, baseUrl, authToken);
+            await updateOnDeck(trackInfo, album, baseUrl, accessToken);
             const albumInfo = await fetchAlbumMetadata();
             dispatch(setPlayQueue(getAlbumQueue(albumInfo.track, albumInfo.album)));
         }
@@ -104,8 +102,7 @@ const Album = () => {
     }
 
     const fetchAlbumMetadata = async () => {
-        const authToken = currentServer.accessToken;
-        const data = await getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": authToken });
+        const data = await getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": accessToken });
         if (data.MediaContainer) {
             const onDeck = findOnDeck(data.MediaContainer);
             setAlbum(data.MediaContainer);
@@ -118,22 +115,22 @@ const Album = () => {
 
     useEffect(() => {
         const fetchMetadata = async () => {
-            if (currentServer && baseUrl && ratingKey)
+            if (accessToken && baseUrl && ratingKey)
                 fetchAlbumMetadata();
         }
         fetchMetadata();
-    }, [baseUrl, currentServer, ratingKey]);
+    }, [baseUrl, accessToken, ratingKey]);
 
     //https://tailwindcomponents.com/component/button-component-default
     return (
         <>
-        {currentServer && (
+        {accessToken && (
         <>
         <Subheader></Subheader>
         <ScrollContent>
         <Container>
             <AlbumContainer>
-                <AlbumImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, album.thumb, currentServer.accessToken)} alt="Album Cover" />
+                <AlbumImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, album.thumb, accessToken)} alt="Album Cover" />
                 <AlbumInfo>
                     <AlbumTitle>{album.parentTitle}</AlbumTitle>
                     <Link to={`/artist/${album.grandparentRatingKey}`}>

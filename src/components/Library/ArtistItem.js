@@ -25,14 +25,14 @@ const ArtistText = styled.div``;
 
 
 const ArtistItem = ({ metadata }) => {
-    const user = useSelector(state => state.application.user);
+    const accessToken = useSelector(state => state.settings.accessToken);
     const baseUrl = useSelector(state => state.application.baseUrl);
 
     return (
         <Link to={`/artist/${metadata.ratingKey}`}>
             <Container>
                 <ArtistImageContainer>
-                    <ArtistImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, metadata.thumb, user.authToken)} alt={metadata.title} loading="lazy" />
+                    <ArtistImage src={getThumbnailTranscodeUrl(200, 200, baseUrl, metadata.thumb, accessToken)} alt={metadata.title} loading="lazy" />
                 </ArtistImageContainer>
                 <ArtistText title={metadata.title}>{metadata.title}</ArtistText>
             </Container>

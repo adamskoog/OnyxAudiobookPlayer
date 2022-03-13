@@ -22,14 +22,14 @@ const AlbumCover = styled.img``;
 const AlbumText = styled.div``;
 
 const AlbumItem = ({ metadata, showAuthor }) => {
-    const user = useSelector(state => state.application.user);
+    const accessToken = useSelector(state => state.settings.accessToken);
     const baseUrl = useSelector(state => state.application.baseUrl);
 
     return (
         <Link to={`/album/${metadata.ratingKey}`}>
             <Container>           
                 <AlbumCoverContainer>
-                    <AlbumCover src={getThumbnailTranscodeUrl(200, 200, baseUrl, metadata.thumb, user.authToken)} alt={metadata.title} loading="lazy" />
+                    <AlbumCover src={getThumbnailTranscodeUrl(200, 200, baseUrl, metadata.thumb, accessToken)} alt={metadata.title} loading="lazy" />
                 </AlbumCoverContainer>
                 <AlbumText title={metadata.title}>{metadata.title}</AlbumText>
                 {showAuthor && (

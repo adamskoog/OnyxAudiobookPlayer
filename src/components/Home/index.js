@@ -18,7 +18,7 @@ const Home = () => {
     const userInfo = useSelector(state => state.application.user);
     const baseUrl = useSelector(state => state.application.baseUrl);
     const section = useSelector(state => state.settings.librarySection);
-    const currentServer = useSelector(state => state.settings.currentServer)
+    const accessToken = useSelector(state => state.settings.accessToken);
 
     const [recentlyAddedInfo, setRecentlyAddedInfo] = useState([]);
     const [recentlyPlayedInfo, setRecentlyPlayedInfo] = useState([]);
@@ -30,7 +30,7 @@ const Home = () => {
         if (baseUrl && section) {
             const fetchLibraryItems = async () => {
                 const data = await getLibraryItems(baseUrl, section, { 
-                    "X-Plex-Token": currentServer.accessToken,
+                    "X-Plex-Token": accessToken,
                     "X-Plex-Container-Start": 0,
                     "X-Plex-Container-Size": 10,
                     sort: "addedAt:desc"
@@ -46,7 +46,7 @@ const Home = () => {
         if (baseUrl && section) {
             const fetchLibraryItems = async () => {
                 const data = await getLibraryItems(baseUrl, section, { 
-                    "X-Plex-Token": currentServer.accessToken,
+                    "X-Plex-Token": accessToken,
                     "X-Plex-Container-Start": 0,
                     "X-Plex-Container-Size": 10,
                     sort: "lastViewedAt:desc"
@@ -66,15 +66,15 @@ const Home = () => {
         {(!baseUrl || !section) && (
             <ErrorMessage>Failed to load library, please update your settings.</ErrorMessage>
         )}
-        {userInfo && baseUrl && (
+        {accessToken && baseUrl && (
             <>
             <Subheader></Subheader>
             <ScrollContent>
                 {recentlyAddedInfo.length > 0 && (
-                <Hub title="Recently Added" baseUrl={baseUrl} userInfo={userInfo} items={recentlyAddedInfo} />
+                <Hub title="Recently Added" items={recentlyAddedInfo} />
                 )}
                 {recentlyPlayedInfo.length > 0 && (
-                <Hub title="Recently Played" baseUrl={baseUrl} userInfo={userInfo} items={recentlyPlayedInfo} />
+                <Hub title="Recently Played" items={recentlyPlayedInfo} />
                 )}
             </ScrollContent>
             </>

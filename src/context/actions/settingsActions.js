@@ -77,15 +77,15 @@ export const setActiveServer = () => {
         const serverId = state.settings.serverIdentifier;
         const resources = state.settings.servers;
         if (!serverId) {
-            dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: null });
+            dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: { currentServer: null, accessToken: null } });
             dispatch({ type: actionTypes.SET_SERVER_URL, payload: null });   
         } else {
             const server = matchServer(serverId, resources);
             if (server) {
-                dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: server });
+                dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: { currentServer: server, accessToken: server.accessToken } });
                 dispatch(setServerBaseUrl());
             } else {
-                dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: null });     
+                dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: { currentServer: null, accessToken: null } });     
                 dispatch({ type: actionTypes.SET_SERVER_URL, payload: null });   
             }
         }

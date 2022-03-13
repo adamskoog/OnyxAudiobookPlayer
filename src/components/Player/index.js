@@ -55,16 +55,14 @@ const NowPlaying = (props) => {
 
     const containerRef = useRef(null);
 
-    //const authToken = useSelector(state => state.application.authToken);
-    const currentServer = useSelector(state => state.settings.currentServer);
+    const accessToken = useSelector(state => state.settings.accessToken);
     const baseUrl = useSelector(state => state.application.baseUrl);
     const playState = useSelector(state => state.player.mode);
     const currentTrack = useSelector(state => state.playQueue.currentTrack);
         
     const getThumbnailUrl = () => {
         if (!currentTrack) return "";
-        const authToken = currentServer.accessToken;
-        return getThumbnailTranscodeUrl(100, 100, baseUrl, currentTrack.thumb, authToken);
+        return getThumbnailTranscodeUrl(100, 100, baseUrl, currentTrack.thumb, accessToken);
     };
 
     const getPlayInfoAttr = (attr) => {
@@ -82,7 +80,7 @@ const NowPlaying = (props) => {
             main.classList.add("playing");
             player.classList.add("playing");
         }
-    }, [currentServer]);
+    }, [accessToken]);
 
     useEffect(() => {
         const main = props.containerRef.current;

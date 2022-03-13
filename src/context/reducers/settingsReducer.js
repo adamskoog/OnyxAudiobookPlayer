@@ -13,7 +13,8 @@ const defaultState = {
     librarySection: "",
     servers: [],
     libraries: [],
-    currentServer: null
+    currentServer: null,
+    accessToken: null
 };
 
 const settingsReducer = (state = defaultState, action) => {
@@ -27,7 +28,7 @@ const settingsReducer = (state = defaultState, action) => {
         case actionTypes.LOAD_SERVER_LIST:
             return { ...state, servers: action.payload };
         case actionTypes.UPDATE_SELECTED_SERVER:
-            return { ...state, currentServer: action.payload };
+            return { ...state, ...action.payload };
         case actionTypes.LOAD_LIBRARY_LIST_COMPLETE:
             return { ...state, libraries: action.payload };
 

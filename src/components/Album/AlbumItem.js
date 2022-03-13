@@ -27,8 +27,6 @@ const TrackCell = styled.div``;
 
 const AlbumItem = ({ trackInfo, playSelectedTrack, updateAlbumInfo }) => {
 
-    const authToken = useSelector(state => state.application.authToken);
-    const baseUrl = useSelector(state => state.application.baseUrl);
     const currentTrack = useSelector(state => state.playQueue.currentTrack);
 
     useEffect(() => {
@@ -53,8 +51,6 @@ const AlbumItem = ({ trackInfo, playSelectedTrack, updateAlbumInfo }) => {
             <TrackCell>
                 <TrackMenu
                     trackInfo={trackInfo}
-                    baseUrl={baseUrl}
-                    authToken={authToken}
                     playSelectedTrack={playSelectedTrack}
                     updateAlbumInfo={updateAlbumInfo}
                 />

@@ -50,7 +50,7 @@ const HubContents = styled.div`
 `;
 
 // Horizontal scrolling based on: https://webdevtrick.com/horizontal-scroll-navigation/
-const Hub = ({ title, items, baseUrl, userInfo }) => {
+const Hub = ({ title, items }) => {
 
     const [leftScrollDisabled, setLeftScrollDisabled] = useState(true);
     const [rightScrollDisabled, setRightScrollDisabled] = useState(true);

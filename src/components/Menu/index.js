@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import MenuItem from './MenuItem';
+import * as Colors from '../util/colors';
 
 import { Transition } from '@headlessui/react';
 
@@ -21,7 +22,7 @@ const MenuContainer = styled.div`
     & > * + * {
         border-top-width: 1px;
         border-bottom-width: 0px;
-        border-color: rgba(209, 213, 219, 1);
+        border-color: ${Colors.LIGHT_CONTEXT_MENU_BORDER};
     }
 `;
 

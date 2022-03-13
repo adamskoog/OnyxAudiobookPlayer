@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
+import * as Colors from '../util/colors';
 import * as Responsive from '../util/responsive';
-import PlexImage from '../util/PlexImage';
 
+import PlexImage from '../util/PlexImage';
 import { Link } from 'react-router-dom';
 import PlayerTime from './controls/PlayerTime';
 import AudioPlayer from './AudioPlayer';
@@ -23,7 +24,7 @@ const Container = styled.div`
     justify-content: space-evenly;
     
     color: #fff;
-    background-color: rgba(31, 41, 55, 1);
+    background-color: ${Colors.LIGHT_NAV_BACKGROUND};
     
     height: 0px;
     &.playing {
@@ -108,10 +109,10 @@ const NowPlaying = (props) => {
             </AlbumImageContainer>
             <InfoContainer>
                 <TextBlock>{trackTitle}</TextBlock>
-                <TextBlock fontColor={"rgba(209, 213, 219, 1)"}>
+                <TextBlock fontColor={Colors.LIGHT_NAV_TEXT}>
                     <Link to={`/album/${albumKey}`}>{albumTitle}</Link>
                 </TextBlock>
-                <TextBlock fontColor={"rgba(209, 213, 219, 1)"}>{artistName}</TextBlock>
+                <TextBlock fontColor={Colors.LIGHT_NAV_TEXT}>{artistName}</TextBlock>
                 <PlayerTime />
             </InfoContainer>
             <AudioPlayer />

@@ -23,8 +23,8 @@ const Container = styled.div`
     align-items: center;
     justify-content: space-evenly;
     
-    color: #fff;
-    background-color: ${Colors.LIGHT_NAV_BACKGROUND};
+    color: ${Colors.LIGHT_PLAYER_TEXT};
+    background-color: ${Colors.LIGHT_PLAYER_BACKGROUND};
     
     height: 0px;
     &.playing {
@@ -58,7 +58,7 @@ const TextBlock = styled.div`
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    color: ${(props) => (props.fontColor) ? props.fontColor : '#fff'};
+    color: ${(props) => (props.fontColor) ? props.fontColor : Colors.LIGHT_PLAYER_TEXT};
 `;
 
 const NowPlaying = (props) => {
@@ -109,10 +109,10 @@ const NowPlaying = (props) => {
             </AlbumImageContainer>
             <InfoContainer>
                 <TextBlock>{trackTitle}</TextBlock>
-                <TextBlock fontColor={Colors.LIGHT_NAV_TEXT}>
+                <TextBlock fontColor={Colors.LIGHT_PLAYER_TEXT_MUTED}>
                     <Link to={`/album/${albumKey}`}>{albumTitle}</Link>
                 </TextBlock>
-                <TextBlock fontColor={Colors.LIGHT_NAV_TEXT}>{artistName}</TextBlock>
+                <TextBlock fontColor={Colors.LIGHT_PLAYER_TEXT_MUTED}>{artistName}</TextBlock>
                 <PlayerTime />
             </InfoContainer>
             <AudioPlayer />

@@ -1,17 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
-
 import { Link } from 'react-router-dom';
 
+import * as Colors from '../util/colors';
+
 const sharedCss = `
-    color: rgba(55, 65, 81, 1);
+    color: ${Colors.LIGHT_CONTEXT_MENU_TEXT};
     padding: .5rem 1rem;
     font-size: 0.875rem;
     line-height: 1.25rem;
     cursor: pointer;
 
     &:hover {
-        background-color: rgba(243, 244, 246, 1);
+        color: ${Colors.LIGHT_CONTEXT_MENU_TEXT_HOVER};
+        background-color: ${Colors.LIGHT_CONTEXT_MENU_BG_HOVER};
     }
 `;
 const MenuItemButton = styled.button`

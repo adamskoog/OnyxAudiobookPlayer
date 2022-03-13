@@ -17,7 +17,7 @@ const MenuContainer = styled.div`
     padding-bottom: 0.25rem;
     margin-top: ${(props) => (props.vOffset ? props.vOffset : '0.5rem')};
     border-radius: 0.375rem;
-    background-color: rgba(255, 255, 255, 1);
+    background-color: ${Colors.LIGHT_CONTEXT_MENU_BG};
 
     & > * + * {
         border-top-width: 1px;

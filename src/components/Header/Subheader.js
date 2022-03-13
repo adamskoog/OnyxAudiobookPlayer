@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
+import * as Colors from '../util/colors';
+
 const Container = styled.div`
-    background-color: rgba(75,85,99,1);
-    color: #fff;
-    box-shadow: 0 5px 15px 15px rgba(75,85,99, 0.4);
+    background-color: ${Colors.LIGHT_SUBHEADER_BG};
+    color: ${Colors.LIGHT_SUBHEADER_TEXT};
+    box-shadow: 0 5px 15px 15px ${Colors.LIGHT_SUBHEADER_SHADOW};
     margin-bottom: 15px;
 `;
 

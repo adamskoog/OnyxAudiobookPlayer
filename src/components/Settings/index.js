@@ -6,6 +6,7 @@ import { setServerSetting, setLibrarySetting } from "../../context/actions/setti
 
 import Subheader from '../Header/Subheader';
 import { ScrollContent  } from '../util/container';
+import * as Colors from '../util/colors';
 
 // Original tailwind styles.
 /* <select className="mt-2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"> */
@@ -19,10 +20,8 @@ const SelectControl = styled.select`
     margin-top: 0.5rem;
     padding: 0.5rem 0.75rem;
 
-    background-color: rgba(255, 255, 255, 1);
-
-    box-shadow: 0 0 #0000, 0 0 #0000, 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    border: solid 1px rgba(209, 213,219, 1);
+    background-color: ${Colors.LIGHT_SETTINGS_CONTROL_BG};
+    border: solid 1px ${Colors.LIGHT_SETTINGS_CONTROL_BORDER};
     border-radius: 0.375rem;
 `;
 

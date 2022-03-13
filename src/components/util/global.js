@@ -1,4 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
+import * as Colors from './colors';
 
 export const HEADER_HEIGHT = '64px';
 export const PLAYER_HEIGHT = '100px';
@@ -78,7 +79,8 @@ export const GlobalStyle = createGlobalStyle`
 
     body {   
         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-        background-color: rgba(229, 231, 235, 1);
+        background-color: ${Colors.LIGHT_BODY_BG};
+        color: ${Colors.LIGHT_BODY_TEXT};
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }

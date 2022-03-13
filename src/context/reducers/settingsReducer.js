@@ -14,13 +14,14 @@ const defaultState = {
     servers: [],
     libraries: [],
     currentServer: null,
-    accessToken: null
+    accessToken: null,
+    isDarkMode: false
 };
 
 const settingsReducer = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.LOAD_SETTINGS:
-            return { ...state, serverIdentifier: action.payload.serverIdentifier, librarySection: action.payload.librarySection }
+            return { ...state, serverIdentifier: action.payload.serverIdentifier, librarySection: action.payload.librarySection, isDarkMode: action.payload.isDarkMode }
         case actionTypes.SAVE_SETTING_SERVER:
             return { ...state, serverIdentifier: action.payload, librarySection: '' };
         case actionTypes.SAVE_SETTING_LIBRARY:
@@ -31,7 +32,8 @@ const settingsReducer = (state = defaultState, action) => {
             return { ...state, ...action.payload };
         case actionTypes.LOAD_LIBRARY_LIST_COMPLETE:
             return { ...state, libraries: action.payload };
-
+        case actionTypes.CHANGE_THEME:
+            return { ...state, isDarkMode: action.payload };
         default:
             return state;
     };

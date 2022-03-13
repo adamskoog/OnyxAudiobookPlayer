@@ -8,7 +8,8 @@ export const loadSettingsValues = () => {
         type: actionTypes.LOAD_SETTINGS,
         payload: {
             serverIdentifier: settings.serverIdentifier ?? "",
-            librarySection: settings.librarySection ?? ""
+            librarySection: settings.librarySection ?? "",
+            isDarkMode: (settings.isDarkMode === '1') ? true : false
         }
     };
 }
@@ -34,11 +35,13 @@ export const setLibrarySetting = (libraryId) => {
     };
 }
 
-
-
-
-
-
+export const setApplicationTheme = (isDarkMode) => {
+    SettingsUtils.saveSettingToStorage(SettingsUtils.SETTINGS_KEYS.theme, (isDarkMode) ? '1' : '0');
+    return {
+        type: actionTypes.CHANGE_THEME,
+        payload: isDarkMode
+    };
+}
 
 // Begin refactor of get server flow - we need to do
 // let in these actions, this action will only get the server

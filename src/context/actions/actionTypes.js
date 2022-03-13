@@ -43,6 +43,8 @@ export const LOAD_LIBRARY_LIST = "settings/loadLibraryList";
 export const LOAD_LIBRARY_LIST_COMPLETE = "settings/loadLibraryListComplete";
 export const LOAD_LIBRARY_LIST_ERROR = "settings/loadLibraryListError";
 
+export const CHANGE_THEME = 'settings/changeTheme';
+
 // Play Queue
 export const SET_PLAY_QUEUE = "player/setPlayQueue";
 export const CHANGE_TRACK = "player/changeTrack";

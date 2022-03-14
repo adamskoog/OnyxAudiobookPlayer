@@ -1,85 +1,95 @@
+// Found side for color mixing/complementary colors:
+//          https://rgbcolorcode.com/color/4DA6FF
+
 // ##############################################
 // Light Theme Colors
 // ##############################################
-
+export const lightMode = {
 // ####    Body    ####
-export const LIGHT_BODY_BG = 'rgba(229, 231, 235, 1)';
-export const LIGHT_BODY_TEXT = '#000';
+    BODY_BG: 'rgba(229, 231, 235, 1)',
+    BODY_TEXT: '#000',
 
 // ####    Header    ####
-export const LIGHT_NAV_BACKGROUND = 'rgba(31, 41, 55, 1)';
-
-export const LIGHT_NAV_TITLE_TEXT = '#fff';
-export const LIGHT_NAV_TEXT = 'rgba(209, 213, 219, 1)';
-export const LIGHT_NAV_TEXT_ACTIVE = '#fff';
-export const LIGHT_NAV_TEXT_HOVER = '#fff';
-
-export const LIGHT_NAV_BG_ACTIVE = 'rgba(75, 85, 99, 1)';
-export const LIGHT_NAV_BG_HOVER = 'rgba(55, 65, 81, 1)';
+    NAV_BACKGROUND: 'rgba(31, 41, 55, 1)',
+    NAV_TITLE_TEXT: '#fff',
+    NAV_TEXT: 'rgba(209, 213, 219, 1)',
+    NAV_TEXT_ACTIVE: '#fff',
+    NAV_TEXT_HOVER: '#fff',
+    NAV_BG_ACTIVE: 'rgba(75, 85, 99, 1)',
+    NAV_BG_HOVER: 'rgba(55, 65, 81, 1)',
 
 // ####    Subheader    ####
-export const LIGHT_SUBHEADER_BG = 'rgba(75, 85, 99, 1)';
-export const LIGHT_SUBHEADER_TEXT = '#fff';
-export const LIGHT_SUBHEADER_SHADOW = 'rgba(75, 85, 99, 0.4)';
+    SUBHEADER_BG: 'rgba(75, 85, 99, 1)',
+    SUBHEADER_TEXT: '#fff',
+    SUBHEADER_SHADOW: 'rgba(75, 85, 99, 0.4)',
 
 // ####    Context Menu    ####
-export const LIGHT_CONTEXT_MENU_BG = '#fff';
-export const LIGHT_CONTEXT_MENU_BG_HOVER = 'rgba(243, 244, 246, 1)';
-export const LIGHT_CONTEXT_MENU_TEXT = 'rgba(55, 65, 81, 1)';
-export const LIGHT_CONTEXT_MENU_TEXT_HOVER = 'rgba(55, 65, 81, 1)';
-export const LIGHT_CONTEXT_MENU_BORDER = 'rgba(209, 213, 219, 1)';
+    CONTEXT_MENU_BG: '#fff',
+    CONTEXT_MENU_BG_HOVER: 'rgba(243, 244, 246, 1)',
+    CONTEXT_MENU_TEXT: 'rgba(55, 65, 81, 1)',
+    CONTEXT_MENU_TEXT_HOVER: 'rgba(55, 65, 81, 1)',
+    CONTEXT_MENU_BORDER: 'rgba(209, 213, 219, 1)',
+
+// ####    Album/Artist   ####
+    CONTAINER_BORDER: '#fff',
 
 // ####    Settings    ####
-export const LIGHT_PLAYER_BACKGROUND = 'rgba(31, 41, 55, 1)';
-export const LIGHT_PLAYER_TEXT = '#fff';
-export const LIGHT_PLAYER_TEXT_MUTED = 'rgba(209, 213, 219, 1)';
+    PLAYER_BACKGROUND: 'rgba(31, 41, 55, 1)',
+    PLAYER_TEXT: '#fff',
+    PLAYER_TEXT_MUTED: 'rgba(209, 213, 219, 1)',
 
 // ####    Settings    ####
-export const LIGHT_SETTINGS_CONTROL_BG = '#fff';
-export const LIGHT_SETTINGS_CONTROL_BORDER = 'rgba(209, 213,219, 1)';
+    SETTINGS_CONTROL_BG: '#fff',
+    SETTINGS_CONTROL_BORDER: 'rgba(209, 213,219, 1)',
 
 // ####    Spinner    ####
-export const LIGHT_SPINNER = 'rgba(255, 255, 255, .3)';
+    SPINNER: 'rgba(255, 255, 255, .3)',
+    SPINNER_BG: 'rgba(229, 231, 235, 1)'
+}
 
 // ##############################################
 // Dark Theme Colors
 // ##############################################
 
+export const darkMode = {
 // ####    Body    ####
-export const DARK_BODY_BG = '#000';
-export const DARK_BODY_TEXT = '#fff';
+    BODY_BG: '#000',
+    BODY_TEXT: '#fff',
 
 // ####    Header    ####
-export const DARK_NAV_BACKGROUND = 'rgba(31, 41, 55, 1)';
-
-export const DARK_NAV_TITLE_TEXT = '#fff';
-export const DARK_NAV_TEXT = 'rgba(209, 213, 219, 1)';
-export const DARK_NAV_TEXT_ACTIVE = '#fff';
-export const DARK_NAV_TEXT_HOVER = '#fff';
-
-export const DARK_NAV_BG_ACTIVE = 'rgba(75, 85, 99, 1)';
-export const DARK_NAV_BG_HOVER = 'rgba(55, 65, 81, 1)';
+    NAV_BACKGROUND: 'rgba(31, 41, 55, 1)',
+    NAV_TITLE_TEXT: '#fff',
+    NAV_TEXT: 'rgba(209, 213, 219, 1)',
+    NAV_TEXT_ACTIVE: '#fff',
+    NAV_TEXT_HOVER: '#fff',
+    NAV_BG_ACTIVE: 'rgba(75, 85, 99, 1)',
+    NAV_BG_HOVER: 'rgba(55, 65, 81, 1)',
 
 // ####    Subheader    ####
-export const DARK_SUBHEADER_BG = 'rgba(75, 85, 99, 1)';
-export const DARK_SUBHEADER_TEXT = '#fff';
-export const DARK_SUBHEADER_SHADOW = 'rgba(75, 85, 99, 0.4)';
+    SUBHEADER_BG: '#283547',
+    SUBHEADER_TEXT: '#fff',
+    SUBHEADER_SHADOW: '#283547',
 
 // ####    Context Menu    ####
-export const DARK_CONTEXT_MENU_BG = '#fff';
-export const DARK_CONTEXT_MENU_BG_HOVER = 'rgba(243, 244, 246, 1)';
-export const DARK_CONTEXT_MENU_TEXT = 'rgba(55, 65, 81, 1)';
-export const DARK_CONTEXT_MENU_TEXT_HOVER = 'rgba(55, 65, 81, 1)';
-export const DARK_CONTEXT_MENU_BORDER = 'rgba(209, 213, 219, 1)';
+    CONTEXT_MENU_BG: 'rgba(75, 85, 99, 1)',
+    CONTEXT_MENU_BG_HOVER: 'rgba(55, 65, 81, 1)',
+    CONTEXT_MENU_TEXT: 'rgba(243, 244, 246, 1)',
+    CONTEXT_MENU_TEXT_HOVER: '#fff',
+    CONTEXT_MENU_BORDER: 'rgba(55, 65, 81, 1)',
+
+// ####    Album/Artist   ####
+    CONTAINER_BORDER: '#fff',
 
 // ####    Settings    ####
-export const DARK_PLAYER_BACKGROUND = 'rgba(31, 41, 55, 1)';
-export const DARK_PLAYER_TEXT = '#fff';
-export const DARK_PLAYER_TEXT_MUTED = 'rgba(209, 213, 219, 1)';
+    PLAYER_BACKGROUND: 'rgba(31, 41, 55, 1)',
+    PLAYER_TEXT: '#fff',
+    PLAYER_TEXT_MUTED: 'rgba(209, 213, 219, 1)',
 
 // ####    Settings    ####
-export const DARK_SETTINGS_CONTROL_BG = '#fff';
-export const DARK_SETTINGS_CONTROL_BORDER = 'rgba(209, 213,219, 1)';
+    SETTINGS_CONTROL_BG: 'rgba(31, 41, 55, 1)',
+    SETTINGS_CONTROL_BORDER: 'rgba(31, 41, 55, 1)',
 
 // ####    Spinner    ####
-export const DARK_SPINNER = 'rgba(255, 255, 255, .3)';
+    SPINNER: 'rgba(255, 255, 255, .3)',
+    SPINNER_BG: 'rgba(229, 231, 235, 1)'
+}

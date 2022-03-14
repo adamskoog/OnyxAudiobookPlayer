@@ -7,12 +7,11 @@ import { Link, useLocation } from 'react-router-dom';
 import UserMenu from './UserMenu';
 import { SrOnly } from '../util/common';
 import { HEADER_HEIGHT } from '../util/global';
-import * as Colors from '../util/colors';
 
 import { ReactComponent as HamburgerSvg } from '../../assets/menuHamburger.svg';
 
 const NavContainer = styled.nav`
-    background-color: ${Colors.LIGHT_NAV_BACKGROUND};
+    background-color: ${({ theme }) => theme.NAV_BACKGROUND};
 `;
 const Container = styled.div`
     max-width: 80rem;
@@ -53,7 +52,7 @@ const MobileMenuItem = styled(Link)`
     display: block;
     border-radius: 0.375rem;
 
-    color: ${Colors.LIGHT_NAV_TEXT};
+    color: ${({ theme }) => theme.NAV_TEXT};
     font-size: 1rem;
     line-height: 1.5rem;
     font-weight: 500;
@@ -66,8 +65,8 @@ const MobileMenuItem = styled(Link)`
     padding-bottom: 0.5rem;
 
     &:hover {
-        color: ${Colors.LIGHT_NAV_TEXT_HOVER};
-        background-color: ${Colors.LIGHT_NAV_BG_HOVER};
+        color: ${({ theme }) => theme.NAV_TEXT_HOVER};
+        background-color: ${({ theme }) => theme.NAV_BG_HOVER};
     }
 `;
 const MobileButtonContainer = styled.div`
@@ -93,11 +92,11 @@ const MobileButton = styled.button`
     font-size: 1.5rem;
     line-height: 2rem;
 
-    color: ${Colors.LIGHT_NAV_TEXT};
+    color: ${({ theme }) => theme.NAV_TEXT};
 
     &:hover {
-        color: ${Colors.LIGHT_NAV_TEXT_HOVER};
-        background-color: ${Colors.LIGHT_NAV_BG_HOVER};
+        color: ${({ theme }) => theme.NAV_TEXT_HOVER};$
+        background-color: ${({ theme }) => theme.NAV_BG_HOVER};
     }
 `;
 
@@ -117,7 +116,7 @@ const Title = styled.div`
     flex-shrink: 0;
     align-items: center;
 
-    color: ${Colors.LIGHT_NAV_TITLE_TEXT};
+    color: ${({ theme }) => theme.NAV_TITLE_TEXT};
 
 `;
 const TitleMenuItem = styled.div`
@@ -130,7 +129,7 @@ const TitleMenuItem = styled.div`
 `;
 
 const TitleMenuItemLink = styled(Link)`
-    color: ${Colors.LIGHT_NAV_TEXT};
+    color: ${({ theme }) => theme.NAV_TEXT};
 
     padding-top: 0.5rem;
     padding-left: 0.75rem;
@@ -144,17 +143,17 @@ const TitleMenuItemLink = styled(Link)`
     font-weight: 500;
 
     &.active {
-        color: ${Colors.LIGHT_NAV_TEXT_ACTIVE};
-        background-color: ${Colors.LIGHT_NAV_BG_ACTIVE};
+        color: ${({ theme }) => theme.NAV_TEXT_ACTIVE};
+        background-color: ${({ theme }) => theme.NAV_BG_ACTIVE};
     }
     &:hover {
-        color: ${Colors.LIGHT_NAV_TEXT_HOVER};
-        background-color: ${Colors.LIGHT_NAV_BG_HOVER};
+        color: ${({ theme }) => theme.NAV_TEXT_HOVER};
+        background-color: ${({ theme }) => theme.NAV_BG_HOVER};
     }
 `;
 
 const TitleMenuItemButton = styled.button`
-    color: ${Colors.LIGHT_NAV_TEXT};
+    color: ${({ theme }) => theme.NAV_TEXT};
 
     padding-top: 0.5rem;
     padding-left: 0.75rem;
@@ -168,12 +167,12 @@ const TitleMenuItemButton = styled.button`
     font-weight: 500;
 
     &.active {
-        color: ${Colors.LIGHT_NAV_TEXT_ACTIVE};
-        background-color: ${Colors.LIGHT_NAV_BG_ACTIVE};
+        color: ${({ theme }) => theme.NAV_TEXT_ACTIVE};
+        background-color: ${({ theme }) => theme.NAV_BG_ACTIVE};
     }
     &:hover {
-        color: ${Colors.LIGHT_NAV_TEXT_HOVER};
-        background-color: ${Colors.LIGHT_NAV_BG_HOVER};
+        color: ${({ theme }) => theme.NAV_TEXT_HOVER};
+        background-color: ${({ theme }) => theme.NAV_BG_HOVER};
     }
 `;
 

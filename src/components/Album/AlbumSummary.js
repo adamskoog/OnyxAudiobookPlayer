@@ -31,7 +31,7 @@ const ExpandDivider = styled.div`
         flex: 1 1 5%; /* The flex basis here will force the starting value of the lines. */
         height: 1px;
         margin: 0 1em;
-        background: #000;
+        background: ${({ theme }) => theme.CONTAINER_BORDER};
     }
 `;
 const ExpandButton = styled.button``;

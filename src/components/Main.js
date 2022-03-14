@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { BrowserRouter as Router, Routes, Route  } from 'react-router-dom';
 
@@ -7,6 +7,7 @@ import { logout, getToken, checkToken, checkAuthId } from "../context/actions/ap
 import { getServers } from "../context/actions/settingsActions";
 import { NormalizeGlobalStyle, GlobalStyle } from './util/global';
 import { prepareLoginRequest } from "../plex/Authentication";
+import { lightMode, darkMode} from './util/colors';
 
 import Header from './Header';
 import NowPlaying from './Player';
@@ -46,7 +47,7 @@ const Main = () => {
     const user = useSelector(state => state.application.user);
     const authToken = useSelector(state => state.application.authToken);
     const authId = useSelector(state => state.application.authId);
-    const darkMode = useSelector(state => state.settings.isDarkMode);
+    const isDarkMode = useSelector(state => state.settings.isDarkMode);
 
     const containerRef = useRef(null);
 
@@ -80,9 +81,9 @@ const Main = () => {
         appBaseUrl = window._env_.BASEURL || '';
 
     return (
-        <>
+        <ThemeProvider theme={(isDarkMode) ? darkMode : lightMode}>
             <NormalizeGlobalStyle />
-            <GlobalStyle darkMode={darkMode} />
+            <GlobalStyle />
             <Loader />
             <Router basename={appBaseUrl}>
                 <Header containerRef={containerRef} userInfo={user} doUserLogin={doUserLogin} doUserLogout={() => dispatch(logout())} />
@@ -99,7 +100,7 @@ const Main = () => {
                 </MainContainer>
                 <NowPlaying containerRef={containerRef} />               
             </Router>
-        </>
+        </ThemeProvider>
     ); 
 }
 

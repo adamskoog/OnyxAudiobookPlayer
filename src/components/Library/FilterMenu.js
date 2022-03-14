@@ -7,7 +7,6 @@ import { SORT_ORDER, MUSIC_LIBRARY_DISPAY_TYPE } from '../../plex/Api';
 
 import { setLibrarySortOrder, setLibraryDisplayType } from '../../context/actions/libraryActions';
 
-import * as Colors from '../util/colors';
 import Subheader from '../Header/Subheader';
 import Menu from '../Menu';
 
@@ -23,7 +22,7 @@ const FilterItem = styled.div`
 const FilterText = styled.span`
 `;
 const FilterButton = styled.button`
-    fill: ${Colors.LIGHT_SUBHEADER_TEXT};
+    fill: ${({ theme }) => theme.SUBHEADER_TEXT};
 
     overflow: hidden;
     transform: rotate(0deg);

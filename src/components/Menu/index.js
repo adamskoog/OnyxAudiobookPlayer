@@ -1,10 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Transition } from '@headlessui/react';
 
 import MenuItem from './MenuItem';
-import * as Colors from '../util/colors';
-
-import { Transition } from '@headlessui/react';
 
 const MenuContainer = styled.div`
     transform-origin: top right;
@@ -17,12 +15,12 @@ const MenuContainer = styled.div`
     padding-bottom: 0.25rem;
     margin-top: ${(props) => (props.vOffset ? props.vOffset : '0.5rem')};
     border-radius: 0.375rem;
-    background-color: ${Colors.LIGHT_CONTEXT_MENU_BG};
+    background-color: ${({ theme }) => theme.CONTEXT_MENU_BG};
 
     & > * + * {
         border-top-width: 1px;
         border-bottom-width: 0px;
-        border-color: ${Colors.LIGHT_CONTEXT_MENU_BORDER};
+        border-color: ${({ theme }) => theme.CONTEXT_MENU_BORDER};
     }
 `;
 

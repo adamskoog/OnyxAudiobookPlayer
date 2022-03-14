@@ -74,7 +74,7 @@ const Tracks = styled.div`
     row-gap: .8rem;
     align-items: center;
 
-    border-top: solid 1px black;
+    border-top: solid 1px ${({ theme }) => theme.CONTAINER_BORDER};
     padding-top: .8rem;
 `;
 const TrackCount = styled.div`

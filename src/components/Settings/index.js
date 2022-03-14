@@ -7,7 +7,6 @@ import { setServerSetting, setLibrarySetting, setApplicationTheme } from "../../
 
 import Subheader from '../Header/Subheader';
 import { ScrollContent  } from '../util/container';
-import * as Colors from '../util/colors';
 import { SrOnly } from '../util/common';
 
 // Original tailwind styles.
@@ -22,8 +21,8 @@ const SelectControl = styled.select`
     margin-top: 0.5rem;
     padding: 0.5rem 0.75rem;
 
-    background-color: ${Colors.LIGHT_SETTINGS_CONTROL_BG};
-    border: solid 1px ${Colors.LIGHT_SETTINGS_CONTROL_BORDER};
+    background-color: ${({ theme }) => theme.SETTINGS_CONTROL_BG};
+    border: solid 1px ${({ theme }) => theme.SETTINGS_CONTROL_BORDER};
     border-radius: 0.375rem;
     
 `;

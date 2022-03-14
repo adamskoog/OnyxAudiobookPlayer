@@ -3,7 +3,6 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { useSelector } from 'react-redux';
-import * as Colors from './util/colors';
 
 const isLoading = (loading, state) => {
     // TODO: we should utilize the state to determine when
@@ -21,7 +20,7 @@ const LoaderContainer = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: ${Colors.LIGHT_NAV_BACKGROUND};
+    background-color: ${({ theme }) => theme.NAV_BACKGROUND};
 `;
 
 const Spinner = styled.div`
@@ -30,7 +29,7 @@ const Spinner = styled.div`
     
     width: 50px;
     height: 50px;
-    border: 3px solid ${Colors.LIGHT_SPINNER};
+    border: 3px solid ${({ theme }) => theme.SPINNER};
     border-radius: 50%;
     border-top-color: #fff;
     animation: spin 1s ease-in-out infinite;

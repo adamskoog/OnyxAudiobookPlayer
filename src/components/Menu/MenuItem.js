@@ -2,28 +2,27 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
-import * as Colors from '../util/colors';
+const sharedCss = (theme) => {
+    return `
+        color: ${theme.CONTEXT_MENU_TEXT};
+        padding: .5rem 1rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        cursor: pointer;
 
-const sharedCss = `
-    color: ${Colors.LIGHT_CONTEXT_MENU_TEXT};
-    padding: .5rem 1rem;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    cursor: pointer;
-
-    &:hover {
-        color: ${Colors.LIGHT_CONTEXT_MENU_TEXT_HOVER};
-        background-color: ${Colors.LIGHT_CONTEXT_MENU_BG_HOVER};
-    }
-`;
+        &:hover {
+            color: ${theme.CONTEXT_MENU_TEXT_HOVER};
+            background-color: ${theme.CONTEXT_MENU_BG_HOVER};
+        }`;
+};
 const MenuItemButton = styled.button`
     width: 100%;
     text-align: left;
-    ${sharedCss}
+    ${({ theme }) => sharedCss(theme)}
 `;
 const MenuItemLink = styled(Link) `
     display: block;
-    ${sharedCss}
+    ${({ theme }) => sharedCss(theme)}
 `;
 
 const MenuItem = ({ linkTo, callback, title}) => {

@@ -52,7 +52,7 @@ const Albums = styled.div`
     align-items: start;
     justify-items: center;
 
-    border-top: solid 1px black;
+    border-top: solid 1px ${({ theme }) => theme.CONTAINER_BORDER};;
     padding-top: .8rem;
 
     grid-template-columns: repeat(2, minmax(0, 1fr));

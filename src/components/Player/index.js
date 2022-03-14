@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
-import * as Colors from '../util/colors';
 import * as Responsive from '../util/responsive';
 
 import PlexImage from '../util/PlexImage';
@@ -23,8 +22,8 @@ const Container = styled.div`
     align-items: center;
     justify-content: space-evenly;
     
-    color: ${Colors.LIGHT_PLAYER_TEXT};
-    background-color: ${Colors.LIGHT_PLAYER_BACKGROUND};
+    color: ${({ theme }) => theme.PLAYER_TEXT};
+    background-color: ${({ theme }) => theme.PLAYER_BACKGROUND};
     
     height: 0px;
     &.playing {
@@ -58,7 +57,7 @@ const TextBlock = styled.div`
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    color: ${(props) => (props.fontColor) ? props.fontColor : Colors.LIGHT_PLAYER_TEXT};
+    color: ${(props) => (props.muted) ? props.theme.PLAYER_TEXT_MUTED : props.theme.PLAYER_TEXT }    
 `;
 
 const NowPlaying = (props) => {
@@ -109,10 +108,10 @@ const NowPlaying = (props) => {
             </AlbumImageContainer>
             <InfoContainer>
                 <TextBlock>{trackTitle}</TextBlock>
-                <TextBlock fontColor={Colors.LIGHT_PLAYER_TEXT_MUTED}>
+                <TextBlock muted={true}>
                     <Link to={`/album/${albumKey}`}>{albumTitle}</Link>
                 </TextBlock>
-                <TextBlock fontColor={Colors.LIGHT_PLAYER_TEXT_MUTED}>{artistName}</TextBlock>
+                <TextBlock muted={true}>{artistName}</TextBlock>
                 <PlayerTime />
             </InfoContainer>
             <AudioPlayer />

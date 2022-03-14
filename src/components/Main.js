@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route  } from 'react-router-dom';
 
 import { logout, getToken, checkToken, checkAuthId } from "../context/actions/appStateActions";
 import { getServers } from "../context/actions/settingsActions";
-
+import { NormalizeGlobalStyle, GlobalStyle } from './util/global';
 import { prepareLoginRequest } from "../plex/Authentication";
 
 import Header from './Header';
@@ -46,6 +46,7 @@ const Main = () => {
     const user = useSelector(state => state.application.user);
     const authToken = useSelector(state => state.application.authToken);
     const authId = useSelector(state => state.application.authId);
+    const darkMode = useSelector(state => state.settings.isDarkMode);
 
     const containerRef = useRef(null);
 
@@ -80,6 +81,8 @@ const Main = () => {
 
     return (
         <>
+            <NormalizeGlobalStyle />
+            <GlobalStyle darkMode={darkMode} />
             <Loader />
             <Router basename={appBaseUrl}>
                 <Header containerRef={containerRef} userInfo={user} doUserLogin={doUserLogin} doUserLogout={() => dispatch(logout())} />

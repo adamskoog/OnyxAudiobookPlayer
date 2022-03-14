@@ -3,7 +3,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Main from './components/Main';
 import reportWebVitals from './reportWebVitals';
-import { NormalizeGlobalStyle, GlobalStyle } from './components/util/global';
 
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
@@ -15,10 +14,6 @@ const store = createStore(allReducers, composeWithDevTools(applyMiddleware(thunk
 
 ReactDOM.render(
   <React.StrictMode>
-
-    <NormalizeGlobalStyle />
-    <GlobalStyle />
-
     <Provider store={store}>
       <Main />
     </Provider>

@@ -46,8 +46,8 @@ export const LIGHT_SPINNER = 'rgba(255, 255, 255, .3)';
 // ##############################################
 
 // ####    Body    ####
-export const DARK_BODY_BG = 'rgba(229, 231, 235, 1)';
-export const DARK_BODY_TEXT = '#000';
+export const DARK_BODY_BG = '#000';
+export const DARK_BODY_TEXT = '#fff';
 
 // ####    Header    ####
 export const DARK_NAV_BACKGROUND = 'rgba(31, 41, 55, 1)';

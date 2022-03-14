@@ -79,8 +79,8 @@ export const GlobalStyle = createGlobalStyle`
 
     body {   
         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-        background-color: ${Colors.LIGHT_BODY_BG};
-        color: ${Colors.LIGHT_BODY_TEXT};
+        background-color: ${({darkMode}) => (darkMode) ? Colors.DARK_BODY_BG : Colors.LIGHT_BODY_BG};
+        color: ${({darkMode}) => (darkMode) ? Colors.DARK_BODY_TEXT : Colors.LIGHT_BODY_TEXT};
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }

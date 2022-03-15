@@ -19,6 +19,7 @@ export const fetchLibraryItems = () => {
     return async (dispatch, getState) => {
 
         dispatch({ type: actionTypes.SET_LIBRARY_LOADING });
+        dispatch({ type: actionTypes.SET_LIBRARY_ITEMS, payload: [] });
 
         const state = getState();
         const userInfo = state.application.user
@@ -33,9 +34,6 @@ export const fetchLibraryItems = () => {
             const data = await getLibraryItems(baseUrl, section, { "X-Plex-Token": resource.accessToken }, createLibrarySortQuery({ display: displayType, order: sortType }));
             if (data.MediaContainer.Metadata)
                 dispatch({ type: actionTypes.SET_LIBRARY_ITEMS, payload: data.MediaContainer.Metadata });
-            else
-                dispatch({ type: actionTypes.SET_LIBRARY_ITEMS, payload: [] });
-        } else
-            dispatch({ type: actionTypes.SET_LIBRARY_ITEMS, payload: [] });
+        }
     };
 }

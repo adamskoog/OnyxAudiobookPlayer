@@ -40,7 +40,7 @@ const Home = () => {
             }
             fetchLibraryItems();
         } else setRecentlyAddedInfo([]);
-    }, [baseUrl, section]);
+    }, [baseUrl, section, accessToken]);
 
     useEffect(() => {
         if (baseUrl && section) {
@@ -56,7 +56,7 @@ const Home = () => {
             }
             fetchLibraryItems();
         } else setRecentlyPlayedInfo([]);
-    }, [baseUrl, section]);
+    }, [baseUrl, section, accessToken]);
 
     return (
         <>
@@ -66,7 +66,7 @@ const Home = () => {
         {(!baseUrl || !section) && (
             <ErrorMessage>Failed to load library, please update your settings.</ErrorMessage>
         )}
-        {accessToken && baseUrl && (
+        {accessToken && baseUrl && section &&(
             <>
             <Subheader></Subheader>
             <ScrollContent>

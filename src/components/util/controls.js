@@ -150,17 +150,12 @@ export const Combobox = ({ value, options, callback, noOptionsLabel }) => {
     });
 
     const notFound = noOptionsLabel ?? 'Nothing found.';
-
-    console.log("selectedValue", selectedValue);
-
-    let test = selectedValue[0] || '';
-
     return (
         <FormControlContainer>
-            <HeadlessCombobox value={test} onChange={callback}>
+            <HeadlessCombobox value={selectedValue[0] || ''} onChange={callback}>
                 <ComboboxOuter>
                     <ComboboxInner>
-                        <ComboboxInput displayValue={(option) => option.displayValue} readOnly={true} />
+                        <ComboboxInput displayValue={(option) => (option) ? option.displayValue : '' } readOnly={true} />
                         <ComboboxButton><ComboboxArrow /></ComboboxButton>
                     </ComboboxInner>
                     <ComboboxOptions>

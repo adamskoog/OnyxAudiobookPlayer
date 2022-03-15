@@ -40,6 +40,7 @@ export const lightMode = {
 
 // ####    Settings    ####
     SETTINGS_CONTROL_BG: '#fff',
+    SETTINGS_CONTROL_TEXT: '#000',
     SETTINGS_CONTROL_BORDER: 'rgba(209, 213,219, 1)',
 
 // ####    Spinner    ####
@@ -87,6 +88,7 @@ export const darkMode = {
 
 // ####    Settings    ####
     SETTINGS_CONTROL_BG: 'rgba(31, 41, 55, 1)',
+    SETTINGS_CONTROL_TEXT: '#fff',
     SETTINGS_CONTROL_BORDER: 'rgba(31, 41, 55, 1)',
 
 // ####    Spinner    ####

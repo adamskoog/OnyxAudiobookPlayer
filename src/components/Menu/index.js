@@ -35,8 +35,8 @@ const Menu = ({ labelledby, children, isOpen, vOffset }) => {
             leave="transition ease-in duration-75"
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95">
-        {(ref) => (
-            <MenuContainer ref={ref} role="menu" aria-orientation="vertical" aria-labelledby={labelledby} vOffset={vOffset}>
+        {(
+            <MenuContainer role="menu" aria-orientation="vertical" aria-labelledby={labelledby} vOffset={vOffset}>
                 {(children.map((child) => (
                     <MenuItem key={child.title} {...child} />
                 )))}

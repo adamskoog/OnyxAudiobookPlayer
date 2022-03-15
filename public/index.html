@@ -25,6 +25,19 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Onyx</title>
+    <script>
+      // if we're not at root, try to redirect to the root so scripts load
+      // correctly based on the path.
+      if (window.location.href.includes('/library')) {
+        window.location.replace(window.location.href.split('/library')[0]);
+      } else if (window.location.href.includes('/album')) {
+        window.location.replace(window.location.href.split('/album')[0]);
+      } else if (window.location.href.includes('/artist')) {
+        window.location.replace(window.location.href.split('/artist')[0]);
+      } else if (window.location.href.includes('/settings')) {
+        window.location.replace(window.location.href.split('/settings')[0]);
+      }
+    </script>
     <script src="%PUBLIC_URL%/env-config.js"></script>
   </head>
   <body>

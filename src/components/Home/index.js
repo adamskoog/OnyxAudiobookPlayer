@@ -2,11 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
-import { ScrollContent  } from '../util/container';
-
 import { getLibraryItems } from '../../plex/Api';
 
-import Subheader from '../Header/Subheader';
 import Hub from './Hub';
 
 const ErrorMessage = styled.div`
@@ -63,20 +60,18 @@ const Home = () => {
         {!userInfo && (
             <ErrorMessage>Must login to view library.</ErrorMessage>
         )}
-        {(!baseUrl || !section) && (
-            <ErrorMessage>Failed to load library, please update your settings.</ErrorMessage>
-        )}
-        {accessToken && baseUrl && section &&(
+        {userInfo && (
             <>
-            <Subheader></Subheader>
-            <ScrollContent>
+            {accessToken && baseUrl && (
+                <>
                 {recentlyAddedInfo.length > 0 && (
                 <Hub title="Recently Added" items={recentlyAddedInfo} />
                 )}
                 {recentlyPlayedInfo.length > 0 && (
                 <Hub title="Recently Played" items={recentlyPlayedInfo} />
                 )}
-            </ScrollContent>
+                </>
+            )}
             </>
         )}
         </>

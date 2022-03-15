@@ -76,12 +76,20 @@ export const GlobalStyle = createGlobalStyle`
         cursor: pointer;
     }
 
+    html, body, #root {
+        height: 100%;
+        body: 100%;
+    }
     body {   
         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
         background: ${({ theme }) => theme.BODY_BG};
         color: ${({ theme }) => theme.BODY_TEXT};
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+    }
+    #root {
+        display: flex !important;
+        flex-direction: column !important;
     }
 `;
 

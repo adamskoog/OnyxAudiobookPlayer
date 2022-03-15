@@ -4,9 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setServerSetting, setLibrarySetting, setApplicationTheme } from "../../context/actions/settingsActions";
 
-import Subheader from '../Header/Subheader';
-import { ScrollContent  } from '../util/container';
-
 import { ToggleSwitch, Combobox } from '../util/controls';
 
 const Settings = () => {
@@ -42,12 +39,9 @@ const Settings = () => {
 
     return (
         <>
-            <Subheader hideServer={true}></Subheader>
-            <ScrollContent>
-                <Combobox value={serverIdentifier} options={serverOptions} callback={(option) => dispatch(setServerSetting(option.value))} noOptionsLabel={'No servers found.'}/>
-                <Combobox value={librarySection} options={libraryOptions} callback={(option) => dispatch(setLibrarySetting(option.value))} noOptionsLabel={'No libraries found.'} />
-                <ToggleSwitch label={'Dark Mode'} srLabel={'Enable Dark Mode'} value={isDarkMode} callback={() => dispatch(setApplicationTheme(!isDarkMode))} />
-            </ScrollContent>
+            <Combobox value={serverIdentifier} options={serverOptions} callback={(option) => dispatch(setServerSetting(option.value))} defaultLabel={'Select a Server...'} noOptionsLabel={'No servers found.'}/>
+            <Combobox value={librarySection} options={libraryOptions} callback={(option) => dispatch(setLibrarySetting(option.value))} defaultLabel={'Select a Library...'} noOptionsLabel={'No libraries found.'} />
+            <ToggleSwitch label={'Dark Mode'} srLabel={'Enable Dark Mode'} value={isDarkMode} callback={() => dispatch(setApplicationTheme(!isDarkMode))} />
         </>
     );
 }

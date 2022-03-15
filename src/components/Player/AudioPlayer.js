@@ -43,8 +43,6 @@ function AudioPlayer() {
     const queueIndex = useSelector(state => state.playQueue.index);
     const playState = useSelector(state => state.player.mode);
 
-    const playerElement = document.getElementById("appPlayer");
-
     function usePrevious(value) {
         const ref = useRef();
         useEffect(() => {
@@ -55,6 +53,7 @@ function AudioPlayer() {
 
     const prevIndex = usePrevious(queueIndex);
     const prevQueue = usePrevious(queueId);
+    const playerRef = useRef(null);
 
     function hasTrackChanged() {
         // we need to do something here to check if the
@@ -65,15 +64,18 @@ function AudioPlayer() {
     };
 
     const playerRangeChanged = (evt) => {
+        const playerElement = playerRef.current;
         playerElement.currentTime = evt.target.value;
     };
 
     const playTrack = () => {
+        const playerElement = playerRef.current;
         playerElement.play();
         dispatch(changePlayState(PlayState.PLAY_STATE_PLAYING));
     };
 
     const pauseTrack = () => {
+        const playerElement = playerRef.current;
         playerElement.pause();
 
         updateTimeline(queue[queueIndex], PlayState.PLAY_STATE_PAUSED, playerElement.currentTime, playerElement.duration);
@@ -81,6 +83,7 @@ function AudioPlayer() {
     };
 
     const stopTrack = () => {
+        const playerElement = playerRef.current;
         playerElement.pause();
 
         updateTimeline(queue[queueIndex], PlayState.PLAY_STATE_STOPPED, playerElement.currentTime, playerElement.duration);
@@ -95,6 +98,7 @@ function AudioPlayer() {
     };
 
     const skipBackward = () => {
+        const playerElement = playerRef.current;
         let newTime = playerElement.currentTime - 10;
         if (newTime < 0)
             newTime = 0;
@@ -102,6 +106,7 @@ function AudioPlayer() {
     };
 
     const skipForward = (skipTime) => {
+        const playerElement = playerRef.current;
         let newTime = playerElement.currentTime + skipTime;
         if (newTime > playerElement.duration)
             newTime = playerElement.duration
@@ -127,14 +132,13 @@ function AudioPlayer() {
     };
 
     const timeUpdated = (event) => {
-        let appPlayer = event.target;
-        dispatch(changePlayerTime(appPlayer.currentTime, appPlayer.duration));
+        dispatch(changePlayerTime(event.target.currentTime, event.target.duration));
     };
 
     
     const audioPlayerEnded = useCallback((event) => {
         let nextIndex = queueIndex + 1;
-        if (queue && queue.length >= nextIndex) {
+        if (queue && queue.length > nextIndex) {
             dispatch(nextTrackInQueue());
         } else {
             stopPlayer();
@@ -142,12 +146,14 @@ function AudioPlayer() {
     });
 
     const throttleTimeline = throttle(() => {
+        const playerElement = playerRef.current;
         if (!playerElement.paused) {
            updateTimeline(queue[queueIndex], PlayState.PLAY_STATE_PLAYING, playerElement.currentTime, playerElement.duration);
         }
     }, 4000, {trailing: false});
 
     useEffect(() => {
+        const playerElement = playerRef.current;
         if (!playerElement) return;
         playerElement.addEventListener("timeupdate", throttleTimeline);
         return () => playerElement.removeEventListener("timeupdate", throttleTimeline);
@@ -175,6 +181,7 @@ function AudioPlayer() {
                 const src = formatUrl(`${baseUrl}${currentTrack.Part[0].key}`, { "X-Plex-Token": accessToken });
 
                 // get the reference to the audio tag.
+                const playerElement = playerRef.current;
                 playerElement.src = src;
                 playerElement.currentTime = 0;
                 if (playInfo.viewOffset) {
@@ -187,20 +194,18 @@ function AudioPlayer() {
     }, [queueId, queueIndex, accessToken]);
 
     return (
-        <>
-            <Container>
-                <PlayerRangeControl playerRangeChanged={playerRangeChanged} />
-                <PlayerControlContainer>
-                    <PreviousTrackControl />
-                    <SkipBackControl skipBackward={skipBackward} />
-                    <PlayPauseControl playTrack={playTrack} pauseTrack={pauseTrack}/>
-                    <SkipForwardControl skipForward={skipForward} />
-                    <NexTrackControl />
-                </PlayerControlContainer>
-            </Container>
-            <StopControl stopPlayer={stopPlayer} />
-            <audio id="appPlayer" onTimeUpdate={timeUpdated} onEnded={audioPlayerEnded} />
-        </>
+        <Container>
+            <PlayerRangeControl playerRangeChanged={playerRangeChanged} />
+            <PlayerControlContainer>
+                <PreviousTrackControl />
+                <SkipBackControl skipBackward={skipBackward} />
+                <PlayPauseControl playTrack={playTrack} pauseTrack={pauseTrack}/>
+                <SkipForwardControl skipForward={skipForward} />
+                <NexTrackControl />
+                <StopControl stopPlayer={stopPlayer} />
+            </PlayerControlContainer>
+            <audio ref={playerRef} onTimeUpdate={timeUpdated} onEnded={audioPlayerEnded} />
+        </Container>
     ); 
 }
 

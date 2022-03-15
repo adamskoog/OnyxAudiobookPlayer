@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
-import { BrowserRouter as Router, Routes, Route  } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { logout, getToken, checkToken, checkAuthId } from "../context/actions/appStateActions";
 import { getServers } from "../context/actions/settingsActions";
@@ -10,6 +10,8 @@ import { prepareLoginRequest } from "../plex/Authentication";
 import { lightMode, darkMode} from './util/colors';
 
 import Header from './Header';
+import { ScrollContainer, ScrollContent } from './util/container';
+import FilterMenu from './Library/FilterMenu';
 import NowPlaying from './Player';
 import Settings from './Settings';
 import Home from './Home';
@@ -18,27 +20,10 @@ import Library from './Library';
 import Album from './Album';
 import Artist from './Artist';
 
-
 const MainContainer = styled.main`
-    height: calc(100vh - 64px);
-
-    overflow: hidden;
-
-    &.playing {
-        height: calc(100vh - 64px - 100px);
-    }
-    &.menu-open {
-        height: calc(100vh - 168px);
-    }
-    &.playing.menu-open {
-        height: calc(100vh - 168px - 100px);
-    }
-`;
-
-const ScrollContainer = styled.div`
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden; /* Hack fix for expand button negative padding issue. */
+    flex: auto;
+    flex-grow: 1;
+    overflow: auto;
 `;
 
 const Main = () => {
@@ -87,18 +72,21 @@ const Main = () => {
             <Loader />
             <Router basename={appBaseUrl}>
                 <Header containerRef={containerRef} userInfo={user} doUserLogin={doUserLogin} doUserLogout={() => dispatch(logout())} />
+                <FilterMenu />
                 <MainContainer ref={containerRef}>
                     <ScrollContainer>
-                        <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route exact path="/library" element={<Library />} />
-                            <Route exact path="/album/:ratingKey" element={<Album />}/>
-                            <Route exact path="/artist/:ratingKey" element={<Artist />}/>
-                            <Route exact path="/settings" element={<Settings />} />
-                        </Routes>
+                        <ScrollContent>
+                            <Routes>
+                                <Route path="/" element={<Home />} />
+                                <Route exact path="/library" element={<Library />} />
+                                <Route exact path="/album/:ratingKey" element={<Album />}/>
+                                <Route exact path="/artist/:ratingKey" element={<Artist />}/>
+                                <Route exact path="/settings" element={<Settings />} />
+                            </Routes>
+                        </ScrollContent>
                     </ScrollContainer>
                 </MainContainer>
-                <NowPlaying containerRef={containerRef} />               
+                <NowPlaying /> 
             </Router>
         </ThemeProvider>
     ); 

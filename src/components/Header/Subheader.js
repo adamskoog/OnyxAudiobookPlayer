@@ -5,10 +5,8 @@ import { useSelector } from 'react-redux';
 const Container = styled.div`
     background-color: ${({ theme }) => theme.SUBHEADER_BG};
     color: ${({ theme }) => theme.SUBHEADER_TEXT};
-    box-shadow: 0 5px 15px 15px ${({ theme }) => theme.SUBHEADER_SHADOW};
-    margin-bottom: 15px;
 `;
-
+//box-shadow: 0 5px 15px 15px ${({ theme }) => theme.SUBHEADER_SHADOW};
 const InnerContainer = styled.div`
     display: flex;
     justify-content: space-between;
@@ -25,7 +23,8 @@ const InnerContainer = styled.div`
 
 const Item = styled.div`
     display: flex;
-    min-height: 1.25rem;
+    flex-grow: 1;
+    min-height: 1.5rem;
 `;
 
 const RightItem = styled(Item)`
@@ -48,6 +47,7 @@ const Subheader = ({ hideServer, children }) => {
             if (libraries && librarySection) {
                 const libraryName = libraries.filter(library => {
                     if (library.key === librarySection) return true;
+                    return false;
                 });
                 if (libraryName.length > 0) {
                     setDisplayName(`${server.name}: ${libraryName[0].title}`);
@@ -58,7 +58,7 @@ const Subheader = ({ hideServer, children }) => {
                 setDisplayName(`${server.name}: Library Not Set`);
         } else
             setDisplayName('Server: Not Set');
-    }, [server, librarySection, libraries]);
+    }, [server, librarySection, libraries, hideServer]);
 
     return (
         <Container>

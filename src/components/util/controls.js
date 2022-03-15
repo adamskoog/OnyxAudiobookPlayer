@@ -142,20 +142,21 @@ const ComboboxUnchecked = styled.div`
     ${checkMarkCss}
 `;
 
-export const Combobox = ({ value, options, callback, noOptionsLabel }) => {
+export const Combobox = ({ value, options, callback, defaultLabel, noOptionsLabel }) => {
 
     // Match our selected value from the options.
     let selectedValue = options.filter((item) => {
         return item.value === value;
     });
 
+    const emptyLabel = defaultLabel || '';
     const notFound = noOptionsLabel ?? 'Nothing found.';
     return (
         <FormControlContainer>
             <HeadlessCombobox value={selectedValue[0] || ''} onChange={callback}>
                 <ComboboxOuter>
                     <ComboboxInner>
-                        <ComboboxInput displayValue={(option) => (option) ? option.displayValue : '' } readOnly={true} />
+                        <ComboboxInput displayValue={(option) => (option) ? option.displayValue : emptyLabel } readOnly={true} />
                         <ComboboxButton><ComboboxArrow /></ComboboxButton>
                     </ComboboxInner>
                     <ComboboxOptions>

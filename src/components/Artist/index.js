@@ -5,11 +5,9 @@ import { useSelector } from 'react-redux';
 
 import { getAlbumMetadata } from '../../plex/Api';
 
-import Subheader from '../Header/Subheader';
 import AlbumItem from '../Library/AlbumItem';
 import AlbumSummary from '../Album/AlbumSummary';
 
-import { ScrollContent  } from '../util/container';
 import * as Responsive from '../util/responsive';
 import PlexImage from '../util/PlexImage';
 
@@ -100,8 +98,7 @@ const Artist = () => {
         <>
         {accessToken && (
         <>
-        <Subheader></Subheader>
-        <ScrollContent>
+
             <Container>
                 <PlexImage width={200} height={200} url={artist.thumb} alt={`${artist.parentTitle}`} />
                 <ArtistInfo>
@@ -117,7 +114,6 @@ const Artist = () => {
                     ))}
                 </Albums>
             </AlbumContainer>
-        </ScrollContent>
         </>
         )}
         </>

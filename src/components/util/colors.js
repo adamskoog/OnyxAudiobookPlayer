@@ -31,7 +31,7 @@ export const lightMode = {
     CONTEXT_MENU_BORDER: 'rgba(209, 213, 219, 1)',
 
 // ####    Album/Artist   ####
-    CONTAINER_BORDER: '#fff',
+    CONTAINER_BORDER: '#000',
 
 // ####    Settings    ####
     PLAYER_BACKGROUND: 'rgba(31, 41, 55, 1)',
@@ -69,7 +69,7 @@ export const darkMode = {
 // ####    Subheader    ####
     SUBHEADER_BG: '#283547',
     SUBHEADER_TEXT: '#fff',
-    SUBHEADER_SHADOW: '#283547',
+    SUBHEADER_SHADOW: '#121212',
 
 // ####    Context Menu    ####
     CONTEXT_MENU_BG: 'rgba(75, 85, 99, 1)',

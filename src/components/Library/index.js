@@ -4,14 +4,15 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import * as Responsive from '../util/responsive';
 
-//import Loader from '../Loader';
-import FilterMenu from './FilterMenu';
 import AlbumItem from './AlbumItem';
 import ArtistItem from './ArtistItem';
 
-import { ScrollContent  } from '../util/container';
 import { fetchLibraryItems } from '../../context/actions/libraryActions';
 import { MUSIC_LIBRARY_DISPAY_TYPE } from '../../plex/Api';
+
+const ErrorMessage = styled.div`
+    margin: 30px;
+`;
 
 const Grid = styled.div`
     display: grid;
@@ -49,30 +50,24 @@ const Library = () => {
     const librarySection = useSelector(state => state.settings.librarySection);
 
     useEffect(() => {
-        dispatch(fetchLibraryItems());
+        if (user && baseUrl && librarySection)
+            dispatch(fetchLibraryItems());
     }, [user, baseUrl, librarySection, displayType, sortType]);
 
     return (
         <>
-        {/* {loading && (
-            <Loader />
-        )} */}
-        {!loading && (
-            <>
-            <FilterMenu />
-            {/* <ScrollContainer> TODO: determine how to conditionally size the parent to account for this. */}
-            <ScrollContent>
-                <Grid>
-                    {(displayType === MUSIC_LIBRARY_DISPAY_TYPE.album.title) && (libraryItems.map((item) => (
-                        <AlbumItem key={item.key} metadata={item} showAuthor={true} />
-                    )))}
-                    {(displayType === MUSIC_LIBRARY_DISPAY_TYPE.artist.title) && (libraryItems.map((item) => (
-                        <ArtistItem key={item.key} metadata={item} />
-                    )))}
-                </Grid>
-            </ScrollContent>
-            {/* </ScrollContainer> */}
-            </>
+        {!user && (
+            <ErrorMessage>Must login to view library.</ErrorMessage>
+        )}
+        {user && !loading && (
+            <Grid>
+                {(displayType === MUSIC_LIBRARY_DISPAY_TYPE.album.title) && (libraryItems.map((item) => (
+                    <AlbumItem key={item.key} metadata={item} showAuthor={true} />
+                )))}
+                {(displayType === MUSIC_LIBRARY_DISPAY_TYPE.artist.title) && (libraryItems.map((item) => (
+                    <ArtistItem key={item.key} metadata={item} />
+                )))}
+            </Grid>
         )}
         </>
     ); 

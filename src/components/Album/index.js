@@ -10,8 +10,6 @@ import { getAlbumQueue, updateOnDeck, isTrackOnDeck, findOnDeck } from '../../pl
 
 import { ReactComponent as OnDeckPlaySvg } from '../../assets/onDeckPlay.svg';
 
-import { ScrollContent  } from '../util/container';
-import Subheader from '../Header/Subheader';
 import AlbumSummary from './AlbumSummary';
 import AlbumItem from './AlbumItem';
 import * as Responsive from '../util/responsive';
@@ -57,7 +55,7 @@ const AlbumYear = styled.div`
     flex-grow: 1;
 `;
 const OnDeck = styled.div`
-
+    margin-top: .5rem;
 `;
 const OnDeckButton = styled.button`
     vertical-align: middle;
@@ -132,8 +130,6 @@ const Album = () => {
         <>
         {accessToken && (
         <>
-        <Subheader></Subheader>
-        <ScrollContent>
         <Container>
             <AlbumContainer>
                 <PlexImage width={200} height={200} url={album.thumb} alt={`${album.parentTitle} Cover`} />
@@ -163,7 +159,6 @@ const Album = () => {
                 </Tracks>
             </TrackContainer>
         </Container>
-        </ScrollContent>
         </>
         )}
         </>

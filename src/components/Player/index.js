@@ -1,34 +1,26 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
 import * as Responsive from '../util/responsive';
-
+import { PLAYER_HEIGHT } from '../util/global';
 import PlexImage from '../util/PlexImage';
 import { Link } from 'react-router-dom';
 import PlayerTime from './controls/PlayerTime';
 import AudioPlayer from './AudioPlayer';
 
 const Container = styled.div`
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0px;
-    overflow: hidden;
+    display: ${(props) => (props.show) ? 'flex' : 'none'};
+    height: ${(props) => (props.show) ? PLAYER_HEIGHT : '0px'};
 
-    display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
+    flex-grow: 0;
     align-items: center;
     justify-content: space-evenly;
     
     color: ${({ theme }) => theme.PLAYER_TEXT};
     background-color: ${({ theme }) => theme.PLAYER_BACKGROUND};
-    
-    height: 0px;
-    &.playing {
-        height: 100px;
-    }
 `;
 const AlbumImageContainer = styled.div`
     display: none;
@@ -60,9 +52,7 @@ const TextBlock = styled.div`
     color: ${(props) => (props.muted) ? props.theme.PLAYER_TEXT_MUTED : props.theme.PLAYER_TEXT }    
 `;
 
-const NowPlaying = (props) => {
-
-    const containerRef = useRef(null);
+const NowPlaying = () => {
 
     const playState = useSelector(state => state.player.mode);
     const currentTrack = useSelector(state => state.playQueue.currentTrack);
@@ -73,18 +63,6 @@ const NowPlaying = (props) => {
     const [albumKey, setAlbumKey] = useState('');
     const [artistName, setArtistName] = useState('');
    
-    useEffect(() => {
-        const main = props.containerRef.current;
-        const player = containerRef.current;
-        if (playState === "stopped") {
-            main.classList.remove("playing");
-            player.classList.remove("playing");
-        } else {
-            main.classList.add("playing");
-            player.classList.add("playing");
-        }
-    }, [playState, props.containerRef]);
-
     useEffect(() => {
         if (currentTrack) {
             setTrackThumbUrl(currentTrack.thumb);
@@ -102,7 +80,7 @@ const NowPlaying = (props) => {
     }, [currentTrack]);
 
     return (
-        <Container ref={containerRef}>
+        <Container show={(playState !== "stopped") ? true : false}>
             <AlbumImageContainer>
                 <PlexImage width={100} height={100} url={trackThumbUrl} alt={trackTitle} hideRadius={true} />
             </AlbumImageContainer>

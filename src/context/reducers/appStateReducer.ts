@@ -1,4 +1,4 @@
-import * as actionTypes from "../actions/actionTypes";
+import * as actionTypes from '../actions/actionTypes';
 
 /*
 state: {
@@ -12,7 +12,7 @@ state: {
 */
 
 declare global {
-    
+
     type ApplicationState = {
         isLoading: boolean,
         applicationState: string,
@@ -24,39 +24,43 @@ declare global {
 }
 
 const defaultState: ApplicationState = {
-    isLoading: false,
-    applicationState: "loggedout",
-    user: null, 
-    authToken: null,
-    authId: null,
-    baseUrl: null
+  isLoading: false,
+  applicationState: 'loggedout',
+  user: null,
+  authToken: null,
+  authId: null,
+  baseUrl: null,
 };
 
 const appStateReducer = (state: ApplicationState = defaultState, action: AppAction): ApplicationState => {
-    switch (action.type) {
-        case actionTypes.CHANGE_APP_STATE:
-            return { ...state, applicationState: action.payload.applicationState };
-        case actionTypes.SET_SERVER_URL:
-            return { ...state, baseUrl: action.payload, applicationState: "ready" };
-        case actionTypes.GET_TOKEN:
-            return { ...state, authToken: action.payload.authToken, authId: action.payload.authId };
-            //return { ...state, authToken: action.payload.authToken, authId: action.payload.authId, settings: action.payload.settings };
-        case actionTypes.CHECK_TOKEN:
-            return { ...state, isLoading: true };
-        case actionTypes.TOKEN_VALID:
-            return { ...state, user: action.payload.user, isLoading: false  };
-        case actionTypes.TOKEN_INVALID:
-            return { ...state, applicationState: "loggedout", isLoading: false };
-        case actionTypes.LOGIN_REQUEST:
-            return { ...state, isLoading: true };
-        case actionTypes.LOGIN_REQUEST_VALIDATED:
-            return { ...state, authId: null, authToken: action.payload.authToken };
-        case actionTypes.LOGIN_REQUEST_NOT_VALID:
-            return { ...state, applicationState: "loggedout", authId: null, isLoading: false };
-        case actionTypes.USER_LOGGED_OUT:
-            return { ...state, applicationState: "loggedout", authId: null, user: null, isLoading: false };
-        default:
-            return state;
-    };
-}
+  switch (action.type) {
+    case actionTypes.CHANGE_APP_STATE:
+      return { ...state, applicationState: action.payload.applicationState };
+    case actionTypes.SET_SERVER_URL:
+      return { ...state, baseUrl: action.payload, applicationState: 'ready' };
+    case actionTypes.GET_TOKEN:
+      return { ...state, authToken: action.payload.authToken, authId: action.payload.authId };
+      // return { ...state, authToken: action.payload.authToken, authId: action.payload.authId, settings: action.payload.settings };
+    case actionTypes.CHECK_TOKEN:
+      return { ...state, isLoading: true };
+    case actionTypes.TOKEN_VALID:
+      return { ...state, user: action.payload.user, isLoading: false };
+    case actionTypes.TOKEN_INVALID:
+      return { ...state, applicationState: 'loggedout', isLoading: false };
+    case actionTypes.LOGIN_REQUEST:
+      return { ...state, isLoading: true };
+    case actionTypes.LOGIN_REQUEST_VALIDATED:
+      return { ...state, authId: null, authToken: action.payload.authToken };
+    case actionTypes.LOGIN_REQUEST_NOT_VALID:
+      return {
+        ...state, applicationState: 'loggedout', authId: null, isLoading: false,
+      };
+    case actionTypes.USER_LOGGED_OUT:
+      return {
+        ...state, applicationState: 'loggedout', authId: null, user: null, isLoading: false,
+      };
+    default:
+      return state;
+  }
+};
 export default appStateReducer;

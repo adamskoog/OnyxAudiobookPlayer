@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../context/hooks';
 
 import * as Responsive from '../util/responsive';
 import { PLAYER_HEIGHT } from '../util/global';
 import PlexImage from '../util/PlexImage';
-import { Link } from 'react-router-dom';
 import PlayerTime from './controls/PlayerTime';
 import AudioPlayer from './AudioPlayer';
 
 const Container: any = styled.div`
-    display: ${(props: any) => (props.show) ? 'flex' : 'none'};
-    height: ${(props: any) => (props.show) ? PLAYER_HEIGHT : '0px'};
+    display: ${(props: any) => ((props.show) ? 'flex' : 'none')};
+    height: ${(props: any) => ((props.show) ? PLAYER_HEIGHT : '0px')};
 
     flex-direction: row;
     flex-wrap: nowrap;
@@ -49,52 +49,51 @@ const TextBlock: any = styled.div`
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    color: ${(props: any) => (props.muted) ? props.theme.PLAYER_TEXT_MUTED : props.theme.PLAYER_TEXT }; 
+    color: ${(props: any) => ((props.muted) ? props.theme.PLAYER_TEXT_MUTED : props.theme.PLAYER_TEXT)}; 
 `;
 
-const NowPlaying = () => {
+function NowPlaying() {
+  const playState = useAppSelector((state) => state.player.mode);
+  const currentTrack = useAppSelector((state) => state.playQueue.currentTrack);
 
-    const playState = useAppSelector(state => state.player.mode);
-    const currentTrack = useAppSelector(state => state.playQueue.currentTrack);
-    
-    const [trackThumbUrl, setTrackThumbUrl]: [any, any] = useState(null);
-    const [trackTitle, setTrackTitle] = useState('');
-    const [albumTitle, setAlbumTitle] = useState('');
-    const [albumKey, setAlbumKey] = useState('');
-    const [artistName, setArtistName] = useState('');
-   
-    useEffect(() => {
-        if (currentTrack) {
-            setTrackThumbUrl(currentTrack.thumb);
-            setTrackTitle(currentTrack.title);
-            setAlbumTitle(currentTrack.parentTitle);
-            setAlbumKey(currentTrack.ratingKey);
-            setArtistName(currentTrack.grandparentTitle);
-        } else {
-            setTrackThumbUrl(null);
-            setTrackTitle('');
-            setAlbumTitle('');
-            setAlbumKey('');
-            setArtistName('');
-        }
-    }, [currentTrack]);
+  const [trackThumbUrl, setTrackThumbUrl]: [any, any] = useState(null);
+  const [trackTitle, setTrackTitle] = useState('');
+  const [albumTitle, setAlbumTitle] = useState('');
+  const [albumKey, setAlbumKey] = useState('');
+  const [artistName, setArtistName] = useState('');
 
-    return (
-        <Container show={(playState !== "stopped") ? true : false}>
-            <AlbumImageContainer>
-                <PlexImage width={100} height={100} url={trackThumbUrl} alt={trackTitle} hideRadius={true} />
-            </AlbumImageContainer>
-            <InfoContainer>
-                <TextBlock>{trackTitle}</TextBlock>
-                <TextBlock muted={true}>
-                    <Link to={`/album/${albumKey}`}>{albumTitle}</Link>
-                </TextBlock>
-                <TextBlock muted={true}>{artistName}</TextBlock>
-                <PlayerTime />
-            </InfoContainer>
-            <AudioPlayer />
-        </Container>
-    );
+  useEffect(() => {
+    if (currentTrack) {
+      setTrackThumbUrl(currentTrack.thumb);
+      setTrackTitle(currentTrack.title);
+      setAlbumTitle(currentTrack.parentTitle);
+      setAlbumKey(currentTrack.ratingKey);
+      setArtistName(currentTrack.grandparentTitle);
+    } else {
+      setTrackThumbUrl(null);
+      setTrackTitle('');
+      setAlbumTitle('');
+      setAlbumKey('');
+      setArtistName('');
+    }
+  }, [currentTrack]);
+
+  return (
+    <Container show={(playState !== 'stopped')}>
+      <AlbumImageContainer>
+        <PlexImage width={100} height={100} url={trackThumbUrl} alt={trackTitle} hideRadius />
+      </AlbumImageContainer>
+      <InfoContainer>
+        <TextBlock>{trackTitle}</TextBlock>
+        <TextBlock muted>
+          <Link to={`/album/${albumKey}`}>{albumTitle}</Link>
+        </TextBlock>
+        <TextBlock muted>{artistName}</TextBlock>
+        <PlayerTime />
+      </InfoContainer>
+      <AudioPlayer />
+    </Container>
+  );
 }
 
 export default NowPlaying;

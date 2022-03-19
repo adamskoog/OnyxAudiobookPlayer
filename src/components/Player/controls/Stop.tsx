@@ -14,13 +14,12 @@ type Props = {
     stopPlayer: () => void
 }
 
-const StopControl = ({ stopPlayer }: Props) => {
-
-    return (
-        <PlayerStopButton onClick={stopPlayer}>
-            <StopTrackSvg />
-        </PlayerStopButton>
-    ); 
+function StopControl({ stopPlayer }: Props) {
+  return (
+    <PlayerStopButton onClick={stopPlayer}>
+      <StopTrackSvg />
+    </PlayerStopButton>
+  );
 }
 
 export default StopControl;

@@ -20,17 +20,17 @@ type Props = {
     metadata: any
 }
 
-const ArtistItem = ({ metadata }: Props) => {
-    return (
-        <Link to={`/artist/${metadata.ratingKey}`}>
-            <Container>
-                <ArtistImageContainer>
-                    <PlexImage width={200} height={200} url={metadata.thumb} alt={`${metadata.title}`} isLazy={true} />
-                </ArtistImageContainer>
-                <ArtistText title={metadata.title}>{metadata.title}</ArtistText>
-            </Container>
-        </Link>
-    ); 
+function ArtistItem({ metadata }: Props) {
+  return (
+    <Link to={`/artist/${metadata.ratingKey}`}>
+      <Container>
+        <ArtistImageContainer>
+          <PlexImage width={200} height={200} url={metadata.thumb} alt={`${metadata.title}`} isLazy />
+        </ArtistImageContainer>
+        <ArtistText title={metadata.title}>{metadata.title}</ArtistText>
+      </Container>
+    </Link>
+  );
 }
 
 export default ArtistItem;

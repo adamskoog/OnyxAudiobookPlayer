@@ -3,10 +3,12 @@ import styled from 'styled-components';
 import { Link, useParams } from 'react-router-dom';
 
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
-import { setPlayQueue } from "../../context/actions/playQueueActions";
+import { setPlayQueue } from '../../context/actions/playQueueActions';
 
 import { getAlbumMetadata } from '../../plex/Api';
-import { getAlbumQueue, updateOnDeck, isTrackOnDeck, findOnDeck } from '../../plex/Playback';
+import {
+  getAlbumQueue, updateOnDeck, isTrackOnDeck, findOnDeck,
+} from '../../plex/Playback';
 
 import OnDeckPlaySvg from '-!svg-react-loader!../../assets/onDeckPlay.svg';
 
@@ -79,92 +81,91 @@ const TrackCount = styled.div`
     margin-bottom: 0.5rem;
 `;
 
-const Album = () => {
+function Album() {
+  const dispatch = useAppDispatch();
 
-    const dispatch = useAppDispatch();
+  const accessToken = useAppSelector((state) => state.settings.accessToken);
+  const baseUrl = useAppSelector((state) => state.application.baseUrl);
 
-    const accessToken = useAppSelector(state => state.settings.accessToken);
-    const baseUrl = useAppSelector(state => state.application.baseUrl);
+  const [album, setAlbum]: [any, any] = useState({ Metadata: [] });
+  const [onDeck, setOnDeck]: [any, any] = useState(null);
 
-    const [album, setAlbum]: [any, any] = useState({ Metadata: [] });
-    const [onDeck, setOnDeck]: [any, any] = useState(null);
+  const { ratingKey } = useParams();
 
-    const { ratingKey } = useParams();
+  const playOnDeckTrack = (trackInfo) => {
+    dispatch(setPlayQueue(getAlbumQueue(trackInfo, album)));
+  };
 
-    const playOnDeckTrack = (trackInfo) => {
-        dispatch(setPlayQueue(getAlbumQueue(trackInfo, album)));
+  const playSelectedTrack = async (trackInfo: any) => {
+    if (baseUrl && accessToken && !isTrackOnDeck(trackInfo, album)) {
+      await updateOnDeck(trackInfo, album, baseUrl, accessToken);
+      const albumInfo: any = await fetchAlbumMetadata();
+      dispatch(setPlayQueue(getAlbumQueue(albumInfo.track, albumInfo.album)));
+    } else playOnDeckTrack(trackInfo);
+  };
+
+  const fetchAlbumMetadata = async () => {
+    if (baseUrl && accessToken && ratingKey) {
+      const data: any = await getAlbumMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
+      if (data.MediaContainer) {
+        const onDeck: any = findOnDeck(data.MediaContainer);
+        setAlbum(data.MediaContainer);
+        setOnDeck(onDeck);
+
+        return { album: data.MediaContainer, track: onDeck };
+      }
     }
+    return null;
+  };
 
-    const playSelectedTrack = async (trackInfo: any) => {
-        if (baseUrl && accessToken && !isTrackOnDeck(trackInfo, album)) {
-            await updateOnDeck(trackInfo, album, baseUrl, accessToken);
-            const albumInfo: any = await fetchAlbumMetadata();
-            dispatch(setPlayQueue(getAlbumQueue(albumInfo.track, albumInfo.album)));
-        }
-        else
-            playOnDeckTrack(trackInfo);
-    }
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      if (accessToken && baseUrl && ratingKey) fetchAlbumMetadata();
+    };
+    fetchMetadata();
+  }, [baseUrl, accessToken, ratingKey]);
 
-    const fetchAlbumMetadata = async () => {
-        if (baseUrl && accessToken && ratingKey) {
-            const data: any = await getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": accessToken });
-            if (data.MediaContainer) {
-                const onDeck: any = findOnDeck(data.MediaContainer);
-                setAlbum(data.MediaContainer);
-                setOnDeck(onDeck);
-
-                return { album: data.MediaContainer, track: onDeck };
-            }
-        }
-        return null;
-    }
-
-    useEffect(() => {
-        const fetchMetadata = async () => {
-            if (accessToken && baseUrl && ratingKey)
-                fetchAlbumMetadata();
-        }
-        fetchMetadata();
-    }, [baseUrl, accessToken, ratingKey]);
-
-    //https://tailwindcomponents.com/component/button-component-default
-    return (
-        <>
-        {accessToken && (
-        <>
-        <Container>
-            <AlbumContainer>
-                <PlexImage width={200} height={200} url={album.thumb} alt={`${album.parentTitle} Cover`} />
-                <AlbumInfo>
-                    <AlbumTitle>{album.parentTitle}</AlbumTitle>
-                    <Link to={`/artist/${album.grandparentRatingKey}`}>
-                        <AlbumAuthor>{album.grandparentTitle}</AlbumAuthor>
-                    </Link>
-                    <AlbumYear>{album.parentYear}</AlbumYear>
-                    {onDeck && (
-                    <OnDeck>
-                        <OnDeckButton onClick={() => playOnDeckTrack(onDeck)}>
-                            <OnDeckPlaySvg />
-                        </OnDeckButton>
-                        {onDeck.title}
-                    </OnDeck>
-                    )}
-                </AlbumInfo>
-            </AlbumContainer>
-            <AlbumSummary summary={album.summary} />
-            <TrackContainer>
-                <TrackCount>{album.size} Track{(album.size > 1) ? "s" : ""}</TrackCount>
-                <Tracks>
-                    {album.Metadata.map((track: any) => (
-                        <AlbumItem key={track.key} trackInfo={track} playSelectedTrack={playSelectedTrack} updateAlbumInfo={fetchAlbumMetadata} />
-                    ))}
-                </Tracks>
-            </TrackContainer>
-        </Container>
-        </>
-        )}
-        </>
-    ); 
-};
+  // https://tailwindcomponents.com/component/button-component-default
+  return (
+    <>
+      {accessToken && (
+      <Container>
+        <AlbumContainer>
+          <PlexImage width={200} height={200} url={album.thumb} alt={`${album.parentTitle} Cover`} />
+          <AlbumInfo>
+            <AlbumTitle>{album.parentTitle}</AlbumTitle>
+            <Link to={`/artist/${album.grandparentRatingKey}`}>
+              <AlbumAuthor>{album.grandparentTitle}</AlbumAuthor>
+            </Link>
+            <AlbumYear>{album.parentYear}</AlbumYear>
+            {onDeck && (
+            <OnDeck>
+              <OnDeckButton onClick={() => playOnDeckTrack(onDeck)}>
+                    <OnDeckPlaySvg />
+                  </OnDeckButton>
+              {onDeck.title}
+            </OnDeck>
+            )}
+          </AlbumInfo>
+        </AlbumContainer>
+        <AlbumSummary summary={album.summary} />
+        <TrackContainer>
+          <TrackCount>
+            {album.size}
+            {' '}
+            Track
+            {(album.size > 1) ? 's' : ''}
+          </TrackCount>
+          <Tracks>
+            {album.Metadata.map((track: any) => (
+              <AlbumItem key={track.key} trackInfo={track} playSelectedTrack={playSelectedTrack} updateAlbumInfo={fetchAlbumMetadata} />
+            ))}
+          </Tracks>
+        </TrackContainer>
+      </Container>
+      )}
+    </>
+  );
+}
 
 export default Album;

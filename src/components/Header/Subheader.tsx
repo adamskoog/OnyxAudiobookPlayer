@@ -7,7 +7,7 @@ const Container = styled.div`
     background-color: ${({ theme }) => theme.SUBHEADER_BG};
     color: ${({ theme }) => theme.SUBHEADER_TEXT};
 `;
-//box-shadow: 0 5px 15px 15px ${({ theme }) => theme.SUBHEADER_SHADOW};
+// box-shadow: 0 5px 15px 15px ${({ theme }) => theme.SUBHEADER_SHADOW};
 const InnerContainer = styled.div`
     display: flex;
     justify-content: space-between;
@@ -38,41 +38,38 @@ type Props = {
     hideServer?: boolean
     children: any
 }
-const Subheader = ({ hideServer, children }: Props) => {
+function Subheader({ hideServer, children }: Props) {
+  const [displayName, setDisplayName] = useState('');
 
-    const [displayName, setDisplayName] = useState('');
+  const server = useAppSelector((state) => state.settings.currentServer);
+  const librarySection = useAppSelector((state) => state.settings.librarySection);
+  const libraries = useAppSelector((state) => state.settings.libraries);
 
-    const server = useAppSelector(state => state.settings.currentServer);
-    const librarySection = useAppSelector(state => state.settings.librarySection);
-    const libraries = useAppSelector(state => state.settings.libraries);
+  useEffect(() => {
+    if (hideServer) setDisplayName('');
+    else if (server) {
+      if (libraries && librarySection) {
+        const libraryName = libraries.filter((library: any) => {
+          if (library.key === librarySection) return true;
+          return false;
+        });
+        if (libraryName.length > 0) {
+          setDisplayName(`${server.name}: ${libraryName[0].title}`);
+        } else {
+          setDisplayName(`${server.name}: Title Not Found`);
+        }
+      } else setDisplayName(`${server.name}: Library Not Set`);
+    } else setDisplayName('Server: Not Set');
+  }, [server, librarySection, libraries, hideServer]);
 
-    useEffect(() => {
-        if (!!hideServer) setDisplayName('');
-        else if (server) {
-            if (libraries && librarySection) {
-                const libraryName = libraries.filter((library: any) => {
-                    if (library.key === librarySection) return true;
-                    return false;
-                });
-                if (libraryName.length > 0) {
-                    setDisplayName(`${server.name}: ${libraryName[0].title}`);
-                } else {
-                    setDisplayName(`${server.name}: Title Not Found`);
-                }
-            } else
-                setDisplayName(`${server.name}: Library Not Set`);
-        } else
-            setDisplayName('Server: Not Set');
-    }, [server, librarySection, libraries, hideServer]);
-
-    return (
-        <Container>
-            <InnerContainer>
-                <Item>{displayName}</Item>
-                <RightItem>{children}</RightItem>
-            </InnerContainer>
-        </Container>
-    ); 
+  return (
+    <Container>
+      <InnerContainer>
+        <Item>{displayName}</Item>
+        <RightItem>{children}</RightItem>
+      </InnerContainer>
+    </Container>
+  );
 }
 
 export default Subheader;

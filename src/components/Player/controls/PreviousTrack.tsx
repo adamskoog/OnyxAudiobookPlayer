@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { useAppSelector, useAppDispatch } from '../../../context/hooks';
-import { previousTrackInQueue } from "../../../context/actions/playQueueActions";
 import PreviousTrackSvg from '-!svg-react-loader!../../../assets/playerPreviousTrack.svg';
+import { useAppSelector, useAppDispatch } from '../../../context/hooks';
+import { previousTrackInQueue } from '../../../context/actions/playQueueActions';
 
 // TODO: refactor to shared
 const PlayerSmallButton = styled.button`
@@ -15,23 +15,23 @@ const PlayerSmallButton = styled.button`
 `;
 
 const hasPreviousTrack = (queueIndex: number): boolean => {
-    let newTrackIndex = queueIndex - 1;
-    if (newTrackIndex >= 0) {
-        return true;
-    }
-    return false;
+  const newTrackIndex = queueIndex - 1;
+  if (newTrackIndex >= 0) {
+    return true;
+  }
+  return false;
 };
 
-const PreviousTrackControl = () => {
-    const dispatch = useAppDispatch();
+function PreviousTrackControl() {
+  const dispatch = useAppDispatch();
 
-    const queueIndex = useAppSelector(state => state.playQueue.index);
+  const queueIndex = useAppSelector((state) => state.playQueue.index);
 
-    return (
-        <PlayerSmallButton disabled={!hasPreviousTrack(queueIndex)}  onClick={() => dispatch(previousTrackInQueue())}>
-            <PreviousTrackSvg />
-        </PlayerSmallButton>
-    ); 
+  return (
+    <PlayerSmallButton disabled={!hasPreviousTrack(queueIndex)} onClick={() => dispatch(previousTrackInQueue())}>
+      <PreviousTrackSvg />
+    </PlayerSmallButton>
+  );
 }
 
 export default PreviousTrackControl;

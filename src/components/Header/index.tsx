@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-import * as Responsive from '../util/responsive';
 import { Link, useLocation } from 'react-router-dom';
+import * as Responsive from '../util/responsive';
 
 import UserMenu from './UserMenu';
 import { SrOnly } from '../util/common';
@@ -33,9 +33,8 @@ const NavContent = styled.div`
     align-items: center;
 `;
 
-
 const MobileMenuContainer: any = styled.div`
-    display: ${(props: any) => (props.isOpen) ? 'block' : 'none' };
+    display: ${(props: any) => ((props.isOpen) ? 'block' : 'none')};
     z-index: 50;
 
     padding-top: 0.5rem;
@@ -183,97 +182,97 @@ type Props = {
     doUserLogout: any
 }
 
-const Header = ({ containerRef, userInfo, doUserLogin, doUserLogout }: Props) => {
+function Header({
+  containerRef, userInfo, doUserLogin, doUserLogout,
+}: Props) {
+  const TITLE = 'Onyx Player';
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
 
-    const TITLE = "Onyx Player";
-    const [menuIsOpen, setMenuIsOpen] = useState(false);
+  const location = useLocation();
 
-    const location = useLocation();
+  const navButtonCss = (active: string) => {
+    const elems = document.querySelectorAll('.nav-menu');
+    elems.forEach((elem) => {
+      if (elem.classList.contains(active)) {
+        elem.classList.add('active');
+      } else {
+        elem.classList.remove('active');
+      }
+    });
+  };
 
-    const navButtonCss = (active: string) => {
-        let elems = document.querySelectorAll(".nav-menu");
-        elems.forEach((elem) => {
-            if (elem.classList.contains(active)) {
-                elem.classList.add("active");
-            } else {
-                elem.classList.remove("active");
-            }
-        });
+  const menuCss = (isOpen: boolean) => {
+    const main = containerRef.current;
+    if (main) {
+      main.classList.remove('menu-open');
     }
-
-    const menuCss = (isOpen: boolean) => {
-        const main = containerRef.current;
-        if (main) {
-            main.classList.remove("menu-open");
-        }
-        if (main && isOpen) {
-            main.classList.add("menu-open");
-        }
-        return;
+    if (main && isOpen) {
+      main.classList.add('menu-open');
     }
+  };
 
-    const closeMainMenu = () => {
-        if (menuIsOpen) setMenuIsOpen(false);
+  const closeMainMenu = () => {
+    if (menuIsOpen) setMenuIsOpen(false);
+  };
+
+  useEffect(() => {
+    if (!location) return;
+
+    switch (location.pathname) {
+      case '/library':
+        navButtonCss('nav-library');
+        break;
+      case '/':
+        navButtonCss('nav-home');
+        break;
+      default:
+        navButtonCss('nav-empty');
     }
+  }, [location]);
 
-    useEffect(() => {
-        if (!location) return;
-        
-        switch (location.pathname) {
-            case "/library":
-                navButtonCss("nav-library");
-                break;
-            case "/":
-                navButtonCss("nav-home");
-                break;
-            default:
-                navButtonCss("nav-empty");
-        }
-    }, [location]);
+  useEffect(() => {
+    menuCss(menuIsOpen);
 
-    useEffect(() => {
-        menuCss(menuIsOpen);
+    if (!menuIsOpen) return;
+    document.addEventListener('click', closeMainMenu);
+    return () => { document.removeEventListener('click', closeMainMenu); };
+  }, [menuIsOpen]);
 
-        if (!menuIsOpen) return;
-        document.addEventListener("click", closeMainMenu);
-        return () => { document.removeEventListener("click", closeMainMenu); }
-    }, [menuIsOpen]);
+  return (
+    <NavContainer>
+      <Container>
+        <NavContent>
+          <MobileButtonContainer>
+            <MobileButton onClick={() => setMenuIsOpen(!menuIsOpen)} aria-expanded="false">
+              <SrOnly>Open main menu</SrOnly>
+              <HamburgerSvg />
+            </MobileButton>
+          </MobileButtonContainer>
 
-    return (
-        <NavContainer>
-            <Container>
-                <NavContent>
-                    <MobileButtonContainer>
-                        <MobileButton onClick={() => setMenuIsOpen(!menuIsOpen)} aria-expanded="false">
-                            <SrOnly>Open main menu</SrOnly>
-                            <HamburgerSvg />
-                        </MobileButton>
-                    </MobileButtonContainer>
+          <TitleContainer>
+            <Title>{TITLE}</Title>
+            <TitleMenuItem>
+              <TitleMenuItemLink className="nav-menu nav-home" to="/">Home</TitleMenuItemLink>
+            </TitleMenuItem>
+            <TitleMenuItem>
+              <TitleMenuItemLink className="nav-menu nav-library" to="/library">Library</TitleMenuItemLink>
+            </TitleMenuItem>
+          </TitleContainer>
 
-                    <TitleContainer>
-                        <Title>{TITLE}</Title>
-                        <TitleMenuItem>
-                            <TitleMenuItemLink className="nav-menu nav-home" to={`/`}>Home</TitleMenuItemLink>
-                        </TitleMenuItem>
-                        <TitleMenuItem>
-                            <TitleMenuItemLink className="nav-menu nav-library" to={`/library`}>Library</TitleMenuItemLink>
-                        </TitleMenuItem>
-                    </TitleContainer>
+          {!userInfo && (
+            <TitleMenuItemButton className="nav-menu nav-signin" onClick={() => doUserLogin()}>Login</TitleMenuItemButton>
+          )}
 
-                    {!userInfo && (
-                        <TitleMenuItemButton className="nav-menu nav-signin" onClick={() => doUserLogin()}>Login</TitleMenuItemButton>
-                    )}
+          <UserMenu userInfo={userInfo} doUserLogout={doUserLogout} />
+        </NavContent>
+      </Container>
 
-                    <UserMenu userInfo={userInfo} doUserLogout={doUserLogout} />
-                </NavContent>
-            </Container>
-
-            <MobileMenuContainer isOpen={menuIsOpen}>
-                <MobileMenuItem to={`/`}>Home</MobileMenuItem>
-                <MobileMenuItem to={`/library`}>Library</MobileMenuItem>
-            </MobileMenuContainer>
-        </NavContainer>
-    ); 
+      <MobileMenuContainer isOpen={menuIsOpen}>
+        <MobileMenuItem to="/">Home</MobileMenuItem>
+        <MobileMenuItem to="/library">Library</MobileMenuItem>
+      </MobileMenuContainer>
+    </NavContainer>
+  );
 }
 
 export default Header;

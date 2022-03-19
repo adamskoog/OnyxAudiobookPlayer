@@ -16,14 +16,13 @@ type Props = {
     skipBackward: (skipBack: number) => void
 }
 
-const SkipBackControl = ({ skipBackward }: Props) => {
-
-    const SKIP_TIME: number = 10;
-    return (
-        <PlayerSmallButton onClick={() => skipBackward(SKIP_TIME)}>
-            <SkipBackSvg />
-        </PlayerSmallButton>
-    ); 
+function SkipBackControl({ skipBackward }: Props) {
+  const SKIP_TIME = 10;
+  return (
+    <PlayerSmallButton onClick={() => skipBackward(SKIP_TIME)}>
+      <SkipBackSvg />
+    </PlayerSmallButton>
+  );
 }
 
 export default SkipBackControl;

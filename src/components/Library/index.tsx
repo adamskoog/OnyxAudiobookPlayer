@@ -37,40 +37,39 @@ const Grid = styled.div`
     `)}
 `;
 
-const Library = () => {
-    const dispatch = useAppDispatch();
+function Library() {
+  const dispatch = useAppDispatch();
 
-    const loading = useAppSelector(state => state.library.isLoading);
-    const libraryItems = useAppSelector(state => state.library.items);
-    const displayType = useAppSelector(state => state.library.displayType);
-    const sortType = useAppSelector(state => state.library.sortType);
+  const loading = useAppSelector((state) => state.library.isLoading);
+  const libraryItems = useAppSelector((state) => state.library.items);
+  const displayType = useAppSelector((state) => state.library.displayType);
+  const sortType = useAppSelector((state) => state.library.sortType);
 
-    const user = useAppSelector(state => state.application.user);
-    const baseUrl = useAppSelector(state => state.application.baseUrl);
-    const librarySection = useAppSelector(state => state.settings.librarySection);
+  const user = useAppSelector((state) => state.application.user);
+  const baseUrl = useAppSelector((state) => state.application.baseUrl);
+  const librarySection = useAppSelector((state) => state.settings.librarySection);
 
-    useEffect(() => {
-        if (user && baseUrl && librarySection)
-            dispatch(fetchLibraryItems());
-    }, [user, baseUrl, librarySection, displayType, sortType]);
+  useEffect(() => {
+    if (user && baseUrl && librarySection) dispatch(fetchLibraryItems());
+  }, [user, baseUrl, librarySection, displayType, sortType]);
 
-    return (
-        <>
-        {!user && (
-            <ErrorMessage>Must login to view library.</ErrorMessage>
-        )}
-        {user && !loading && (
-            <Grid>
-                {(displayType === MUSIC_LIBRARY_DISPAY_TYPE.album.title) && (libraryItems.map((item: any) => (
-                    <AlbumItem key={item.key} metadata={item} showAuthor={true} />
-                )))}
-                {(displayType === MUSIC_LIBRARY_DISPAY_TYPE.artist.title) && (libraryItems.map((item: any) => (
-                    <ArtistItem key={item.key} metadata={item} />
-                )))}
-            </Grid>
-        )}
-        </>
-    ); 
+  return (
+    <>
+      {!user && (
+      <ErrorMessage>Must login to view library.</ErrorMessage>
+      )}
+      {user && !loading && (
+      <Grid>
+        {(displayType === MUSIC_LIBRARY_DISPAY_TYPE.album.title) && (libraryItems.map((item: any) => (
+          <AlbumItem key={item.key} metadata={item} showAuthor />
+        )))}
+        {(displayType === MUSIC_LIBRARY_DISPAY_TYPE.artist.title) && (libraryItems.map((item: any) => (
+          <ArtistItem key={item.key} metadata={item} />
+        )))}
+      </Grid>
+      )}
+    </>
+  );
 }
 
 export default Library;

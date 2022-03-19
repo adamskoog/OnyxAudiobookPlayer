@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useAppSelector } from '../../../context/hooks';
-
-import { PlayState } from "../../../context/actions/playerActions";
 import PauseTrackSvg from '-!svg-react-loader!../../../assets/playerPause.svg';
 import PlayTrackSvg from '-!svg-react-loader!../../../assets/playerPlay.svg';
+import { useAppSelector } from '../../../context/hooks';
+
+import { PlayState } from '../../../context/actions/playerActions';
 
 const PlayerLargeButton = styled.button`
     margin-left: 0.5rem;
@@ -18,24 +18,23 @@ type Props = {
     pauseTrack: () => void
 }
 
-const PlayPauseControl = ({ playTrack, pauseTrack }: Props) => {
+function PlayPauseControl({ playTrack, pauseTrack }: Props) {
+  const playState = useAppSelector((state) => state.player.mode);
 
-    const playState = useAppSelector(state => state.player.mode);
-
-    return (
-        <>
-        {playState === PlayState.PLAY_STATE_PAUSED && (
-            <PlayerLargeButton onClick={() => playTrack()}>
-                <PauseTrackSvg />
-            </PlayerLargeButton>
-        )}
-        {playState === PlayState.PLAY_STATE_PLAYING && (
-            <PlayerLargeButton onClick={() => pauseTrack()}>
-                <PlayTrackSvg />
-            </PlayerLargeButton>
-        )}
-        </>
-    ); 
+  return (
+    <>
+      {playState === PlayState.PLAY_STATE_PAUSED && (
+      <PlayerLargeButton onClick={() => playTrack()}>
+        <PauseTrackSvg />
+      </PlayerLargeButton>
+      )}
+      {playState === PlayState.PLAY_STATE_PLAYING && (
+      <PlayerLargeButton onClick={() => pauseTrack()}>
+        <PlayTrackSvg />
+      </PlayerLargeButton>
+      )}
+    </>
+  );
 }
 
 export default PlayPauseControl;

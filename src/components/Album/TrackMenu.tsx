@@ -21,15 +21,15 @@ const MenuButton = styled.button`
 `;
 
 const markPlayed = async (trackInfo: any, baseUrl: string | null, accessToken: string | null, updateAlbumInfo: any): Promise<void> => {
-    if (!baseUrl || !accessToken) return;
-    await markTrackPlayed(trackInfo , baseUrl, accessToken);
-    updateAlbumInfo();
+  if (!baseUrl || !accessToken) return;
+  await markTrackPlayed(trackInfo, baseUrl, accessToken);
+  updateAlbumInfo();
 };
 
 const markUnplayed = async (trackInfo: any, baseUrl: string | null, accessToken: string | null, updateAlbumInfo: any): Promise<void> => {
-    if (!baseUrl || !accessToken) return;
-    await markTrackUnplayed(trackInfo , baseUrl, accessToken)
-    updateAlbumInfo();
+  if (!baseUrl || !accessToken) return;
+  await markTrackUnplayed(trackInfo, baseUrl, accessToken);
+  updateAlbumInfo();
 };
 
 type Props = {
@@ -38,40 +38,39 @@ type Props = {
     updateAlbumInfo: any
 }
 
-const TrackMenu = ({ trackInfo, playSelectedTrack, updateAlbumInfo }: Props) => {
+function TrackMenu({ trackInfo, playSelectedTrack, updateAlbumInfo }: Props) {
+  const accessToken = useAppSelector((state) => state.settings.accessToken);
+  const baseUrl = useAppSelector((state) => state.application.baseUrl);
 
-    const accessToken = useAppSelector(state => state.settings.accessToken);
-    const baseUrl = useAppSelector(state => state.application.baseUrl);
+  const [isOpen, setIsOpen] = useState(false);
 
-    const [isOpen, setIsOpen] = useState(false);
+  const menuItems = [
+    { title: 'Play', callback: () => playSelectedTrack(trackInfo) },
+    { title: 'Mark as Played', callback: () => markPlayed(trackInfo, baseUrl, accessToken, updateAlbumInfo) },
+    { title: 'Mark as Unplayed', callback: () => markUnplayed(trackInfo, baseUrl, accessToken, updateAlbumInfo) },
+  ];
 
-    const menuItems = [
-        { title: 'Play', callback: () => playSelectedTrack(trackInfo) },
-        { title: 'Mark as Played', callback: () => markPlayed(trackInfo, baseUrl, accessToken, updateAlbumInfo) },
-        { title: 'Mark as Unplayed', callback: () => markUnplayed(trackInfo, baseUrl, accessToken, updateAlbumInfo) },
-    ];
+  useEffect(() => {
+    if (!isOpen) return;
 
-    useEffect(() => {
-        if (!isOpen) return;
+    const closeMenu = () => {
+      if (isOpen) setIsOpen(false);
+    };
 
-        const closeMenu = () => {
-            if (isOpen) setIsOpen(false);
-        }
+    document.addEventListener('click', closeMenu);
+    return () => { document.removeEventListener('click', closeMenu); };
+  }, [isOpen]);
 
-        document.addEventListener("click", closeMenu);
-        return () => { document.removeEventListener("click", closeMenu); }
-    }, [isOpen]);
-
-    return (
-        <Container>
-            <ContainerOffset>
-                <MenuButton onClick={() => setIsOpen(!isOpen)} id="track-menu" aria-haspopup="true">
-                    <EllipsesSvg />
-                </MenuButton>
-                <Menu isOpen={isOpen} labelledby={'track-menu'} children={menuItems} />
-            </ContainerOffset>
-        </Container>
-    ); 
+  return (
+    <Container>
+      <ContainerOffset>
+        <MenuButton onClick={() => setIsOpen(!isOpen)} id="track-menu" aria-haspopup="true">
+          <EllipsesSvg />
+        </MenuButton>
+        <Menu isOpen={isOpen} labelledby="track-menu" children={menuItems} />
+      </ContainerOffset>
+    </Container>
+  );
 }
 
 export default TrackMenu;

@@ -30,37 +30,36 @@ type Props = {
     doUserLogout: any
 }
 
-const SettingsMenu = ({ userInfo, doUserLogout }: Props) => {
+function SettingsMenu({ userInfo, doUserLogout }: Props) {
+  const [isOpen, setIsOpen] = useState(false);
 
-    const [isOpen, setIsOpen] = useState(false);
+  const menuItems: Array<any> = [
+    { title: 'Settings', linkTo: '/settings' },
+    { title: 'Sign Out', callback: doUserLogout },
+  ];
 
-    const menuItems: Array<any> = [
-        { title: 'Settings', linkTo: '/settings' },
-        { title: 'Sign Out', callback: doUserLogout },
-    ];
+  useEffect(() => {
+    if (!isOpen) return;
 
-    useEffect(() => {
-        if (!isOpen) return;
+    const closeMenu = () => {
+      if (isOpen) setIsOpen(false);
+    };
 
-        const closeMenu = () => {
-            if (isOpen) setIsOpen(false);
-        }
+    document.addEventListener('click', closeMenu);
+    return () => { document.removeEventListener('click', closeMenu); };
+  }, [isOpen]);
 
-        document.addEventListener("click", closeMenu);
-        return () => { document.removeEventListener("click", closeMenu); }
-    }, [isOpen]);
-
-    return (
-        <Container>
-            <AvatarButton onClick={() => setIsOpen(!isOpen)} id="user-menu" aria-haspopup="true">
-                <SrOnly>Open user menu</SrOnly>
-                {userInfo && (
-                    <Avatar src={userInfo.thumb} alt="avatar" />
-                )}
-            </AvatarButton>
-            <Menu isOpen={isOpen} labelledby={'user-menu'} children={menuItems} />
-        </Container>
-    ); 
+  return (
+    <Container>
+      <AvatarButton onClick={() => setIsOpen(!isOpen)} id="user-menu" aria-haspopup="true">
+        <SrOnly>Open user menu</SrOnly>
+        {userInfo && (
+        <Avatar src={userInfo.thumb} alt="avatar" />
+        )}
+      </AvatarButton>
+      <Menu isOpen={isOpen} labelledby="user-menu" children={menuItems} />
+    </Container>
+  );
 }
 
 export default SettingsMenu;

@@ -1,48 +1,46 @@
 import React, { useEffect, useState } from 'react';
 
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
-import { setServerSetting, setLibrarySetting, setApplicationTheme } from "../../context/actions/settingsActions";
+import { setServerSetting, setLibrarySetting, setApplicationTheme } from '../../context/actions/settingsActions';
 
 import { ToggleSwitch, Combobox } from '../util/controls';
 
-const Settings = () => {
-    const dispatch = useAppDispatch();
-   
-    const serverIdentifier = useAppSelector(state => state.settings.serverIdentifier);
-    const librarySection = useAppSelector(state => state.settings.librarySection);
-    const resources = useAppSelector(state => state.settings.servers);
-    const libraries = useAppSelector(state => state.settings.libraries);
-    const isDarkMode = useAppSelector(state => state.settings.isDarkMode);
+function Settings() {
+  const dispatch = useAppDispatch();
 
-    // Local state for option arrays.
-    const [serverOptions, setServerOptions]: [any, any] = useState([]);
-    const [libraryOptions, setLibraryOptions]: [any, any] = useState([]);
+  const serverIdentifier = useAppSelector((state) => state.settings.serverIdentifier);
+  const librarySection = useAppSelector((state) => state.settings.librarySection);
+  const resources = useAppSelector((state) => state.settings.servers);
+  const libraries = useAppSelector((state) => state.settings.libraries);
+  const isDarkMode = useAppSelector((state) => state.settings.isDarkMode);
 
-    useEffect(() => {    
-        if (resources && resources.length > 0) {
-            setServerOptions(resources.map((resource: any) => ({
-                displayValue: resource.name, value: resource.clientIdentifier
-            })));
-        } else setServerOptions([]);
+  // Local state for option arrays.
+  const [serverOptions, setServerOptions]: [any, any] = useState([]);
+  const [libraryOptions, setLibraryOptions]: [any, any] = useState([]);
 
-    }, [resources]);
+  useEffect(() => {
+    if (resources && resources.length > 0) {
+      setServerOptions(resources.map((resource: any) => ({
+        displayValue: resource.name, value: resource.clientIdentifier,
+      })));
+    } else setServerOptions([]);
+  }, [resources]);
 
-    useEffect(() => {    
-        if (libraries && libraries.length > 0) {
-            setLibraryOptions(libraries.map((library: any) => ({
-                displayValue: library.title, value: library.key
-            })));
-        } else setLibraryOptions([]);
+  useEffect(() => {
+    if (libraries && libraries.length > 0) {
+      setLibraryOptions(libraries.map((library: any) => ({
+        displayValue: library.title, value: library.key,
+      })));
+    } else setLibraryOptions([]);
+  }, [libraries]);
 
-    }, [libraries]);
-
-    return (
-        <>
-            <Combobox value={serverIdentifier} options={serverOptions} callback={(option: any) => dispatch(setServerSetting(option.value))} defaultLabel={'Select a Server...'} noOptionsLabel={'No servers found.'}/>
-            <Combobox value={librarySection} options={libraryOptions} callback={(option: any) => dispatch(setLibrarySetting(option.value))} defaultLabel={'Select a Library...'} noOptionsLabel={'No libraries found.'} />
-            <ToggleSwitch label={'Dark Mode'} srLabel={'Enable Dark Mode'} value={isDarkMode} callback={() => dispatch(setApplicationTheme(!isDarkMode))} />
-        </>
-    );
+  return (
+    <>
+      <Combobox value={serverIdentifier} options={serverOptions} callback={(option: any) => dispatch(setServerSetting(option.value))} defaultLabel="Select a Server..." noOptionsLabel="No servers found." />
+      <Combobox value={librarySection} options={libraryOptions} callback={(option: any) => dispatch(setLibrarySetting(option.value))} defaultLabel="Select a Library..." noOptionsLabel="No libraries found." />
+      <ToggleSwitch label="Dark Mode" srLabel="Enable Dark Mode" value={isDarkMode} callback={() => dispatch(setApplicationTheme(!isDarkMode))} />
+    </>
+  );
 }
 
 export default Settings;

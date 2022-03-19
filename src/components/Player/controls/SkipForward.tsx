@@ -16,15 +16,14 @@ type Props = {
     skipForward: (skipTime: number) => void
 }
 
-const SkipForwardControl = ({ skipForward }: Props) => {
+function SkipForwardControl({ skipForward }: Props) {
+  const SKIP_TIME = 30;
 
-    const SKIP_TIME: number = 30;
-
-    return (
-        <PlayerSmallButton onClick={() => skipForward(SKIP_TIME)}>
-            <SkipForwardSvg />
-        </PlayerSmallButton>
-    ); 
+  return (
+    <PlayerSmallButton onClick={() => skipForward(SKIP_TIME)}>
+      <SkipForwardSvg />
+    </PlayerSmallButton>
+  );
 }
 
 export default SkipForwardControl;

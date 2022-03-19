@@ -18,25 +18,25 @@ const AlbumText = styled.div`
     font-weight: 500;
 `;
 const ArtistText = styled.div`
-`
+`;
 type Props = {
     metadata: any,
     showAuthor?: boolean
 }
-const AlbumItem = ({ metadata, showAuthor }: Props) => {
-    return (
-        <Link to={`/album/${metadata.ratingKey}`}>
-            <Container>           
-                <AlbumCoverContainer>
-                    <PlexImage width={200} height={200} url={metadata.thumb} alt={`${metadata.title}`} isLazy={true} />
-                </AlbumCoverContainer>
-                <AlbumText title={metadata.title}>{metadata.title}</AlbumText>
-                {showAuthor && (
-                    <ArtistText title={metadata.parentTitle}>{metadata.parentTitle}</ArtistText>
-                )}
-            </Container>
-        </Link>
-    ); 
+function AlbumItem({ metadata, showAuthor }: Props) {
+  return (
+    <Link to={`/album/${metadata.ratingKey}`}>
+      <Container>
+        <AlbumCoverContainer>
+          <PlexImage width={200} height={200} url={metadata.thumb} alt={`${metadata.title}`} isLazy />
+        </AlbumCoverContainer>
+        <AlbumText title={metadata.title}>{metadata.title}</AlbumText>
+        {showAuthor && (
+        <ArtistText title={metadata.parentTitle}>{metadata.parentTitle}</ArtistText>
+        )}
+      </Container>
+    </Link>
+  );
 }
 
 export default AlbumItem;

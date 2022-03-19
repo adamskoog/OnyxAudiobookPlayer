@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom';
 
 import { useAppSelector } from '../../context/hooks';
 import { getAlbumMetadata } from '../../plex/Api';
@@ -72,50 +72,54 @@ const AlbumCount = styled.div`
     margin-bottom: 0.5rem;
 `;
 
-const Artist = () => {
+function Artist() {
+  const accessToken = useAppSelector((state) => state.settings.accessToken);
+  const baseUrl = useAppSelector((state) => state.application.baseUrl);
 
-    const accessToken = useAppSelector(state => state.settings.accessToken);
-    const baseUrl = useAppSelector(state => state.application.baseUrl);
+  const [artist, setArtist]: [any, any] = useState({ Metadata: [] });
 
-    const [artist, setArtist]: [any, any] = useState({ Metadata: [] });
+  const { ratingKey } = useParams();
 
-    const { ratingKey } = useParams();
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      if (accessToken && baseUrl && ratingKey) {
+        const data = await getAlbumMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
+        console.log('artist metadata', data);
+        setArtist(data.MediaContainer);
+      }
+    };
+    fetchMetadata();
+  }, [baseUrl, accessToken, ratingKey]);
 
-    useEffect(() => {
-        const fetchMetadata = async () => {
-            if (accessToken && baseUrl && ratingKey) {
-                const data = await getAlbumMetadata(baseUrl, ratingKey, { "X-Plex-Token": accessToken });
-                console.log("artist metadata", data);
-                setArtist(data.MediaContainer);
-            }
-        }
-        fetchMetadata();
-    }, [baseUrl, accessToken, ratingKey]);
+  return (
+    <>
+      {accessToken && (
+      <>
 
-    return (
-        <>
-        {accessToken && (
-        <>
-
-            <Container>
-                <PlexImage width={200} height={200} url={artist.thumb} alt={`${artist.parentTitle}`} />
-                <ArtistInfo>
-                    <ArtistName>{artist.parentTitle}</ArtistName>
-                    <AlbumSummary summary={artist.summary} />
-                </ArtistInfo>
-            </Container>
-            <AlbumContainer>
-                <AlbumCount>{artist.size} Album{(artist.size > 1) ? "s" : ""}</AlbumCount>
-                <Albums>
-                    {artist.Metadata.map((album) => (
-                        <AlbumItem key={album.key} metadata={album} />
-                    ))}
-                </Albums>
-            </AlbumContainer>
-        </>
-        )}
-        </>
-    ); 
-};
+        <Container>
+          <PlexImage width={200} height={200} url={artist.thumb} alt={`${artist.parentTitle}`} />
+          <ArtistInfo>
+            <ArtistName>{artist.parentTitle}</ArtistName>
+            <AlbumSummary summary={artist.summary} />
+          </ArtistInfo>
+        </Container>
+        <AlbumContainer>
+          <AlbumCount>
+            {artist.size}
+            {' '}
+            Album
+            {(artist.size > 1) ? 's' : ''}
+          </AlbumCount>
+          <Albums>
+            {artist.Metadata.map((album) => (
+              <AlbumItem key={album.key} metadata={album} />
+            ))}
+          </Albums>
+        </AlbumContainer>
+      </>
+      )}
+    </>
+  );
+}
 
 export default Artist;

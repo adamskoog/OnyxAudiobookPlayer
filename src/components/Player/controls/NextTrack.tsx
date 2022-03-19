@@ -1,11 +1,10 @@
-
 import React from 'react';
 import styled from 'styled-components';
 
+import NextTrackSvg from '-!svg-react-loader!../../../assets/playerNextTrack.svg';
 import { useAppSelector, useAppDispatch } from '../../../context/hooks';
 
-import { nextTrackInQueue } from "../../../context/actions/playQueueActions";
-import NextTrackSvg from '-!svg-react-loader!../../../assets/playerNextTrack.svg';
+import { nextTrackInQueue } from '../../../context/actions/playQueueActions';
 
 // TODO: refactor to shared
 const PlayerSmallButton = styled.button`
@@ -16,25 +15,25 @@ const PlayerSmallButton = styled.button`
     line-height: 2rem;
 `;
 
-const hasNextTrack = (queueIndex: number, queue: Array<Object>): boolean => {       
-    let newTrackIndex = queueIndex + 1;
-    if (newTrackIndex < queue.length) {
-        return true;
-    }
-    return false;
+const hasNextTrack = (queueIndex: number, queue: Array<Object>): boolean => {
+  const newTrackIndex = queueIndex + 1;
+  if (newTrackIndex < queue.length) {
+    return true;
+  }
+  return false;
 };
 
-const NexTrackControl = () => {
-    const dispatch = useAppDispatch();
+function NexTrackControl() {
+  const dispatch = useAppDispatch();
 
-    const queueIndex = useAppSelector(state => state.playQueue.index);
-    const queue = useAppSelector(state => state.playQueue.queue);
+  const queueIndex = useAppSelector((state) => state.playQueue.index);
+  const queue = useAppSelector((state) => state.playQueue.queue);
 
-    return (
-        <PlayerSmallButton disabled={!hasNextTrack(queueIndex, queue)} onClick={() => dispatch(nextTrackInQueue())}>
-            <NextTrackSvg />
-        </PlayerSmallButton>
-    ); 
+  return (
+    <PlayerSmallButton disabled={!hasNextTrack(queueIndex, queue)} onClick={() => dispatch(nextTrackInQueue())}>
+      <NextTrackSvg />
+    </PlayerSmallButton>
+  );
 }
 
 export default NexTrackControl;

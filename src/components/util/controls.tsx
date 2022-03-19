@@ -19,7 +19,7 @@ const Switch = styled(HeadlessSwitch)`
     width: 2.75rem;
     border-radius: 9999px;
     height: 1.5rem;
-    background-color: ${(props: any) => (props.checked) ? 'rgba(31, 41, 55, 1)' : 'rgba(75, 85, 99, 1)'};   
+    background-color: ${(props: any) => ((props.checked) ? 'rgba(31, 41, 55, 1)' : 'rgba(75, 85, 99, 1)')};   
 `;
 const SwitchLabel = styled.span`
     flex-grow: 1;
@@ -33,7 +33,7 @@ const SwitchButton: any = styled.span`
     height: 1rem;
     background-color: #fff;
     border-radius: 9999px;
-    transform: ${(props: any) => (props.checked) ? 'translate(1.5rem, 0)' : 'translate(0.3rem, 0)'};
+    transform: ${(props: any) => ((props.checked) ? 'translate(1.5rem, 0)' : 'translate(0.3rem, 0)')};
 `;
 
 type ToggleProps = {
@@ -43,19 +43,19 @@ type ToggleProps = {
     callback?: any
 }
 
-export const ToggleSwitch = ({ label, srLabel, value, callback }: ToggleProps) => {
-    return (
-        <FormControlContainer> 
-            <SwitchLabel>{label}</SwitchLabel>
-            <Switch checked={value} onChange={callback}>
-                <SrOnly>{srLabel}</SrOnly>
-                <SwitchButton checked={value} />
-            </Switch>
-        </FormControlContainer>
-    ); 
+export function ToggleSwitch({
+  label, srLabel, value, callback,
+}: ToggleProps) {
+  return (
+    <FormControlContainer>
+      <SwitchLabel>{label}</SwitchLabel>
+      <Switch checked={value} onChange={callback}>
+        <SrOnly>{srLabel}</SrOnly>
+        <SwitchButton checked={value} />
+      </Switch>
+    </FormControlContainer>
+  );
 }
-
-
 
 const ComboboxOuter = styled.div`
     position: relative;
@@ -157,41 +157,40 @@ type ComboboxProps = {
     callback?: any
 }
 
-export const Combobox = ({ value, options, callback, defaultLabel, noOptionsLabel }: ComboboxProps) => {
+export function Combobox({
+  value, options, callback, defaultLabel, noOptionsLabel,
+}: ComboboxProps) {
+  // Match our selected value from the options.
+  const selectedValue = options.filter((item) => item.value === value);
 
-    // Match our selected value from the options.
-    let selectedValue = options.filter((item) => {
-        return item.value === value;
-    });
-
-    const emptyLabel = defaultLabel || '';
-    const notFound = noOptionsLabel ?? 'Nothing found.';
-    return (
-        <FormControlContainer>
-            <HeadlessCombobox value={selectedValue[0] || ''} onChange={callback}>
-                <ComboboxOuter>
-                    <ComboboxInner>
-                        <ComboboxInput displayValue={(option: any) => (option) ? option.displayValue : emptyLabel } readOnly={true} />
-                        <ComboboxButton><ComboboxArrow /></ComboboxButton>
-                    </ComboboxInner>
-                    <ComboboxOptions>
-                        {options.length === 0 ? (
-                            <ComboboxOptionNone key={''} value={''}>{notFound}</ComboboxOptionNone>
-                        ) : (
-                        options.map((option: any) => (
-                            <ComboboxOption key={option.value} value={option}>
-                                {({ selected }: any) => (
-                                <>
-                                    {selected && <ComboboxCheckStyled />}
-                                    {!selected && <ComboboxUnchecked />}
-                                    <span>{option.displayValue}</span>
-                                </>
-                                )}
-                            </ComboboxOption>
-                        )))}
-                    </ComboboxOptions>
-                </ComboboxOuter>
-            </HeadlessCombobox>
-        </FormControlContainer>
-    ); 
+  const emptyLabel = defaultLabel || '';
+  const notFound = noOptionsLabel ?? 'Nothing found.';
+  return (
+    <FormControlContainer>
+      <HeadlessCombobox value={selectedValue[0] || ''} onChange={callback}>
+        <ComboboxOuter>
+          <ComboboxInner>
+            <ComboboxInput displayValue={(option: any) => ((option) ? option.displayValue : emptyLabel)} readOnly />
+            <ComboboxButton><ComboboxArrow /></ComboboxButton>
+          </ComboboxInner>
+          <ComboboxOptions>
+            {options.length === 0 ? (
+              <ComboboxOptionNone key="" value="">{notFound}</ComboboxOptionNone>
+            ) : (
+              options.map((option: any) => (
+                <ComboboxOption key={option.value} value={option}>
+                  {({ selected }: any) => (
+                      <>
+                          {selected && <ComboboxCheckStyled />}
+                          {!selected && <ComboboxUnchecked />}
+                          <span>{option.displayValue}</span>
+                        </>
+                    )}
+                </ComboboxOption>
+              )))}
+          </ComboboxOptions>
+        </ComboboxOuter>
+      </HeadlessCombobox>
+    </FormControlContainer>
+  );
 }

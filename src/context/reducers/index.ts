@@ -1,26 +1,25 @@
 import { combineReducers, AnyAction } from 'redux';
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit';
 import { ThunkAction } from 'redux-thunk';
 
-import appStateReducer from "./appStateReducer";
-import settingsReducer from "./settingsReducer";
-import playQueueReducer from "./playQueueReducer";
-import playerReducer from "./playerReducer";
-import libraryReducer from "./libraryReducer";
+import appStateReducer from './appStateReducer';
+import settingsReducer from './settingsReducer';
+import playQueueReducer from './playQueueReducer';
+import playerReducer from './playerReducer';
+import libraryReducer from './libraryReducer';
 
 // First we'll combine all the reducers into
 // a single store.
 const rootReducer = combineReducers({
-    application: appStateReducer,
-    settings: settingsReducer,
-    playQueue: playQueueReducer,
-    player: playerReducer,
-    library: libraryReducer
+  application: appStateReducer,
+  settings: settingsReducer,
+  playQueue: playQueueReducer,
+  player: playerReducer,
+  library: libraryReducer,
 });
 
 // Declare the store, add dev tools and thunk middleware.
 const store = configureStore({ reducer: rootReducer });
-
 
 // Declare global types related to the store.
 declare global {

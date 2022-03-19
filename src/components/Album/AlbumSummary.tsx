@@ -1,4 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, {
+  useRef, useState, useEffect, ReactElement,
+} from 'react';
 import styled from 'styled-components';
 
 const MAX_CONTAINER_HEIGHT = 120;
@@ -36,7 +38,7 @@ const ExpandDivider: any = styled.div`
 `;
 const ExpandButton = styled.button``;
 
-const formatSummary = (summary) => {
+const formatSummary = (summary: string): string => {
   if (summary) {
     const splitted = summary.split('\n');
     return `<p>${splitted.join('</p><p>')}</p>`;
@@ -44,7 +46,7 @@ const formatSummary = (summary) => {
   return '';
 };
 
-function AlbumSummary({ summary }) {
+function AlbumSummary({ summary }): ReactElement {
   const innerRef: any = useRef(null);
   const [expanded, setExpanded] = useState(false);
   const [hasOverflow, setHasOverflow] = useState(false);

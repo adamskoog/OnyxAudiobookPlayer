@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 
 import PreviousTrackSvg from '-!svg-react-loader!../../../assets/playerPreviousTrack.svg';
@@ -22,7 +22,7 @@ const hasPreviousTrack = (queueIndex: number): boolean => {
   return false;
 };
 
-function PreviousTrackControl() {
+function PreviousTrackControl(): ReactElement {
   const dispatch = useAppDispatch();
 
   const queueIndex = useAppSelector((state) => state.playQueue.index);

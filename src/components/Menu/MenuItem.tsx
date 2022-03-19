@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
@@ -29,11 +29,15 @@ type Props = {
     callback?: any
 }
 
-function MenuItem({ linkTo, callback, title }: Props) {
+function MenuItem({ linkTo, callback, title }: Props): ReactElement {
   if (callback) {
     return (<MenuItemButton role="menuitem" onClick={callback}>{title}</MenuItemButton>);
   }
   return (<MenuItemLink role="menuitem" to={linkTo}>{title}</MenuItemLink>);
 }
+
+MenuItem.defaultProps = {
+  callback: null,
+};
 
 export default MenuItem;

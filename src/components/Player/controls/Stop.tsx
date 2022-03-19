@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 
 import StopTrackSvg from '-!svg-react-loader!../../../assets/playerStop.svg';
@@ -14,7 +14,7 @@ type Props = {
     stopPlayer: () => void
 }
 
-function StopControl({ stopPlayer }: Props) {
+function StopControl({ stopPlayer }: Props): ReactElement {
   return (
     <PlayerStopButton onClick={stopPlayer}>
       <StopTrackSvg />

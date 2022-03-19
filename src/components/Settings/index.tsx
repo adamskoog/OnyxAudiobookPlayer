@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ReactElement } from 'react';
 
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
 import { setServerSetting, setLibrarySetting, setApplicationTheme } from '../../context/actions/settingsActions';
 
 import { ToggleSwitch, Combobox } from '../util/controls';
 
-function Settings() {
+function Settings(): ReactElement {
   const dispatch = useAppDispatch();
 
   const serverIdentifier = useAppSelector((state) => state.settings.serverIdentifier);

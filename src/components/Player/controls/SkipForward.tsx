@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 
 import SkipForwardSvg from '-!svg-react-loader!../../../assets/playerSkipForward.svg';
@@ -16,7 +16,7 @@ type Props = {
     skipForward: (skipTime: number) => void
 }
 
-function SkipForwardControl({ skipForward }: Props) {
+function SkipForwardControl({ skipForward }: Props): ReactElement {
   const SKIP_TIME = 30;
 
   return (

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../context/hooks';
@@ -30,7 +30,7 @@ type Props = {
     updateAlbumInfo: any
 }
 
-function AlbumItem({ trackInfo, playSelectedTrack, updateAlbumInfo }: Props) {
+function AlbumItem({ trackInfo, playSelectedTrack, updateAlbumInfo }: Props): ReactElement {
   const currentTrack = useAppSelector((state) => state.playQueue.currentTrack);
 
   useEffect(() => {

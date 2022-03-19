@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ReactElement } from 'react';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../context/hooks';
@@ -38,7 +38,7 @@ type Props = {
     hideServer?: boolean
     children: any
 }
-function Subheader({ hideServer, children }: Props) {
+function Subheader({ hideServer, children }: Props): ReactElement {
   const [displayName, setDisplayName] = useState('');
 
   const server = useAppSelector((state) => state.settings.currentServer);
@@ -71,5 +71,9 @@ function Subheader({ hideServer, children }: Props) {
     </Container>
   );
 }
+
+Subheader.defaultProps = {
+  hideServer: false,
+};
 
 export default Subheader;

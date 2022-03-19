@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, {
+  useEffect, useRef, useCallback, ReactElement,
+} from 'react';
 import styled from 'styled-components';
 
 import throttle from 'lodash/throttle';
@@ -32,7 +34,7 @@ const PlayerControlContainer = styled.div`
     margin-bottom: 1.5rem;
 `;
 
-function AudioPlayer() {
+function AudioPlayer(): ReactElement {
   const dispatch = useAppDispatch();
 
   const accessToken = useAppSelector((state) => state.settings.accessToken);
@@ -42,7 +44,7 @@ function AudioPlayer() {
   const queueIndex = useAppSelector((state) => state.playQueue.index);
   const playState = useAppSelector((state) => state.player.mode);
 
-  function usePrevious(value: any) {
+  function usePrevious(value: any): any {
     const ref = useRef();
     useEffect(() => {
       ref.current = value;
@@ -54,26 +56,45 @@ function AudioPlayer() {
   const prevQueue: any = usePrevious(queueId); // TODO: is this the correct value, prevQueue.id is used below....
   const playerRef: any = useRef(null);
 
-  function hasTrackChanged() {
+  const hasTrackChanged = (): boolean => {
     // we need to do something here to check if the
     // track has been changed.
     if (prevQueue && prevQueue.id !== queueId) return true;
     if (prevIndex !== queueIndex) return true;
     return false;
-  }
+  };
 
-  const playerRangeChanged = (evt) => {
+  const updateTimeline = (trackInfo: any, playerState: any, currentTime: any, duration: any): void => {
+    // we need a way to update the album info if the user is looking at the album
+    // page, It should keep the on deck updated.
+    // Should this be done while playing, or only when user pauses/kills the stream.
+    if (!baseUrl || !accessToken) return;
+    const args = {
+      ratingKey: trackInfo.ratingKey,
+      key: trackInfo.key,
+      state: playerState,
+      time: convertSecondsToMs(currentTime),
+      playbackTime: convertSecondsToMs(currentTime),
+      duration: convertSecondsToMs(duration),
+      'X-Plex-Token': accessToken,
+    };
+    // console.log("updateTimeline", args);
+    updateTimelineApi(baseUrl, args);
+    // .then((data) => { /* console.log("data", data); TODO: This doesn't seem to return anything, and errors out often. */ });
+  };
+
+  const playerRangeChanged = (evt): void => {
     const playerElement: HTMLAudioElement = playerRef.current;
     playerElement.currentTime = evt.target.value;
   };
 
-  const playTrack = () => {
+  const playTrack = (): void => {
     const playerElement: HTMLAudioElement = playerRef.current;
     playerElement.play();
     dispatch(changePlayState(PlayState.PLAY_STATE_PLAYING));
   };
 
-  const pauseTrack = () => {
+  const pauseTrack = (): void => {
     const playerElement: HTMLAudioElement = playerRef.current;
     playerElement.pause();
 
@@ -81,7 +102,7 @@ function AudioPlayer() {
     dispatch(changePlayState(PlayState.PLAY_STATE_PAUSED));
   };
 
-  const stopTrack = () => {
+  const stopTrack = (): void => {
     const playerElement: HTMLAudioElement = playerRef.current;
     playerElement.pause();
 
@@ -91,49 +112,30 @@ function AudioPlayer() {
     playerElement.src = '';
   };
 
-  const stopPlayer = () => {
+  const stopPlayer = (): void => {
     stopTrack();
     dispatch(clearPlayQueue());
   };
 
-  const skipBackward = () => {
+  const skipBackward = (): void => {
     const playerElement: HTMLAudioElement = playerRef.current;
     let newTime = playerElement.currentTime - 10;
     if (newTime < 0) newTime = 0;
     playerElement.currentTime = newTime;
   };
 
-  const skipForward = (skipTime: number) => {
+  const skipForward = (skipTime: number): void => {
     const playerElement: HTMLAudioElement = playerRef.current;
     let newTime = playerElement.currentTime + skipTime;
     if (newTime > playerElement.duration) newTime = playerElement.duration;
     playerElement.currentTime = newTime;
   };
 
-  const updateTimeline = (trackInfo: any, playState: any, currentTime: any, duration: any) => {
-    // we need a way to update the album info if the user is looking at the album
-    // page, It should keep the on deck updated.
-    // Should this be done while playing, or only when user pauses/kills the stream.
-    if (!baseUrl || !accessToken) return;
-    const args = {
-      ratingKey: trackInfo.ratingKey,
-      key: trackInfo.key,
-      state: playState,
-      time: convertSecondsToMs(currentTime),
-      playbackTime: convertSecondsToMs(currentTime),
-      duration: convertSecondsToMs(duration),
-      'X-Plex-Token': accessToken,
-    };
-    // console.log("updateTimeline", args);
-    updateTimelineApi(baseUrl, args)
-      .then((data) => { /* console.log("data", data); TODO: This doesn't seem to return anything, and errors out often. */ });
-  };
-
-  const timeUpdated = (event) => {
+  const timeUpdated = (event: any): void => {
     dispatch(changePlayerTime(event.target.currentTime, event.target.duration));
   };
 
-  const audioPlayerEnded = useCallback((event) => {
+  const audioPlayerEnded = useCallback((event: any): void => {
     const nextIndex = queueIndex + 1;
     if (queue && queue.length > nextIndex) {
       dispatch(nextTrackInQueue());

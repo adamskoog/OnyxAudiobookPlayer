@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../context/hooks';
@@ -38,7 +38,7 @@ type Props = {
     updateAlbumInfo: any
 }
 
-function TrackMenu({ trackInfo, playSelectedTrack, updateAlbumInfo }: Props) {
+function TrackMenu({ trackInfo, playSelectedTrack, updateAlbumInfo }: Props): ReactElement {
   const accessToken = useAppSelector((state) => state.settings.accessToken);
   const baseUrl = useAppSelector((state) => state.application.baseUrl);
 
@@ -53,7 +53,7 @@ function TrackMenu({ trackInfo, playSelectedTrack, updateAlbumInfo }: Props) {
   useEffect(() => {
     if (!isOpen) return;
 
-    const closeMenu = () => {
+    const closeMenu = (): void => {
       if (isOpen) setIsOpen(false);
     };
 
@@ -67,7 +67,9 @@ function TrackMenu({ trackInfo, playSelectedTrack, updateAlbumInfo }: Props) {
         <MenuButton onClick={() => setIsOpen(!isOpen)} id="track-menu" aria-haspopup="true">
           <EllipsesSvg />
         </MenuButton>
-        <Menu isOpen={isOpen} labelledby="track-menu" children={menuItems} />
+        <Menu isOpen={isOpen} labelledby="track-menu">
+          {menuItems}
+        </Menu>
       </ContainerOffset>
     </Container>
   );

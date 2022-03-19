@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 import { Link, useParams } from 'react-router-dom';
 
@@ -81,7 +81,7 @@ const TrackCount = styled.div`
     margin-bottom: 0.5rem;
 `;
 
-function Album() {
+function Album(): ReactElement {
   const dispatch = useAppDispatch();
 
   const accessToken = useAppSelector((state) => state.settings.accessToken);
@@ -92,11 +92,25 @@ function Album() {
 
   const { ratingKey } = useParams();
 
-  const playOnDeckTrack = (trackInfo) => {
+  const playOnDeckTrack = (trackInfo: any): void => {
     dispatch(setPlayQueue(getAlbumQueue(trackInfo, album)));
   };
 
-  const playSelectedTrack = async (trackInfo: any) => {
+  const fetchAlbumMetadata = async (): Promise<any> => {
+    if (baseUrl && accessToken && ratingKey) {
+      const data: any = await getAlbumMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
+      if (data.MediaContainer) {
+        const newOnDeck: any = findOnDeck(data.MediaContainer);
+        setAlbum(data.MediaContainer);
+        setOnDeck(newOnDeck);
+
+        return { album: data.MediaContainer, track: newOnDeck };
+      }
+    }
+    return null;
+  };
+
+  const playSelectedTrack = async (trackInfo: any): Promise<void> => {
     if (baseUrl && accessToken && !isTrackOnDeck(trackInfo, album)) {
       await updateOnDeck(trackInfo, album, baseUrl, accessToken);
       const albumInfo: any = await fetchAlbumMetadata();
@@ -104,22 +118,8 @@ function Album() {
     } else playOnDeckTrack(trackInfo);
   };
 
-  const fetchAlbumMetadata = async () => {
-    if (baseUrl && accessToken && ratingKey) {
-      const data: any = await getAlbumMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
-      if (data.MediaContainer) {
-        const onDeck: any = findOnDeck(data.MediaContainer);
-        setAlbum(data.MediaContainer);
-        setOnDeck(onDeck);
-
-        return { album: data.MediaContainer, track: onDeck };
-      }
-    }
-    return null;
-  };
-
   useEffect(() => {
-    const fetchMetadata = async () => {
+    const fetchMetadata = async (): Promise<void> => {
       if (accessToken && baseUrl && ratingKey) fetchAlbumMetadata();
     };
     fetchMetadata();
@@ -141,8 +141,8 @@ function Album() {
             {onDeck && (
             <OnDeck>
               <OnDeckButton onClick={() => playOnDeckTrack(onDeck)}>
-                    <OnDeckPlaySvg />
-                  </OnDeckButton>
+                <OnDeckPlaySvg />
+              </OnDeckButton>
               {onDeck.title}
             </OnDeck>
             )}

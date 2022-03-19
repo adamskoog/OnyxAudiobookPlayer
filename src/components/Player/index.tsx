@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ReactElement } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../context/hooks';
@@ -52,7 +52,7 @@ const TextBlock: any = styled.div`
     color: ${(props: any) => ((props.muted) ? props.theme.PLAYER_TEXT_MUTED : props.theme.PLAYER_TEXT)}; 
 `;
 
-function NowPlaying() {
+function NowPlaying(): ReactElement {
   const playState = useAppSelector((state) => state.player.mode);
   const currentTrack = useAppSelector((state) => state.playQueue.currentTrack);
 

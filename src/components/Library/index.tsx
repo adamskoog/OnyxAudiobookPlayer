@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
@@ -37,7 +37,7 @@ const Grid = styled.div`
     `)}
 `;
 
-function Library() {
+function Library(): ReactElement {
   const dispatch = useAppDispatch();
 
   const loading = useAppSelector((state) => state.library.isLoading);

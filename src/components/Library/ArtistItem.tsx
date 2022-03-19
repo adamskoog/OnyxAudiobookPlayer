@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 
 import { Link } from 'react-router-dom';
@@ -20,7 +20,7 @@ type Props = {
     metadata: any
 }
 
-function ArtistItem({ metadata }: Props) {
+function ArtistItem({ metadata }: Props): ReactElement {
   return (
     <Link to={`/artist/${metadata.ratingKey}`}>
       <Container>

@@ -4,12 +4,18 @@ import {
 } from '../utility/settings';
 
 // Action = GET_TOKEN
-export const getAuthTokenFromStorage = () => {
+export const getAuthTokenFromStorage = (): string | null => {
   // Attempt to get the token from browser local storage.
   const token = loadSettingFromStorage(SETTINGS_KEYS.token);
   if (token && token !== '') return token;
   return null;
 };
+
+export const logout = (): void => {
+  // Might need to do more here, clear settings??
+  removeSettingFromStorage(SETTINGS_KEYS.token);
+};
+
 // previously 'checkToken'
 // Main.js -> processLogin
 // Action = CHECK_TOKEN
@@ -45,9 +51,4 @@ export const validateAuthId = async (authId: string): Promise<any> => {
   saveSettingToStorage(SETTINGS_KEYS.clientIdentifier, '616647cf-a68b-4474-8b4f-3ad72ed95cf9');
 
   return { token: regInfo.authToken };
-};
-
-export const logout = (): void => {
-  // Might need to do more here, clear settings??
-  removeSettingFromStorage(SETTINGS_KEYS.token);
 };

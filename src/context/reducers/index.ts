@@ -1,5 +1,5 @@
-import { combineReducers, AnyAction } from 'redux';
 import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, AnyAction } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 
 import appStateReducer from './appStateReducer';

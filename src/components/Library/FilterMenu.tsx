@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ReactElement } from 'react';
 import styled from 'styled-components';
 import { useLocation } from 'react-router-dom';
 
@@ -36,7 +36,7 @@ const FilterButton: any = styled.button`
     }
 `;
 
-function FilterMenu() {
+function FilterMenu(): ReactElement {
   const dispatch = useAppDispatch();
   const location = useLocation();
 
@@ -58,7 +58,7 @@ function FilterMenu() {
   useEffect(() => {
     if (!displayMenuIsOpen) return;
 
-    const closeMenu = () => {
+    const closeMenu = (): void => {
       if (displayMenuIsOpen) setDisplayMenuIsOpen(false);
     };
 
@@ -69,7 +69,7 @@ function FilterMenu() {
   useEffect(() => {
     if (!sortMenuIsOpen) return;
 
-    const closeMenu = () => {
+    const closeMenu = (): void => {
       if (sortMenuIsOpen) setSortMenuIsOpen(false);
     };
 
@@ -87,7 +87,9 @@ function FilterMenu() {
               {displayType}
             </FilterText>
             <FilterButton showRotate={displayMenuIsOpen} onClick={() => setDisplayMenuIsOpen(!displayMenuIsOpen)} id="display-menu" aria-haspopup="true"><ChevronDownArrow /></FilterButton>
-            <Menu isOpen={displayMenuIsOpen} labelledby="display-menu" children={displayMenuItems} vOffset="2rem" />
+            <Menu isOpen={displayMenuIsOpen} labelledby="display-menu" vOffset="2rem">
+              {displayMenuItems}
+            </Menu>
           </FilterItem>
           <FilterItem>
             <FilterText>
@@ -95,7 +97,9 @@ function FilterMenu() {
               {sortType}
             </FilterText>
             <FilterButton showRotate={sortMenuIsOpen} onClick={() => setSortMenuIsOpen(!sortMenuIsOpen)} id="sort-order-menu" aria-haspopup="true"><ChevronDownArrow /></FilterButton>
-            <Menu isOpen={sortMenuIsOpen} labelledby="sort-order-menu" children={sortMenuItems} vOffset="2rem" />
+            <Menu isOpen={sortMenuIsOpen} labelledby="sort-order-menu" vOffset="2rem">
+              {sortMenuItems}
+            </Menu>
           </FilterItem>
         </>
       )}

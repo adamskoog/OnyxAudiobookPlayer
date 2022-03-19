@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
 
@@ -72,7 +72,7 @@ const AlbumCount = styled.div`
     margin-bottom: 0.5rem;
 `;
 
-function Artist() {
+function Artist(): ReactElement {
   const accessToken = useAppSelector((state) => state.settings.accessToken);
   const baseUrl = useAppSelector((state) => state.application.baseUrl);
 
@@ -81,10 +81,9 @@ function Artist() {
   const { ratingKey } = useParams();
 
   useEffect(() => {
-    const fetchMetadata = async () => {
+    const fetchMetadata = async (): Promise<void> => {
       if (accessToken && baseUrl && ratingKey) {
         const data = await getAlbumMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
-        console.log('artist metadata', data);
         setArtist(data.MediaContainer);
       }
     };
@@ -95,7 +94,6 @@ function Artist() {
     <>
       {accessToken && (
       <>
-
         <Container>
           <PlexImage width={200} height={200} url={artist.thumb} alt={`${artist.parentTitle}`} />
           <ArtistInfo>

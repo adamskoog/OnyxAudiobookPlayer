@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 
 import NextTrackSvg from '-!svg-react-loader!../../../assets/playerNextTrack.svg';
@@ -15,7 +15,7 @@ const PlayerSmallButton = styled.button`
     line-height: 2rem;
 `;
 
-const hasNextTrack = (queueIndex: number, queue: Array<Object>): boolean => {
+const hasNextTrack = (queueIndex: number, queue: Array<any>): boolean => {
   const newTrackIndex = queueIndex + 1;
   if (newTrackIndex < queue.length) {
     return true;
@@ -23,7 +23,7 @@ const hasNextTrack = (queueIndex: number, queue: Array<Object>): boolean => {
   return false;
 };
 
-function NexTrackControl() {
+function NexTrackControl(): ReactElement {
   const dispatch = useAppDispatch();
 
   const queueIndex = useAppSelector((state) => state.playQueue.index);

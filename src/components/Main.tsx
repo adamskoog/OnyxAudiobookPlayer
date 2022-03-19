@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, ReactElement } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../context/hooks';
@@ -28,7 +28,7 @@ const MainContainer = styled.main`
     overflow: auto;
 `;
 
-function Main() {
+function Main(): ReactElement {
   const dispatch = useAppDispatch();
 
   const user = useAppSelector((state) => state.application.user);
@@ -38,7 +38,7 @@ function Main() {
 
   const containerRef = useRef(null);
 
-  const doUserLogin = async () => {
+  const doUserLogin = async (): Promise<void> => {
     const response = await prepareLoginRequest();
     window.location.href = response.url;
   };

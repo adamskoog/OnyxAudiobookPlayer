@@ -16,6 +16,56 @@ export const loadSettingsValues = (): AppAction => {
   };
 };
 
+export const getLibraries = (): AppThunk => async (dispatch, getState) => {
+  const state = getState();
+
+  const { baseUrl } = state.application;
+  const resource = state.settings.currentServer;
+
+  if (baseUrl && resource) {
+    const libraries = await getPlexLibraries(baseUrl, resource.accessToken);
+    dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libraries });
+  }
+};
+
+export const setServerBaseUrl = (): AppThunk => async (dispatch, getState) => {
+  // Get the current state and retrieve the authToken.
+  const state = getState();
+  const server = state.settings.currentServer;
+
+  const baseUrl = await findServerBaseUrl(server);
+  dispatch({ type: actionTypes.SET_SERVER_URL, payload: baseUrl.uri });
+  dispatch(getLibraries());
+};
+
+const matchServer = (serverId: string, resources: Array<any>): any => {
+  for (let i = 0; i < resources.length; i++) {
+    if (serverId === resources[i].clientIdentifier) {
+      return resources[i];
+    }
+  }
+  return null;
+};
+
+export const setActiveServer = (): AppThunk => (dispatch, getState) => {
+  const state = getState();
+  const serverId = state.settings.serverIdentifier;
+  const resources = state.settings.servers;
+  if (!serverId) {
+    dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: { currentServer: null, accessToken: null } });
+    dispatch({ type: actionTypes.SET_SERVER_URL, payload: null });
+  } else {
+    const server = matchServer(serverId, resources);
+    if (server) {
+      dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: { currentServer: server, accessToken: server.accessToken } });
+      dispatch(setServerBaseUrl());
+    } else {
+      dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: { currentServer: null, accessToken: null } });
+      dispatch({ type: actionTypes.SET_SERVER_URL, payload: null });
+    }
+  }
+};
+
 export const setServerSetting = (serverId: string): AppThunk => async (dispatch, getState) => {
   // Update the config value on server setting change.
   SettingsUtils.saveSettingToStorage(SettingsUtils.SETTINGS_KEYS.serverId, serverId);
@@ -60,54 +110,4 @@ export const getServers = (): AppThunk => async (dispatch, getState) => {
   }
 
   // TODO: reset state to no server active???
-};
-
-const matchServer = (serverId: string, resources: Array<any>): any => {
-  for (let i = 0; i < resources.length; i++) {
-    if (serverId === resources[i].clientIdentifier) {
-      return resources[i];
-    }
-  }
-  return null;
-};
-
-export const setActiveServer = (): AppThunk => (dispatch, getState) => {
-  const state = getState();
-  const serverId = state.settings.serverIdentifier;
-  const resources = state.settings.servers;
-  if (!serverId) {
-    dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: { currentServer: null, accessToken: null } });
-    dispatch({ type: actionTypes.SET_SERVER_URL, payload: null });
-  } else {
-    const server = matchServer(serverId, resources);
-    if (server) {
-      dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: { currentServer: server, accessToken: server.accessToken } });
-      dispatch(setServerBaseUrl());
-    } else {
-      dispatch({ type: actionTypes.UPDATE_SELECTED_SERVER, payload: { currentServer: null, accessToken: null } });
-      dispatch({ type: actionTypes.SET_SERVER_URL, payload: null });
-    }
-  }
-};
-
-export const setServerBaseUrl = (): AppThunk => async (dispatch, getState) => {
-  // Get the current state and retrieve the authToken.
-  const state = getState();
-  const server = state.settings.currentServer;
-
-  const baseUrl = await findServerBaseUrl(server);
-  dispatch({ type: actionTypes.SET_SERVER_URL, payload: baseUrl.uri });
-  dispatch(getLibraries());
-};
-
-export const getLibraries = (): AppThunk => async (dispatch, getState) => {
-  const state = getState();
-
-  const { baseUrl } = state.application;
-  const resource = state.settings.currentServer;
-
-  if (baseUrl && resource) {
-    const libraries = await getPlexLibraries(baseUrl, resource.accessToken);
-    dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libraries });
-  }
 };

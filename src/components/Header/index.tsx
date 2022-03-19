@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 
 import { Link, useLocation } from 'react-router-dom';
@@ -184,13 +184,13 @@ type Props = {
 
 function Header({
   containerRef, userInfo, doUserLogin, doUserLogout,
-}: Props) {
+}: Props): ReactElement {
   const TITLE = 'Onyx Player';
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   const location = useLocation();
 
-  const navButtonCss = (active: string) => {
+  const navButtonCss = (active: string): void => {
     const elems = document.querySelectorAll('.nav-menu');
     elems.forEach((elem) => {
       if (elem.classList.contains(active)) {
@@ -201,7 +201,7 @@ function Header({
     });
   };
 
-  const menuCss = (isOpen: boolean) => {
+  const menuCss = (isOpen: boolean): void => {
     const main = containerRef.current;
     if (main) {
       main.classList.remove('menu-open');
@@ -211,7 +211,7 @@ function Header({
     }
   };
 
-  const closeMainMenu = () => {
+  const closeMainMenu = (): void => {
     if (menuIsOpen) setMenuIsOpen(false);
   };
 

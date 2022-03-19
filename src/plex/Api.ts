@@ -1,3 +1,5 @@
+import qs from 'qs';
+
 const PLEX_BASE_URL = 'https://plex.tv';
 const PLEX_RESOURCES_URL = '/api/v2/resources';
 const PLEX_USER_URL = '/api/v2/user';
@@ -22,8 +24,8 @@ const BASE_REQUEST: any = {
 const GET_REQUEST: any = { method: 'GET', ...BASE_REQUEST };
 const POST_REQUEST: any = { method: 'POST', ...BASE_REQUEST };
 
-export const formatUrl = (url: string, args: any) => {
-  const params = require('qs').stringify(args);
+export const formatUrl = (url: string, args: any): string => {
+  const params = qs.stringify(args);
   if (params && params !== '') return `${url}?${params}`;
   return url;
 };
@@ -51,20 +53,6 @@ export const getResources = async (token: string, resourceType?: any): Promise<a
   if (!resourceType) return resources; // return the unfilters resource reponse.
 
   return resources.filter((resource) => resource.provides === resourceType);
-};
-
-export const findServerBaseUrl = async (resource: any): Promise<any> => {
-  // TODO: refactor server connection test.
-  const url = await serverConnectionTest(resource.connections, resource.accessToken);
-  return url;
-};
-
-export const getLibraries = async (url: string, token: string): Promise<any> => {
-  const mediaContainer = await getSections(url, token);
-  const sections = mediaContainer.MediaContainer.Directory;
-
-  if (sections.length === 0) return [];
-  return sections.filter((section: any) => section.type === LIBRARYTYPES.music);
 };
 
 // https://forums.plex.tv/t/authenticating-with-plex/609370
@@ -112,10 +100,8 @@ export const signIn = async (): Promise<any> => {
 };
 
 export const validatePin = async (id: string): Promise<any> => {
-  const url = `https://plex.tv/api/v2/pins/${id}?${
-    require('qs').stringify({
-      'X-Plex-Client-Identifier': BASE_PARAMS['X-Plex-Client-Identifier'],
-    })}`;
+  const url = `https://plex.tv/api/v2/pins/${id}?
+      ${qs.stringify({ 'X-Plex-Client-Identifier': BASE_PARAMS['X-Plex-Client-Identifier'] })}`;
   const response = await fetch(url, GET_REQUEST);
   const data = await response.json();
   return data;
@@ -167,11 +153,17 @@ export const serverConnectionTest = (connections: any, token: string): Promise<a
     }
 
     if (preferredConnection) resolve({ uri: preferredConnection });
-    reject({ message: 'Failed to resolve connection to server.' });
+    reject({ message: 'Failed to resolve connection to server.', error: 'No server connection found.' });
   }).catch((error) => {
-    reject({ message: 'Failed to resolve connection to server.' });
+    reject({ message: 'Failed to resolve connection to server.', error });
   });
 });
+
+export const findServerBaseUrl = async (resource: any): Promise<any> => {
+  // TODO: refactor server connection test.
+  const url = await serverConnectionTest(resource.connections, resource.accessToken);
+  return url;
+};
 
 export const getSections = async (baseUrl: string, token: string): Promise<any> => {
   const params = { ...BASE_PARAMS, 'X-Plex-Token': token };
@@ -180,6 +172,14 @@ export const getSections = async (baseUrl: string, token: string): Promise<any> 
   const response = await fetch(url, GET_REQUEST);
   const data = await response.json();
   return data;
+};
+
+export const getLibraries = async (url: string, token: string): Promise<any> => {
+  const mediaContainer = await getSections(url, token);
+  const sections = mediaContainer.MediaContainer.Directory;
+
+  if (sections.length === 0) return [];
+  return sections.filter((section: any) => section.type === LIBRARYTYPES.music);
 };
 
 export const getSectionHubs = async (baseUrl: string, section: string, token: string): Promise<any> => {
@@ -228,9 +228,8 @@ export const createLibrarySortQuery = ({ order, display }): any => {
   else if (display === MUSIC_LIBRARY_DISPAY_TYPE.album.title) args.type = MUSIC_LIBRARY_DISPAY_TYPE.album.key;
   else args.type = MUSIC_LIBRARY_DISPAY_TYPE.artist.key;
 
-  if (!order)
+  if (!order) {
   // set a default order based on the album type.
-  {
     if (args.type === MUSIC_LIBRARY_DISPAY_TYPE.album.key) args.order = 'artist.titleSort,album.titleSort,album.index,album.id,album.originallyAvailableAt';
     else args.order = 'titleSort';
   } else {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 import { Transition } from '@headlessui/react';
 
@@ -33,7 +33,7 @@ type Props = {
 
 function Menu({
   labelledby, children, isOpen, vOffset,
-}: Props) {
+}: Props): ReactElement {
   return (
     <Transition
       show={isOpen}
@@ -45,12 +45,17 @@ function Menu({
       leaveTo="transform opacity-0 scale-95"
     >
       <MenuContainer role="menu" aria-orientation="vertical" aria-labelledby={labelledby} vOffset={vOffset}>
-        {(children.map((child) => (
+        {(children.map((child: any) => (
           <MenuItem key={child.title} {...child} />
         )))}
       </MenuContainer>
     </Transition>
   );
 }
+
+Menu.defaultProps = {
+  children: [],
+  vOffset: null,
+};
 
 export default Menu;

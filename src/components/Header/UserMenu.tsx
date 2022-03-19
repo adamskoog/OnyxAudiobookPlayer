@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 
 import Menu from '../Menu';
@@ -30,7 +30,7 @@ type Props = {
     doUserLogout: any
 }
 
-function SettingsMenu({ userInfo, doUserLogout }: Props) {
+function SettingsMenu({ userInfo, doUserLogout }: Props): ReactElement {
   const [isOpen, setIsOpen] = useState(false);
 
   const menuItems: Array<any> = [
@@ -41,7 +41,7 @@ function SettingsMenu({ userInfo, doUserLogout }: Props) {
   useEffect(() => {
     if (!isOpen) return;
 
-    const closeMenu = () => {
+    const closeMenu = (): void => {
       if (isOpen) setIsOpen(false);
     };
 
@@ -57,7 +57,9 @@ function SettingsMenu({ userInfo, doUserLogout }: Props) {
         <Avatar src={userInfo.thumb} alt="avatar" />
         )}
       </AvatarButton>
-      <Menu isOpen={isOpen} labelledby="user-menu" children={menuItems} />
+      <Menu isOpen={isOpen} labelledby="user-menu">
+        {menuItems}
+      </Menu>
     </Container>
   );
 }

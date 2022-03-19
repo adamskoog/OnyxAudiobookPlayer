@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../context/hooks';
@@ -28,7 +28,7 @@ type Props = {
 
 function PlexImage({
   height, width, url, alt, isLazy, hideRadius,
-}: Props) {
+}: Props): ReactElement {
   const [imageUrl, setImageUrl]: [any, any] = useState(null);
 
   const accessToken = useAppSelector((state) => state.settings.accessToken);
@@ -53,5 +53,10 @@ function PlexImage({
     </>
   );
 }
+
+PlexImage.defaultProps = {
+  isLazy: false,
+  hideRadius: false,
+};
 
 export default PlexImage;

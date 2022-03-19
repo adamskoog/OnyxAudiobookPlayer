@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../context/hooks';
 
-const isLoading = (loading: boolean, state: string) => {
+const showLoading = (loading: boolean, state: string): boolean => {
   // TODO: we should utilize the state to determine when
   // this is shown.
   if (loading) return true;
@@ -11,7 +11,7 @@ const isLoading = (loading: boolean, state: string) => {
 };
 
 const LoaderContainer: any = styled.div`
-    display: ${(props: any) => ((isLoading(props.isLoading, props.applicationState)) ? 'block' : 'none')};
+    display: ${(props: any) => ((showLoading(props.isLoading, props.applicationState)) ? 'block' : 'none')};
     z-index: 50;
     position: absolute;
     top: 0;
@@ -37,7 +37,7 @@ const Spinner = styled.div`
     }
 `;
 
-function Loader() {
+function Loader(): ReactElement {
   const isLoading = useAppSelector((state) => state.application.isLoading);
   const applicationState = useAppSelector((state) => state.application.applicationState);
 

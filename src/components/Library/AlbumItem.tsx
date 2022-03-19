@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 
 import { Link } from 'react-router-dom';
@@ -23,7 +23,7 @@ type Props = {
     metadata: any,
     showAuthor?: boolean
 }
-function AlbumItem({ metadata, showAuthor }: Props) {
+function AlbumItem({ metadata, showAuthor }: Props): ReactElement {
   return (
     <Link to={`/album/${metadata.ratingKey}`}>
       <Container>
@@ -38,5 +38,9 @@ function AlbumItem({ metadata, showAuthor }: Props) {
     </Link>
   );
 }
+
+AlbumItem.defaultProps = {
+  showAuthor: false,
+};
 
 export default AlbumItem;

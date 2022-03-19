@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 import PauseTrackSvg from '-!svg-react-loader!../../../assets/playerPause.svg';
 import PlayTrackSvg from '-!svg-react-loader!../../../assets/playerPlay.svg';
@@ -18,7 +18,7 @@ type Props = {
     pauseTrack: () => void
 }
 
-function PlayPauseControl({ playTrack, pauseTrack }: Props) {
+function PlayPauseControl({ playTrack, pauseTrack }: Props): ReactElement {
   const playState = useAppSelector((state) => state.player.mode);
 
   return (

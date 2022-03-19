@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {
+  useState, useEffect, useRef, ReactElement,
+} from 'react';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../context/hooks';
@@ -10,7 +12,7 @@ const ErrorMessage = styled.div`
     margin: 30px;
 `;
 
-function Home() {
+function Home(): ReactElement {
   const userInfo = useAppSelector((state) => state.application.user);
   const baseUrl = useAppSelector((state) => state.application.baseUrl);
   const section = useAppSelector((state) => state.settings.librarySection);
@@ -24,7 +26,7 @@ function Home() {
 
   useEffect(() => {
     if (baseUrl && section) {
-      const fetchLibraryItems = async () => {
+      const fetchLibraryItems = async (): Promise<void> => {
         if (!baseUrl || !section || !accessToken) return;
         const data = await getLibraryItems(baseUrl, section, {
           'X-Plex-Token': accessToken,
@@ -40,7 +42,7 @@ function Home() {
 
   useEffect(() => {
     if (baseUrl && section) {
-      const fetchLibraryItems = async () => {
+      const fetchLibraryItems = async (): Promise<void> => {
         const data = await getLibraryItems(baseUrl, section, {
           'X-Plex-Token': accessToken,
           'X-Plex-Container-Start': 0,
@@ -58,9 +60,7 @@ function Home() {
       {!userInfo && (
       <ErrorMessage>Must login to view library.</ErrorMessage>
       )}
-      {userInfo && (
-      <>
-        {accessToken && baseUrl && (
+      {userInfo && accessToken && baseUrl && (
         <>
           {recentlyAddedInfo.length > 0 && (
           <Hub title="Recently Added" items={recentlyAddedInfo} />
@@ -69,8 +69,6 @@ function Home() {
           <Hub title="Recently Played" items={recentlyPlayedInfo} />
           )}
         </>
-        )}
-      </>
       )}
     </>
   );

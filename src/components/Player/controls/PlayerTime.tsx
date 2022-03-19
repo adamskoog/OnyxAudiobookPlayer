@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 import { useAppSelector } from '../../../context/hooks';
 
@@ -8,12 +8,12 @@ const TimeDisplay = styled.div``;
 
 const defaultTimeDisplay = '--:--/--:--';
 
-const formatTime = (currentTime: any, duration: any) => {
+const formatTime = (currentTime: any, duration: any): string => {
   if (!currentTime && !duration) return defaultTimeDisplay;
   return formatPlayerDisplay(currentTime, duration);
 };
 
-function PlayerTime() {
+function PlayerTime(): ReactElement {
   const currentTime = useAppSelector((state) => state.player.currentTime);
   const duration = useAppSelector((state) => state.player.duration);
 

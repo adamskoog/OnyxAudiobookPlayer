@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 import { useAppSelector } from '../../../context/hooks';
 
@@ -9,7 +9,7 @@ const PlayerRangeInput = styled.input`
 
 // TODO: need to figure out where/when this might not be a number.
 const checkValid = (value: number | any): number => {
-  if (!value || isNaN(value)) return 0;
+  if (!value || Number.isNaN(value)) return 0;
   return value;
 };
 
@@ -17,7 +17,7 @@ type Props = {
     playerRangeChanged: (evt: any) => void
 }
 
-function PlayerRangeControl({ playerRangeChanged }: Props) {
+function PlayerRangeControl({ playerRangeChanged }: Props): ReactElement {
   const currentTime = useAppSelector((state) => state.player.currentTime);
   const duration = useAppSelector((state) => state.player.duration);
 

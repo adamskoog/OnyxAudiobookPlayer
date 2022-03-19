@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { Switch as HeadlessSwitch, Combobox as HeadlessCombobox } from '@headlessui/react';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import ComboboxArrowSvg from '-!svg-react-loader!../../assets/comboboxArrow.svg';
 import ComboboxCheckSvg from '-!svg-react-loader!../../assets/comboboxCheck.svg';
@@ -45,7 +45,7 @@ type ToggleProps = {
 
 export function ToggleSwitch({
   label, srLabel, value, callback,
-}: ToggleProps) {
+}: ToggleProps): ReactElement {
   return (
     <FormControlContainer>
       <SwitchLabel>{label}</SwitchLabel>
@@ -56,6 +56,11 @@ export function ToggleSwitch({
     </FormControlContainer>
   );
 }
+
+ToggleSwitch.defaultProps = {
+  srLabel: '',
+  callback: null,
+};
 
 const ComboboxOuter = styled.div`
     position: relative;
@@ -159,7 +164,7 @@ type ComboboxProps = {
 
 export function Combobox({
   value, options, callback, defaultLabel, noOptionsLabel,
-}: ComboboxProps) {
+}: ComboboxProps): ReactElement {
   // Match our selected value from the options.
   const selectedValue = options.filter((item) => item.value === value);
 
@@ -180,12 +185,12 @@ export function Combobox({
               options.map((option: any) => (
                 <ComboboxOption key={option.value} value={option}>
                   {({ selected }: any) => (
-                      <>
-                          {selected && <ComboboxCheckStyled />}
-                          {!selected && <ComboboxUnchecked />}
-                          <span>{option.displayValue}</span>
-                        </>
-                    )}
+                    <>
+                      {selected && <ComboboxCheckStyled />}
+                      {!selected && <ComboboxUnchecked />}
+                      <span>{option.displayValue}</span>
+                    </>
+                  )}
                 </ComboboxOption>
               )))}
           </ComboboxOptions>
@@ -194,3 +199,9 @@ export function Combobox({
     </FormControlContainer>
   );
 }
+
+Combobox.defaultProps = {
+  defaultLabel: '',
+  noOptionsLabel: '',
+  callback: null,
+};

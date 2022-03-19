@@ -1,4 +1,6 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, {
+  useRef, useEffect, useState, ReactElement,
+} from 'react';
 import styled from 'styled-components';
 
 import LibraryItem from '../Library/AlbumItem';
@@ -55,7 +57,7 @@ type Props = {
 }
 
 // Horizontal scrolling based on: https://webdevtrick.com/horizontal-scroll-navigation/
-function Hub({ title, items }: Props) {
+function Hub({ title, items }: Props): ReactElement {
   const [leftScrollDisabled, setLeftScrollDisabled] = useState(true);
   const [rightScrollDisabled, setRightScrollDisabled] = useState(true);
 
@@ -66,7 +68,7 @@ function Hub({ title, items }: Props) {
   const isTravelingRef = useRef(false);
   const directionRef = useRef('');
 
-  const determineOverflow = (container, content) => {
+  const determineOverflow = (container: any, content: any): string => {
     const containerMetrics = container.getBoundingClientRect();
     const containerMetricsRight = Math.floor(containerMetrics.right);
     const containerMetricsLeft = Math.floor(containerMetrics.left);
@@ -83,7 +85,7 @@ function Hub({ title, items }: Props) {
     return 'none';
   };
 
-  const checkOverflow = () => {
+  const checkOverflow = (): void => {
     const overflow = determineOverflow(containerRef.current, contentRef.current);
 
     setLeftScrollDisabled(!((overflow === 'both' || overflow === 'left')));
@@ -91,7 +93,7 @@ function Hub({ title, items }: Props) {
     containerRef.current.setAttribute('data-overflowing', overflow);
   };
 
-  const advanceRight = () => {
+  const advanceRight = (): void => {
     // If in the middle of a move return
     if (isTravelingRef.current === true) return;
     // If we have content overflowing both sides or on the right
@@ -120,7 +122,7 @@ function Hub({ title, items }: Props) {
     containerRef.current.setAttribute('data-overflowing', determineOverflow(containerRef.current, contentRef.current));
   };
 
-  const advanceLeft = () => {
+  const advanceLeft = (): void => {
     if (isTravelingRef.current === true) return;
     // If we have content overflowing both sides or on the left
     if (determineOverflow(containerRef.current, contentRef.current) === 'left' || determineOverflow(containerRef.current, contentRef.current) === 'both') {
@@ -144,7 +146,7 @@ function Hub({ title, items }: Props) {
     containerRef.current.setAttribute('data-overflowing', determineOverflow(containerRef.current, contentRef.current));
   };
 
-  const navTransition = () => {
+  const navTransition = (): void => {
     // get the value of the transform, apply that to the current scroll position (so get the scroll pos first) and then remove the transform
     const styleOfTransform = window.getComputedStyle(contentRef.current, null);
     const tr = styleOfTransform.getPropertyValue('-webkit-transform') || styleOfTransform.getPropertyValue('transform');
@@ -154,14 +156,14 @@ function Hub({ title, items }: Props) {
     contentRef.current.classList.add('hub-no-transition');
     // Now lets set the scroll position
     if (directionRef.current === 'left') {
-      containerRef.current.scrollLeft = containerRef.current.scrollLeft - amount;
+      containerRef.current.scrollLeft -= amount;
     } else {
-      containerRef.current.scrollLeft = containerRef.current.scrollLeft + amount;
+      containerRef.current.scrollLeft += amount;
     }
     isTravelingRef.current = false;
   };
 
-  const scroller = () => {
+  const scroller = (): void => {
     if (!isTickingRef.current) {
       window.requestAnimationFrame(() => {
         checkOverflow();

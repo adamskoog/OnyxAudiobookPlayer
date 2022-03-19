@@ -127,44 +127,44 @@ function Album(): ReactElement {
 
   // https://tailwindcomponents.com/component/button-component-default
   return (
-    <>
+    <Container>
       {accessToken && (
-      <Container>
-        <AlbumContainer>
-          <PlexImage width={200} height={200} url={album.thumb} alt={`${album.parentTitle} Cover`} />
-          <AlbumInfo>
-            <AlbumTitle>{album.parentTitle}</AlbumTitle>
-            <Link to={`/artist/${album.grandparentRatingKey}`}>
-              <AlbumAuthor>{album.grandparentTitle}</AlbumAuthor>
-            </Link>
-            <AlbumYear>{album.parentYear}</AlbumYear>
-            {onDeck && (
-            <OnDeck>
-              <OnDeckButton onClick={() => playOnDeckTrack(onDeck)}>
-                <OnDeckPlaySvg />
-              </OnDeckButton>
-              {onDeck.title}
-            </OnDeck>
-            )}
-          </AlbumInfo>
-        </AlbumContainer>
-        <AlbumSummary summary={album.summary} />
-        <TrackContainer>
-          <TrackCount>
-            {album.size}
-            {' '}
-            Track
-            {(album.size > 1) ? 's' : ''}
-          </TrackCount>
-          <Tracks>
-            {album.Metadata.map((track: any) => (
-              <AlbumItem key={track.key} trackInfo={track} playSelectedTrack={playSelectedTrack} updateAlbumInfo={fetchAlbumMetadata} />
-            ))}
-          </Tracks>
-        </TrackContainer>
-      </Container>
+        <>
+          <AlbumContainer>
+            <PlexImage width={200} height={200} url={album.thumb} alt={`${album.parentTitle} Cover`} />
+            <AlbumInfo>
+              <AlbumTitle>{album.parentTitle}</AlbumTitle>
+              <Link to={`/artist/${album.grandparentRatingKey}`}>
+                <AlbumAuthor>{album.grandparentTitle}</AlbumAuthor>
+              </Link>
+              <AlbumYear>{album.parentYear}</AlbumYear>
+              {onDeck && (
+              <OnDeck>
+                <OnDeckButton onClick={() => playOnDeckTrack(onDeck)}>
+                  <OnDeckPlaySvg />
+                </OnDeckButton>
+                {onDeck.title}
+              </OnDeck>
+              )}
+            </AlbumInfo>
+          </AlbumContainer>
+          <AlbumSummary summary={album.summary} />
+          <TrackContainer>
+            <TrackCount>
+              {album.size}
+              {' '}
+              Track
+              {(album.size > 1) ? 's' : ''}
+            </TrackCount>
+            <Tracks>
+              {album.Metadata.map((track: any) => (
+                <AlbumItem key={track.key} trackInfo={track} playSelectedTrack={playSelectedTrack} updateAlbumInfo={fetchAlbumMetadata} />
+              ))}
+            </Tracks>
+          </TrackContainer>
+        </>
       )}
-    </>
+    </Container>
   );
 }
 

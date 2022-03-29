@@ -242,6 +242,10 @@ export const createLibrarySortQuery = ({ order, display }): any => {
   return args;
 };
 
+type PlexLibraryItem = {
+
+};
+
 export const getLibraryItems = async (baseUrl: string, section: string, args: any, sortArgs?: any): Promise<any> => {
   if (!sortArgs) {
     sortArgs = createLibrarySortQuery({ order: null, display: null });
@@ -259,18 +263,36 @@ export const getLibraryItems = async (baseUrl: string, section: string, args: an
   const url = formatUrl(`${baseUrl}/library/sections/${section}/all`, params);
 
   const response = await fetch(url, GET_REQUEST);
+
+  ///if (sortArgs.type === MUSIC_LIBRARY_DISPAY_TYPE.artist.key) {
+    //const data: PlexArtistMediaContainer = await response.json();
+    //console.log("getArtistLibraryItems", data.MediaContainer);
+    //return data.MediaContainer;
+  //}
+  ///const data: PlexAlbumMediaContainer = await response.json();
+  //console.log("getAlbumLibraryItems", data.MediaContainer);
   const data = await response.json();
-  return data;
+  return data.MediaContainer;
 };
 
-export const getAlbumMetadata = async (baseUrl: string, itemId: string, args: any): Promise<ArtistMediaContainer> => {
+export const getAlbumMetadata = async (baseUrl: string, itemId: string, args: any): Promise<PlexAlbumMetadata> => {
   const localParams = { };
   const params = { ...BASE_PARAMS, ...localParams, ...args };
   const url = formatUrl(`${baseUrl}/library/metadata/${itemId}/children`, params);
 
   const response = await fetch(url, GET_REQUEST);
-  const data = await response.json();
-  return data;
+  const data: PlexAlbumMediaContainer = await response.json();
+  return data.MediaContainer;
+};
+
+export const getArtistMetadata = async (baseUrl: string, itemId: string, args: any): Promise<PlexArtistMetadata> => {
+  const localParams = { };
+  const params = { ...BASE_PARAMS, ...localParams, ...args };
+  const url = formatUrl(`${baseUrl}/library/metadata/${itemId}/children`, params);
+
+  const response = await fetch(url, GET_REQUEST);
+  const data: PlexArtistMediaContainer = await response.json();
+  return data.MediaContainer;
 };
 
 export const scrobble = async (baseUrl: string, key: string, token: string): Promise<void> => {
@@ -335,63 +357,65 @@ export const updateTimeline = async (baseUrl: string, args: any): Promise<any> =
   return data;
 };
 
-export declare type ArtistMediaContainer = {
-    MediaContainer: ArtistMetadata
-}
-export declare type AlbumMediaContainer = {
-    MediaContainer: AlbumMetadata
-}
+declare global {
+  type PlexArtistMediaContainer = {
+      MediaContainer: PlexArtistMetadata
+  }
+  type PlexAlbumMediaContainer = {
+      MediaContainer: PlexAlbumMetadata
+  }
 
-// Artist?? Is this the same as others???
-export declare type ArtistMetadata = {
-    Metadata: Array<AlbumMetadata>,
-    allowSync: boolean,
-    art: string,
-    key: string,
-    librarySectionID: number,
-    librarySectionTitle: string,
-    librarySectionUUID: string,
-    mediaTagPrefix: string,
-    mediaTagVersion: number,
-    nocache: boolean,
-    parentIndex: number,
-    parentTitle: string,
-    size: number,
-    summary: string,
-    thumb: string,
-    title1: string,
-    title2: string,
-    viewGroup: string,
-    viewMode: number
-};
+  // Artist?? Is this the same as others???
+  type PlexArtistMetadata = {
+      Metadata: Array<PlexAlbumMetadata>,
+      allowSync: boolean,
+      art: string,
+      key: string,
+      librarySectionID: number,
+      librarySectionTitle: string,
+      librarySectionUUID: string,
+      mediaTagPrefix: string,
+      mediaTagVersion: number,
+      nocache: boolean,
+      parentIndex: number,
+      parentTitle: string,
+      size: number,
+      summary: string,
+      thumb: string,
+      title1: string,
+      title2: string,
+      viewGroup: string,
+      viewMode: number
+  };
 
-/// This comes from under Artist, same as media container on album view??
-export declare type AlbumMetadata = {
-    addedAt: number,
-    guid: string,
-    index: number,
-    key: string,
-    lastViewedAt: number,
-    loudnessAnalysisVersion: string,
-    originallyAvailableAt: string,
-    parentGuid: string,
-    parentRatingKey: string,
-    parentThumb: string,
-    parentTitle: string,
-    ratingKey: string,
-    skipCount: number,
-    studio: string,
-    summary: string,
-    thumb: string,
-    title: string,
-    titleSort: string,
-    type: string,
-    updatedAt: number,
-    viewCount: number,
-    year: number,
-    Collection: Array<Tag>
-};
+  /// This comes from under Artist, same as media container on album view??
+  type PlexAlbumMetadata = {
+      addedAt: number,
+      guid: string,
+      index: number,
+      key: string,
+      lastViewedAt: number,
+      loudnessAnalysisVersion: string,
+      originallyAvailableAt: string,
+      parentGuid: string,
+      parentRatingKey: string,
+      parentThumb: string,
+      parentTitle: string,
+      ratingKey: string,
+      skipCount: number,
+      studio: string,
+      summary: string,
+      thumb: string,
+      title: string,
+      titleSort: string,
+      type: string,
+      updatedAt: number,
+      viewCount: number,
+      year: number,
+      Collection: Array<PlexTag>
+  };
 
-export declare type Tag = {
-    tag: string
+  type PlexTag = {
+      tag: string
+  }
 }

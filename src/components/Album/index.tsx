@@ -98,14 +98,12 @@ function Album(): ReactElement {
 
   const fetchAlbumMetadata = async (): Promise<any> => {
     if (baseUrl && accessToken && ratingKey) {
-      const data: any = await getAlbumMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
-      if (data.MediaContainer) {
-        const newOnDeck: any = findOnDeck(data.MediaContainer);
-        setAlbum(data.MediaContainer);
+      const data: PlexAlbumMetadata = await getAlbumMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
+        const newOnDeck: any = findOnDeck(data);
+        setAlbum(data);
         setOnDeck(newOnDeck);
 
-        return { album: data.MediaContainer, track: newOnDeck };
-      }
+        return { album: data, track: newOnDeck };
     }
     return null;
   };

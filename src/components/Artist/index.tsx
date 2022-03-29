@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
 
 import { useAppSelector } from '../../context/hooks';
-import { getAlbumMetadata } from '../../plex/Api';
+import { getArtistMetadata } from '../../plex/Api';
 
 import AlbumItem from '../Library/AlbumItem';
 import AlbumSummary from '../Album/AlbumSummary';
@@ -83,8 +83,8 @@ function Artist(): ReactElement {
   useEffect(() => {
     const fetchMetadata = async (): Promise<void> => {
       if (accessToken && baseUrl && ratingKey) {
-        const data = await getAlbumMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
-        setArtist(data.MediaContainer);
+        const data = await getArtistMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
+        setArtist(data);
       }
     };
     fetchMetadata();

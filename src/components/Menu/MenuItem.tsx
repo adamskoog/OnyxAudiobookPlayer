@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
+import Link from 'next/link';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 
 const sharedCss = (theme: any): string => `
         color: ${theme.CONTEXT_MENU_TEXT};
@@ -33,7 +33,7 @@ function MenuItem({ linkTo, callback, title }: Props): ReactElement {
   if (callback) {
     return (<MenuItemButton role="menuitem" onClick={callback}>{title}</MenuItemButton>);
   }
-  return (<MenuItemLink role="menuitem" to={linkTo}>{title}</MenuItemLink>);
+  return (<MenuItemLink href={linkTo}>{title}</MenuItemLink>);
 }
 
 MenuItem.defaultProps = {

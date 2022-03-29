@@ -1,7 +1,6 @@
 import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 
-import { Link } from 'react-router-dom';
 import PlexImage from '../util/PlexImage';
 
 const Container = styled.div`
@@ -25,7 +24,7 @@ type Props = {
 }
 function AlbumItem({ metadata, showAuthor }: Props): ReactElement {
   return (
-    <Link to={`/album/${metadata.ratingKey}`}>
+    // <Link to={`/album/${metadata.ratingKey}`}>
       <Container>
         <AlbumCoverContainer>
           <PlexImage width={200} height={200} url={metadata.thumb} alt={`${metadata.title}`} isLazy />
@@ -35,7 +34,7 @@ function AlbumItem({ metadata, showAuthor }: Props): ReactElement {
         <ArtistText title={metadata.parentTitle}>{metadata.parentTitle}</ArtistText>
         )}
       </Container>
-    </Link>
+    // </Link>
   );
 }
 

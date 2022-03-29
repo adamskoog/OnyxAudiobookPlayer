@@ -1,6 +1,5 @@
 import React, { useEffect, useState, ReactElement } from 'react';
 import styled from 'styled-components';
-import { useLocation } from 'react-router-dom';
 
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
 
@@ -38,8 +37,8 @@ const FilterButton: any = styled.button`
 
 function FilterMenu(): ReactElement {
   const dispatch = useAppDispatch();
-  const location = useLocation();
-
+  // const location = useLocation();
+  const location = null;
   const displayType = useAppSelector((state) => state.library.displayType);
   const sortType = useAppSelector((state) => state.library.sortType);
 
@@ -79,7 +78,7 @@ function FilterMenu(): ReactElement {
 
   return (
     <Subheader>
-      {location.pathname === '/library' && (
+      {'location.pathname' === '/library' && (
         <>
           <FilterItem>
             <FilterText>

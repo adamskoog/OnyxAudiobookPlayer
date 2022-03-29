@@ -100,8 +100,7 @@ export const signIn = async (): Promise<any> => {
 };
 
 export const validatePin = async (id: string): Promise<any> => {
-  const url = `https://plex.tv/api/v2/pins/${id}?
-      ${qs.stringify({ 'X-Plex-Client-Identifier': BASE_PARAMS['X-Plex-Client-Identifier'] })}`;
+  const url = `https://plex.tv/api/v2/pins/${id}?${qs.stringify({ 'X-Plex-Client-Identifier': BASE_PARAMS['X-Plex-Client-Identifier'] })}`;
   const response = await fetch(url, GET_REQUEST);
   const data = await response.json();
   return data;

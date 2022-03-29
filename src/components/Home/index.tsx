@@ -34,7 +34,7 @@ function Home(): ReactElement {
           'X-Plex-Container-Size': 10,
           sort: 'addedAt:desc',
         });
-        if (data.MediaContainer.Metadata && isMountedRef.current) setRecentlyAddedInfo(data.MediaContainer.Metadata);
+        if (data.Metadata && isMountedRef.current) setRecentlyAddedInfo(data.Metadata);
       };
       fetchLibraryItems();
     } else setRecentlyAddedInfo([]);
@@ -49,7 +49,7 @@ function Home(): ReactElement {
           'X-Plex-Container-Size': 10,
           sort: 'lastViewedAt:desc',
         });
-        if (data.MediaContainer.Metadata && isMountedRef.current) setRecentlyPlayedInfo(data.MediaContainer.Metadata);
+        if (data.Metadata && isMountedRef.current) setRecentlyPlayedInfo(data.Metadata);
       };
       fetchLibraryItems();
     } else setRecentlyPlayedInfo([]);

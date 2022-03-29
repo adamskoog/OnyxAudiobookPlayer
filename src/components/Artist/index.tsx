@@ -1,6 +1,5 @@
 import React, { useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
-import { useParams } from 'react-router-dom';
 
 import { useAppSelector } from '../../context/hooks';
 import { getArtistMetadata } from '../../plex/Api';
@@ -78,8 +77,8 @@ function Artist(): ReactElement {
 
   const [artist, setArtist]: [any, any] = useState({ Metadata: [] });
 
-  const { ratingKey } = useParams();
-
+  // const { ratingKey } = useParams();
+  const ratingKey = null;
   useEffect(() => {
     const fetchMetadata = async (): Promise<void> => {
       if (accessToken && baseUrl && ratingKey) {

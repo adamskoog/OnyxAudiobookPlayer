@@ -25,6 +25,6 @@ export const fetchLibraryItems = (): AppThunk => async (dispatch, getState) => {
 
   if (baseUrl && section && resource) {
     const data = await getLibraryItems(baseUrl, section, { 'X-Plex-Token': resource.accessToken }, createLibrarySortQuery({ display: displayType, order: sortType }));
-    if (data.MediaContainer.Metadata) dispatch({ type: actionTypes.SET_LIBRARY_ITEMS, payload: data.MediaContainer.Metadata });
+    if (data.Metadata) dispatch({ type: actionTypes.SET_LIBRARY_ITEMS, payload: data.Metadata });
   }
 };

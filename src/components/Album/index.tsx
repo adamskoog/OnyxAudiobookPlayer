@@ -1,6 +1,5 @@
 import React, { useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
-import { Link, useParams } from 'react-router-dom';
 
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
 import { setPlayQueue } from '../../context/actions/playQueueActions';
@@ -90,7 +89,8 @@ function Album(): ReactElement {
   const [album, setAlbum]: [any, any] = useState({ Metadata: [] });
   const [onDeck, setOnDeck]: [any, any] = useState(null);
 
-  const { ratingKey } = useParams();
+  // const { ratingKey } = useParams();
+  const ratingKey = null;
 
   const playOnDeckTrack = (trackInfo: any): void => {
     dispatch(setPlayQueue(getAlbumQueue(trackInfo, album)));
@@ -132,9 +132,9 @@ function Album(): ReactElement {
             <PlexImage width={200} height={200} url={album.thumb} alt={`${album.parentTitle} Cover`} />
             <AlbumInfo>
               <AlbumTitle>{album.parentTitle}</AlbumTitle>
-              <Link to={`/artist/${album.grandparentRatingKey}`}>
+              {/* <Link to={`/artist/${album.grandparentRatingKey}`}>
                 <AlbumAuthor>{album.grandparentTitle}</AlbumAuthor>
-              </Link>
+              </Link> */}
               <AlbumYear>{album.parentYear}</AlbumYear>
               {onDeck && (
               <OnDeck>

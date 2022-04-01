@@ -10,6 +10,7 @@ import Layout from '../components/Layout';
 import { Provider } from 'react-redux';
 import store from '../context/reducers';
 
+import { PlexTvApi } from '../plex/Api';
 import { getToken, checkToken, checkAuthId } from '../context/actions/appStateActions';
 import { getServers } from '../context/actions/settingsActions';
 
@@ -29,6 +30,8 @@ function Authentication() {
     const applicationState = useAppSelector((state) => state.application.applicationState);
 
     useEffect(() => {
+      PlexTvApi.initialize();
+      
       if (!user) {
         // We have no user logged in, check for tokens.
         dispatch(getToken());

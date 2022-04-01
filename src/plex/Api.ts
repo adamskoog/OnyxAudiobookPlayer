@@ -1,5 +1,237 @@
+import axios, { AxiosInstance } from 'axios';
 import qs from 'qs';
 
+
+export const RESOURCETYPES = {
+  server: 'server',
+};
+
+export const LIBRARYTYPES = {
+  music: 'artist',
+};
+
+// Placeholder types
+type UserInfo = any;
+type Resource = any;
+
+export const formatUrl = (url: string, args: any): string => {
+  const params = qs.stringify(args);
+  if (params && params !== '') return `${url}?${params}`;
+  return url;
+};
+
+export class PlexTvApi {
+
+    private static client: AxiosInstance;
+
+    private static PLEX_BASE_URL: string = 'https://plex.tv';
+    private static PLEX_RESOURCES_URL: string = '/api/v2/resources';
+    private static PLEX_USER_URL = '/api/v2/user';
+    private static PLEX_PINS_URL = '/api/v2/pins';
+
+    private static isInitialized: boolean = false;
+    private static requestTokenParam: Object = {
+      'X-Plex-Token': null
+    };
+    private static requestBaseParams: Object = {
+        'X-Plex-Device-Name': 'Onyx',
+        'X-Plex-Product': 'Onyx Audiobook Player',
+        'X-Plex-Version': '0.9.1',
+        'X-Plex-Client-Identifier': null,
+        'X-Plex-Platform': 'Chrome', // fill in with found browser....
+        'X-Plex-Device': 'Windows'
+    };
+
+    get baseParams() {
+        return PlexTvApi.requestBaseParams;
+    }
+
+    private static setupBaseParams(): void {
+        // We need to auto generate a guid to pass to the server
+        // when this value doesn't exist
+        this.requestBaseParams['X-Plex-Client-Identifier'] = '616647cf-a68b-4474-8b4f-3ad72ed95cf9';
+    };
+
+    static initialize(clientIdentifier?: string): void {
+
+        if (this.isInitialized) return;
+
+        // We we don't have a client identifier set, we'll need to
+        // authenticate - we will not have a token either.
+        if (!clientIdentifier) this.setupBaseParams();
+
+        // Create a client for plex.tv requests
+        this.client = axios.create({
+            baseURL: this.PLEX_BASE_URL,
+            headers: {
+              'Accept': 'application/json',
+              'Content-type': 'application/json'
+            }
+        });
+
+        this.isInitialized = true;
+    };
+
+    /**
+     * Check the auth token to make sure it is still valid for use.
+     * @param token string - the auth token to validate.
+     * @returns Promise<UserInfo> - a promise for the plex.tv user information.
+     */
+    static validateToken = async (token: string): Promise<UserInfo> => {
+      
+        // Update our currently stored token with the value passed.
+        // this.plexToken = token;
+        this.requestTokenParam['X-Plex-Token'] = token;
+
+        try {
+          const response = await this.client.get(this.PLEX_USER_URL, {
+            params: {
+                ...this.requestBaseParams,
+                ...this.requestTokenParam
+            }
+          });
+          const data = response.data;
+          if (data.errors) {
+            return { message: data.errors[0].message };
+          }
+          // Return the user information
+          return data as UserInfo;
+        } catch {
+          this.requestTokenParam['X-Plex-Token'] = null;
+          return { message: 'Unexpected error occurred.' };
+        }
+    };
+
+    static signIn = async (): Promise<any> => {
+        const response = await this.client.post(this.PLEX_PINS_URL, {
+          data: {
+              strong: true,
+              ...this.requestBaseParams,
+              ...this.requestTokenParam
+          }
+        });
+
+        // TODO: where should formatUrl live?
+        const data = response.data;
+        const authAppUrl = formatUrl(`${PLEX_BASE_URL}/auth#`, {
+            clientID: BASE_PARAMS['X-Plex-Client-Identifier'],
+            code: data.code,
+            forwardUrl: window.location.href,
+            context: {
+                device: {
+                    product: BASE_PARAMS['X-Plex-Product'],
+                },
+            },
+        });
+    
+        return { id: data.id, redirectUrl: authAppUrl };
+    };
+
+    static validatePin = async (id: string): Promise<any> => {
+      const url = `${PLEX_BASE_URL}${PLEX_PINS_URL}/${id}?${qs.stringify({ 'X-Plex-Client-Identifier': BASE_PARAMS['X-Plex-Client-Identifier'] })}`;
+      const response = await axios.get(url);
+      return response.data;
+    };
+
+    /**
+     * Get the resources based on the authenticated user.
+     * @param resourceType string - a specific resource to be retrieved.
+     * @returns Array<Resource> - an array of the resources that match the request.
+     */
+    static getResources = async (resourceType?: string): Promise<Array<Resource>> => {
+        const response = await this.client.get(this.PLEX_RESOURCES_URL, {
+            params: {
+                includeHttps: 1,
+                includeRelay: 1,
+                ...this.requestBaseParams,
+                ...this.requestTokenParam
+            }
+        });
+        const resources: Array<Resource> = response.data;
+        if (!resourceType) return resources; // return the unfilters resource reponse.   
+        return resources.filter((resource: Resource) => resource.provides === resourceType);
+    };
+};
+
+export class PlexServerApi {
+    // private static plexToken: string | null = null;
+    // private static clientIdentifier: string | null = null;
+    // private static requestBaseParams: Object = {
+    //   'X-Plex-Device-Name': 'Onyx',
+    //   'X-Plex-Product': 'Onyx Audiobook Player',
+    //   'X-Plex-Version': '0.9.1',
+    //   'X-Plex-Client-Identifier': null,
+    //   'X-Plex-Platform': 'Chrome', // fill in with found browser....
+    //   'X-Plex-Device': 'Windows',
+    //   'X-Plex-Token': null
+    // };
+
+    private static client: AxiosInstance;
+    
+    static initialize = async (resource: any): Promise<void> => {
+
+        // This class is initialized by a server being selected.
+        // This can happen on load or from the Settings page.
+        const baseUrl = await this.determineBaseUrl(resource);
+
+        this.client = axios.create({
+          baseURL: baseUrl,
+          headers: {
+            'Accept': 'application/json',
+            'Content-type': 'application/json'
+          }
+        });
+
+    };
+
+    private static determineBaseUrl = async (resource: any): Promise<string> => {
+        // TODO: refactor server connection test.
+        const url = await this.serverConnectionTest(resource.connections, resource.accessToken);
+        return url;
+    };
+
+    /**
+     * Run connection tests for a server to determine the best connection to use.
+     * @param {array[uri]} connections - An array of the server connections to be tested.
+     * @param {string} token
+     */
+    private static serverConnectionTest = (connections: any, token: string): Promise<any> => new Promise((resolve, reject) => {
+      const params = { ...BASE_PARAMS, 'X-Plex-Token': token };
+
+      const connectionPromises = connections.map((connection) => {
+        // Use different timeout lengths for local vs remote servers.
+        const timeout = (connection.local) ? 1000 : 5000;
+
+        // Identity endpoint is very small, used by other projects.
+        return fetchWithTimeout(formatUrl(`${connection.uri}/identity`, params), {
+          timeout,
+        });
+      });
+
+      Promise.allSettled(connectionPromises).then((values: any) => {
+        let preferredConnection = null;
+        for (let i = 0; i < connections.length; i++) {
+          for (let j = 0; j < values.length; j++) {
+            if (values[i].status === 'fulfilled' && values[i].value.url.includes(connections[j].uri)) {
+              preferredConnection = connections[j].uri;
+              break;
+            }
+          }
+          if (preferredConnection) break;
+        }
+
+        if (preferredConnection) resolve({ uri: preferredConnection });
+        reject({ message: 'Failed to resolve connection to server.', error: 'No server connection found.' });
+      }).catch((error) => {
+        reject({ message: 'Failed to resolve connection to server.', error });
+      });
+    });
+};
+
+
+
+
+/// ****************   Old API   *********************
 const PLEX_BASE_URL = 'https://plex.tv';
 const PLEX_RESOURCES_URL = '/api/v2/resources';
 const PLEX_USER_URL = '/api/v2/user';
@@ -23,20 +255,6 @@ const BASE_REQUEST: any = {
 };
 const GET_REQUEST: any = { method: 'GET', ...BASE_REQUEST };
 const POST_REQUEST: any = { method: 'POST', ...BASE_REQUEST };
-
-export const formatUrl = (url: string, args: any): string => {
-  const params = qs.stringify(args);
-  if (params && params !== '') return `${url}?${params}`;
-  return url;
-};
-
-export const RESOURCETYPES = {
-  server: 'server',
-};
-
-export const LIBRARYTYPES = {
-  music: 'artist',
-};
 
 export const getResources = async (token: string, resourceType?: any): Promise<any> => {
   const localParams = {

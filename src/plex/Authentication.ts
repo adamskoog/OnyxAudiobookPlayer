@@ -1,4 +1,4 @@
-import { checkToken, signIn, validatePin } from './Api';
+import { PlexTvApi } from './Api';
 import {
   SETTINGS_KEYS, loadSettingFromStorage, saveSettingToStorage, removeSettingFromStorage,
 } from '../utility/settings';
@@ -20,7 +20,7 @@ export const logout = (): void => {
 // Main.js -> processLogin
 // Action = CHECK_TOKEN
 export const validateToken = async (token: string): Promise<any> => {
-  const userInfo = await checkToken(token);
+  const userInfo = await PlexTvApi.validateToken(token);
 
   if (userInfo.message) {
     logout();
@@ -36,7 +36,7 @@ export const getAuthenticationId = (): string | null => {
 };
 
 export const prepareLoginRequest = async (): Promise<any> => {
-  const redirectInfo = await signIn();
+  const redirectInfo = await PlexTvApi.signIn();
 
   saveSettingToStorage(SETTINGS_KEYS.loginRedirectId, redirectInfo.id);
 
@@ -44,7 +44,7 @@ export const prepareLoginRequest = async (): Promise<any> => {
 };
 
 export const validateAuthId = async (authId: string): Promise<any> => {
-  const regInfo = await validatePin(authId);
+  const regInfo = await PlexTvApi.validatePin(authId);
 
   removeSettingFromStorage(SETTINGS_KEYS.loginRedirectId);
   saveSettingToStorage(SETTINGS_KEYS.token, regInfo.authToken);

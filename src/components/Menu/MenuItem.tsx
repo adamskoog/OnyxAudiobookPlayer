@@ -18,8 +18,9 @@ const MenuItemButton = styled.button`
     text-align: left;
     ${({ theme }) => sharedCss(theme)}
 `;
-const MenuItemLink = styled(Link)`
-    display: block;
+const MenuItemLink = styled.div`
+    width: 100%;
+    text-align: left;
     ${({ theme }) => sharedCss(theme)}
 `;
 
@@ -33,7 +34,7 @@ function MenuItem({ linkTo, callback, title }: Props): ReactElement {
   if (callback) {
     return (<MenuItemButton role="menuitem" onClick={callback}>{title}</MenuItemButton>);
   }
-  return (<MenuItemLink href={linkTo}>{title}</MenuItemLink>);
+  return (<Link href={linkTo}><MenuItemLink>{title}</MenuItemLink></Link>);
 }
 
 MenuItem.defaultProps = {

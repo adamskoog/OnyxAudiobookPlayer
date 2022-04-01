@@ -71,14 +71,16 @@ const AlbumCount = styled.div`
     margin-bottom: 0.5rem;
 `;
 
-function Artist(): ReactElement {
+type Props = {
+  ratingKey: any
+}
+
+function Artist({ ratingKey }: Props): ReactElement {
   const accessToken = useAppSelector((state) => state.settings.accessToken);
   const baseUrl = useAppSelector((state) => state.application.baseUrl);
 
   const [artist, setArtist]: [any, any] = useState({ Metadata: [] });
 
-  // const { ratingKey } = useParams();
-  const ratingKey = null;
   useEffect(() => {
     const fetchMetadata = async (): Promise<void> => {
       if (accessToken && baseUrl && ratingKey) {

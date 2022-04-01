@@ -24,8 +24,8 @@ declare global {
 }
 
 const defaultState: ApplicationState = {
-  isLoading: false,
-  applicationState: 'loggedout',
+  isLoading: true,
+  applicationState: 'loading',
   user: null,
   authToken: null,
   authId: null,

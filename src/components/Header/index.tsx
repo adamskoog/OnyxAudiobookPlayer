@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ReactElement } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
 
@@ -51,10 +52,10 @@ const MobileMenuContainer: any = styled.div`
     `)}
 `;
 
-const MobileMenuItem = styled(Link)`
+const MobileMenuItem = styled.span`
     display: block;
     border-radius: 0.375rem;
-
+    cursor: pointer;
     color: ${({ theme }) => theme.NAV_TEXT};
     font-size: 1rem;
     line-height: 1.5rem;
@@ -131,9 +132,9 @@ const TitleMenuItem = styled.div`
     `)}
 `;
 
-const TitleMenuItemLink = styled(Link)`
+const TitleMenuItemLink = styled.span`
     color: ${({ theme }) => theme.NAV_TEXT};
-
+    cursor: pointer;
     padding-top: 0.5rem;
     padding-left: 0.75rem;
     padding-right: 0.75rem;
@@ -179,21 +180,12 @@ const TitleMenuItemButton = styled.button`
     }
 `;
 
-type Props = {
-    // containerRef: any,
-    // userInfo: any,
-    // doUserLogin: any,
-    // doUserLogout: any
-}
-
 const doUserLogin = async (): Promise<void> => {
   const response = await prepareLoginRequest();
   window.location.href = response.url;
 };
 
-function Header({
-  // doUserLogin, doUserLogout,
-}: Props): ReactElement {
+function Header(): ReactElement {
   const dispatch = useAppDispatch();
 
   const TITLE = 'Onyx Player';
@@ -201,8 +193,9 @@ function Header({
 
   const userInfo = useAppSelector((state) => state.application.user);
 
-  //const location = useLocation();
-  const location = null;
+  const router = useRouter();
+  const pathname = router.pathname;
+
   const navButtonCss = (active: string): void => {
     const elems = document.querySelectorAll('.nav-menu');
     elems.forEach((elem) => {
@@ -214,38 +207,25 @@ function Header({
     });
   };
 
-  // const menuCss = (isOpen: boolean): void => {
-  //   const main = containerRef.current;
-  //   if (main) {
-  //     main.classList.remove('menu-open');
-  //   }
-  //   if (main && isOpen) {
-  //     main.classList.add('menu-open');
-  //   }
-  // };
-
   const closeMainMenu = (): void => {
     if (menuIsOpen) setMenuIsOpen(false);
   };
 
-  // useEffect(() => {
-  //   if (!location) return;
-
-  //   switch (location.pathname) {
-  //     case '/library':
-  //       navButtonCss('nav-library');
-  //       break;
-  //     case '/':
-  //       navButtonCss('nav-home');
-  //       break;
-  //     default:
-  //       navButtonCss('nav-empty');
-  //   }
-  // }, [location]);
+  useEffect(() => {
+    if (!pathname) return;
+    switch (pathname) {
+      case '/library':
+        navButtonCss('nav-library');
+        break;
+      case '/':
+        navButtonCss('nav-home');
+        break;
+      default:
+        navButtonCss('nav-empty');
+    }
+  }, [pathname]);
 
   useEffect(() => {
-    // menuCss(menuIsOpen);
-
     if (!menuIsOpen) return;
     document.addEventListener('click', closeMainMenu);
     return () => { document.removeEventListener('click', closeMainMenu); };
@@ -265,12 +245,10 @@ function Header({
           <TitleContainer>
             <Title>{TITLE}</Title>
             <TitleMenuItem>
-            {/* className="nav-menu nav-home" */}
-              <TitleMenuItemLink href="/">Home</TitleMenuItemLink>
+              <Link href="/"><TitleMenuItemLink className={'nav-menu nav-home'}>Home</TitleMenuItemLink></Link>
             </TitleMenuItem>
             <TitleMenuItem>
-            {/* className="nav-menu nav-library"  */}
-              <TitleMenuItemLink href="/library">Library</TitleMenuItemLink>
+              <Link href="/library"><TitleMenuItemLink className={'nav-menu nav-library'}>Library</TitleMenuItemLink></Link>
             </TitleMenuItem>
           </TitleContainer>
 
@@ -283,8 +261,8 @@ function Header({
       </Container>
 
       <MobileMenuContainer isOpen={menuIsOpen}>
-        <MobileMenuItem href="/">Home</MobileMenuItem>
-        <MobileMenuItem href="/library">Library</MobileMenuItem>
+        <Link href="/"><MobileMenuItem>Home</MobileMenuItem></Link>
+        <Link href="/library"><MobileMenuItem>Library</MobileMenuItem></Link>
       </MobileMenuContainer>
     </NavContainer>
   );

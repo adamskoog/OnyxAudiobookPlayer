@@ -2,8 +2,8 @@ import * as actionTypes from './actionTypes';
 import * as SettingsUtils from '../../utility/settings';
 import {
   RESOURCETYPES, getResources, findServerBaseUrl, getLibraries as getPlexLibraries,
+  PlexTvApi
 } from '../../plex/Api';
-
 export const loadSettingsValues = (): AppAction => {
   const settings = SettingsUtils.loadSettingsFromStorage();
   return {
@@ -104,7 +104,9 @@ export const getServers = (): AppThunk => async (dispatch, getState) => {
 
   // Call our plex api to get the resources.
   if (authToken) {
-    const servers = await getResources(authToken, RESOURCETYPES.server);
+    // TODO: move this initialization.
+    PlexTvApi.initialize();
+    const servers = await PlexTvApi.getResources(RESOURCETYPES.server);
     dispatch({ type: actionTypes.LOAD_SERVER_LIST, payload: servers });
     dispatch(setActiveServer());
   }

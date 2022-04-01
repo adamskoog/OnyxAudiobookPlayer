@@ -1,4 +1,5 @@
 import React, { ReactElement } from 'react';
+import Link from 'next/link';
 import styled from 'styled-components';
 
 import PlexImage from '../util/PlexImage';
@@ -8,6 +9,7 @@ const Container = styled.div`
     text-align: center;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
 `;
 const AlbumCoverContainer = styled.div`
     margin-bottom: 0.25rem;
@@ -17,6 +19,7 @@ const AlbumText = styled.div`
     font-weight: 500;
 `;
 const ArtistText = styled.div`
+    padding-bottom: 1px;
 `;
 type Props = {
     metadata: any,
@@ -24,7 +27,7 @@ type Props = {
 }
 function AlbumItem({ metadata, showAuthor }: Props): ReactElement {
   return (
-    // <Link to={`/album/${metadata.ratingKey}`}>
+    <Link href={'/album/[ratingKey]'} as={`/album/${metadata.ratingKey}`}>
       <Container>
         <AlbumCoverContainer>
           <PlexImage width={200} height={200} url={metadata.thumb} alt={`${metadata.title}`} isLazy />
@@ -34,7 +37,7 @@ function AlbumItem({ metadata, showAuthor }: Props): ReactElement {
         <ArtistText title={metadata.parentTitle}>{metadata.parentTitle}</ArtistText>
         )}
       </Container>
-    // </Link>
+    </Link>
   );
 }
 

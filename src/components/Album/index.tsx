@@ -1,4 +1,5 @@
 import React, { useState, useEffect, ReactElement } from 'react';
+import Link from 'next/link';
 import styled from 'styled-components';
 
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
@@ -50,6 +51,7 @@ const AlbumAuthor = styled.div`
 
     font-size: 1.125rem;
     line-height: 1.125rem;
+    cursor: pointer;
 `;
 const AlbumYear = styled.div`
     margin-top: .25rem;
@@ -80,7 +82,11 @@ const TrackCount = styled.div`
     margin-bottom: 0.5rem;
 `;
 
-function Album(): ReactElement {
+type Props = {
+  ratingKey: any
+}
+
+function Album({ ratingKey }: Props): ReactElement {
   const dispatch = useAppDispatch();
 
   const accessToken = useAppSelector((state) => state.settings.accessToken);
@@ -88,9 +94,6 @@ function Album(): ReactElement {
 
   const [album, setAlbum]: [any, any] = useState({ Metadata: [] });
   const [onDeck, setOnDeck]: [any, any] = useState(null);
-
-  // const { ratingKey } = useParams();
-  const ratingKey = null;
 
   const playOnDeckTrack = (trackInfo: any): void => {
     dispatch(setPlayQueue(getAlbumQueue(trackInfo, album)));
@@ -132,9 +135,9 @@ function Album(): ReactElement {
             <PlexImage width={200} height={200} url={album.thumb} alt={`${album.parentTitle} Cover`} />
             <AlbumInfo>
               <AlbumTitle>{album.parentTitle}</AlbumTitle>
-              {/* <Link to={`/artist/${album.grandparentRatingKey}`}>
+              <Link href={'/artist/[ratingKey]'} as={`/artist/${album.grandparentRatingKey}`}>
                 <AlbumAuthor>{album.grandparentTitle}</AlbumAuthor>
-              </Link> */}
+              </Link>
               <AlbumYear>{album.parentYear}</AlbumYear>
               {onDeck && (
               <OnDeck>

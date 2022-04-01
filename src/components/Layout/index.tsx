@@ -27,7 +27,7 @@ function Layout({ children }) {
         <NormalizeGlobalStyle />
         <GlobalStyle />
 
-        <Loader />
+        {/* <Loader /> */}
         <Header />
         <FilterMenu />
         <MainContainer>

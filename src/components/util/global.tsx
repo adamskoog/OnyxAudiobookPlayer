@@ -76,7 +76,7 @@ export const GlobalStyle = createGlobalStyle`
         cursor: pointer;
     }
 
-    html, body, #root {
+    html, body, #__next {
         height: 100%;
         body: 100%;
     }
@@ -87,7 +87,7 @@ export const GlobalStyle = createGlobalStyle`
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
-    #root {
+    #__next {
         display: flex !important;
         flex-direction: column !important;
     }

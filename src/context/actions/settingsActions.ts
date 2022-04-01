@@ -1,7 +1,7 @@
 import * as actionTypes from './actionTypes';
 import * as SettingsUtils from '../../utility/settings';
 import {
-  RESOURCETYPES, getResources, findServerBaseUrl, getLibraries as getPlexLibraries,
+  RESOURCETYPES, findServerBaseUrl, getLibraries as getPlexLibraries,
   PlexTvApi
 } from '../../plex/Api';
 export const loadSettingsValues = (): AppAction => {
@@ -38,7 +38,8 @@ export const setServerBaseUrl = (): AppThunk => async (dispatch, getState) => {
   dispatch(getLibraries());
 };
 
-const matchServer = (serverId: string, resources: Array<any>): any => {
+const matchServer = (serverId: string, resources: Array<any> | null): any => {
+  if (!resources) throw 'No Servers Found.'
   for (let i = 0; i < resources.length; i++) {
     if (serverId === resources[i].clientIdentifier) {
       return resources[i];

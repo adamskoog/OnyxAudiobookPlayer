@@ -72,6 +72,13 @@ export class PlexTvApi {
         this.isInitialized = true;
     };
 
+    // https://forums.plex.tv/t/authenticating-with-plex/609370
+    // We can also getting setting information - libraries
+    // https://plex.tv/api/v2/user?includeSubscriptions=1&includeProviders=1&includeSettings=1&includeSharedSettings=1&X-Plex-Product=Plex%20Web&X-Plex-Version=4.48.1&X-Plex-Client-Identifier=0bkgja3athsl27xtz5mh7m49&X-Plex-Platform=Microsoft%20Edge&X-Plex-Platform-Version=87.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=hosted&X-Plex-Device=Windows&X-Plex-Device-Name=Microsoft%20Edge&X-Plex-Device-Screen-Resolution=1500x858%2C1500x1000&X-Plex-Language=en&X-Plex-Token=mnjYNhmCzSzYxmazHtoj
+    // Get home users?
+    // https://plex.tv/api/home/users?X-Plex-Product=Plex%20Web&X-Plex-Version=4.48.1&X-Plex-Client-Identifier=0bkgja3athsl27xtz5mh7m49&X-Plex-Platform=Microsoft%20Edge&X-Plex-Platform-Version=87.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=hosted&X-Plex-Device=Windows&X-Plex-Device-Name=Microsoft%20Edge&X-Plex-Device-Screen-Resolution=1500x858%2C1500x1000&X-Plex-Token=mnjYNhmCzSzYxmazHtoj&X-Plex-Language=en
+    // https://plex.tv/api/users?X-Plex-Product=Plex%20Web&X-Plex-Version=4.48.1&X-Plex-Client-Identifier=0bkgja3athsl27xtz5mh7m49&X-Plex-Platform=Microsoft%20Edge&X-Plex-Platform-Version=87.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=hosted&X-Plex-Device=Windows&X-Plex-Device-Name=Microsoft%20Edge&X-Plex-Device-Screen-Resolution=1500x858%2C1500x1000&X-Plex-Token=mnjYNhmCzSzYxmazHtoj&X-Plex-Language=en
+
     /**
      * Check the auth token to make sure it is still valid for use.
      * @param token string - the auth token to validate.
@@ -102,6 +109,10 @@ export class PlexTvApi {
         }
     };
 
+    /**
+     * Do user sign in request
+     * @returns Promise<any> - TODO
+     */
     static signIn = async (): Promise<any> => {
         const response = await this.client.post(this.PLEX_PINS_URL, {
           data: {
@@ -113,7 +124,7 @@ export class PlexTvApi {
 
         // TODO: where should formatUrl live?
         const data = response.data;
-        const authAppUrl = formatUrl(`${PLEX_BASE_URL}/auth#`, {
+        const authAppUrl = formatUrl(`${this.PLEX_BASE_URL}/auth#`, {
             clientID: BASE_PARAMS['X-Plex-Client-Identifier'],
             code: data.code,
             forwardUrl: window.location.href,
@@ -127,8 +138,13 @@ export class PlexTvApi {
         return { id: data.id, redirectUrl: authAppUrl };
     };
 
+    /**
+     * Get the resources based on the authenticated user.
+     * @param id string - the auth id obtained from plex.tv
+     * @returns Promise<any> - TODO
+     */
     static validatePin = async (id: string): Promise<any> => {
-      const url = `${PLEX_BASE_URL}${PLEX_PINS_URL}/${id}?${qs.stringify({ 'X-Plex-Client-Identifier': BASE_PARAMS['X-Plex-Client-Identifier'] })}`;
+      const url = `${this.PLEX_BASE_URL}${this.PLEX_PINS_URL}/${id}?${qs.stringify({ 'X-Plex-Client-Identifier': BASE_PARAMS['X-Plex-Client-Identifier'] })}`;
       const response = await axios.get(url);
       return response.data;
     };
@@ -232,11 +248,6 @@ export class PlexServerApi {
 
 
 /// ****************   Old API   *********************
-const PLEX_BASE_URL = 'https://plex.tv';
-const PLEX_RESOURCES_URL = '/api/v2/resources';
-const PLEX_USER_URL = '/api/v2/user';
-const PLEX_PINS_URL = '/api/v2/pins';
-
 const BASE_PARAMS: any = {
   'X-Plex-Device-Name': 'Onyx',
   'X-Plex-Product': 'Onyx Audiobook Player',
@@ -254,75 +265,7 @@ const BASE_REQUEST: any = {
   },
 };
 const GET_REQUEST: any = { method: 'GET', ...BASE_REQUEST };
-const POST_REQUEST: any = { method: 'POST', ...BASE_REQUEST };
-
-export const getResources = async (token: string, resourceType?: any): Promise<any> => {
-  const localParams = {
-    includeHttps: 1,
-    includeRelay: 1,
-  };
-  const params = { ...BASE_PARAMS, ...localParams, 'X-Plex-Token': token };
-  const url = formatUrl(`${PLEX_BASE_URL}${PLEX_RESOURCES_URL}`, params);
-
-  const response = await fetch(url, GET_REQUEST);
-  if (!response.ok) return []; // If request fails, return empty array. TODO: something better??
-
-  const resources = await response.json();
-  if (!resourceType) return resources; // return the unfilters resource reponse.
-
-  return resources.filter((resource) => resource.provides === resourceType);
-};
-
-// https://forums.plex.tv/t/authenticating-with-plex/609370
-// We can also getting setting information - libraries
-// https://plex.tv/api/v2/user?includeSubscriptions=1&includeProviders=1&includeSettings=1&includeSharedSettings=1&X-Plex-Product=Plex%20Web&X-Plex-Version=4.48.1&X-Plex-Client-Identifier=0bkgja3athsl27xtz5mh7m49&X-Plex-Platform=Microsoft%20Edge&X-Plex-Platform-Version=87.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=hosted&X-Plex-Device=Windows&X-Plex-Device-Name=Microsoft%20Edge&X-Plex-Device-Screen-Resolution=1500x858%2C1500x1000&X-Plex-Language=en&X-Plex-Token=mnjYNhmCzSzYxmazHtoj
-// Get home users?
-// https://plex.tv/api/home/users?X-Plex-Product=Plex%20Web&X-Plex-Version=4.48.1&X-Plex-Client-Identifier=0bkgja3athsl27xtz5mh7m49&X-Plex-Platform=Microsoft%20Edge&X-Plex-Platform-Version=87.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=hosted&X-Plex-Device=Windows&X-Plex-Device-Name=Microsoft%20Edge&X-Plex-Device-Screen-Resolution=1500x858%2C1500x1000&X-Plex-Token=mnjYNhmCzSzYxmazHtoj&X-Plex-Language=en
-// https://plex.tv/api/users?X-Plex-Product=Plex%20Web&X-Plex-Version=4.48.1&X-Plex-Client-Identifier=0bkgja3athsl27xtz5mh7m49&X-Plex-Platform=Microsoft%20Edge&X-Plex-Platform-Version=87.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=hosted&X-Plex-Device=Windows&X-Plex-Device-Name=Microsoft%20Edge&X-Plex-Device-Screen-Resolution=1500x858%2C1500x1000&X-Plex-Token=mnjYNhmCzSzYxmazHtoj&X-Plex-Language=en
-export const checkToken = async (token: string): Promise<any> => {
-  const params = { ...BASE_PARAMS, 'X-Plex-Token': token };
-  const url = formatUrl(`${PLEX_BASE_URL}${PLEX_USER_URL}`, params);
-
-  const response = await fetch(url, GET_REQUEST);
-  // if (!response.ok) return [];    // If request fails, return empty array. TODO: something better??
-
-  const data = await response.json();
-  if (data.errors) {
-    return { message: data.errors[0].message };
-  }
-  return data;
-};
-
-export const signIn = async (): Promise<any> => {
-  const localParams = {
-    strong: true,
-  };
-  const params = { ...BASE_PARAMS, ...localParams };
-  const url = formatUrl(`${PLEX_BASE_URL}${PLEX_PINS_URL}`, params);
-
-  const response = await fetch(url, POST_REQUEST);
-  const data = await response.json();
-
-  const authAppUrl = formatUrl('https://app.plex.tv/auth#', {
-    clientID: BASE_PARAMS['X-Plex-Client-Identifier'],
-    code: data.code,
-    forwardUrl: window.location.href,
-    context: {
-      device: {
-        product: BASE_PARAMS['X-Plex-Product'],
-      },
-    },
-  });
-
-  return { id: data.id, redirectUrl: authAppUrl };
-};
-
-export const validatePin = async (id: string): Promise<any> => {
-  const url = `https://plex.tv/api/v2/pins/${id}?${qs.stringify({ 'X-Plex-Client-Identifier': BASE_PARAMS['X-Plex-Client-Identifier'] })}`;
-  const response = await fetch(url, GET_REQUEST);
-  const data = await response.json();
-  return data;
-};
+//const POST_REQUEST: any = { method: 'POST', ...BASE_REQUEST };
 
 const fetchWithTimeout = async (resource: any, options: any): Promise<any> => {
   const { timeout = 8000 } = options;

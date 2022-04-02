@@ -1,6 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 import qs from 'qs';
+import { v4 as uuidv4 } from 'uuid';
 
+import * as Settings from '../utility/settings';
 
 export const RESOURCETYPES = {
   server: 'server',
@@ -8,6 +10,16 @@ export const RESOURCETYPES = {
 
 export const LIBRARYTYPES = {
   music: 'artist',
+};
+
+export const MUSIC_LIBRARY_DISPAY_TYPE = {
+  artist: { title: 'Author', key: 8 },
+  album: { title: 'Book', key: 9 }
+};
+
+export const SORT_ORDER = {
+  ascending: 'Ascending',
+  descending: 'Decending',
 };
 
 // Placeholder types
@@ -30,6 +42,8 @@ export class PlexTvApi {
     private static PLEX_PINS_URL = '/api/v2/pins';
 
     private static isInitialized: boolean = false;
+    private static needsLogin: boolean = false;
+
     private static requestTokenParam: Object = {
       'X-Plex-Token': null
     };
@@ -42,23 +56,52 @@ export class PlexTvApi {
         'X-Plex-Device': 'Windows'
     };
 
-    get baseParams() {
+    static get baseParams() {
         return PlexTvApi.requestBaseParams;
     }
 
-    private static setupBaseParams(): void {
+    static get authToken() {
+        return this.requestTokenParam['X-Plex-Token'];
+    }
+
+    static get isLoggedOut() {
+        return this.needsLogin;
+    }
+
+    private static generateClientId(): string {
         // We need to auto generate a guid to pass to the server
         // when this value doesn't exist
-        this.requestBaseParams['X-Plex-Client-Identifier'] = '616647cf-a68b-4474-8b4f-3ad72ed95cf9';
+        const clientIdentifier = uuidv4();
+        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.clientIdentifier, clientIdentifier);
+        return clientIdentifier;
     };
 
-    static initialize(clientIdentifier?: string): void {
+    static initialize(): void {
 
         if (this.isInitialized) return;
 
-        // We we don't have a client identifier set, we'll need to
-        // authenticate - we will not have a token either.
-        if (!clientIdentifier) this.setupBaseParams();
+        // We have not initialized, we need to check the browser storage
+        // for plex.tv token and client identifier.
+        const token = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.token);
+        let clientIdentifier = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.clientIdentifier);
+
+        if (!clientIdentifier) {
+            // The client id is no longer available or valid, generate a new one.
+            clientIdentifier = this.generateClientId();
+        }
+
+        // We now defintely have a cliend id to set, update params.
+        this.requestBaseParams['X-Plex-Client-Identifier'] = clientIdentifier;
+        
+        // If either of the above is not available, we need to process
+        // a login with plex.tv.
+        if (!token) {
+            this.needsLogin = true;
+        } else {
+            // The user is logged in, we need to save the token and client id
+            // for use in query parameters.
+            this.requestTokenParam['X-Plex-Token'] = token;
+        }
 
         // Create a client for plex.tv requests
         this.client = axios.create({
@@ -105,6 +148,8 @@ export class PlexTvApi {
           return data as UserInfo;
         } catch {
           this.requestTokenParam['X-Plex-Token'] = null;
+          this.logout();
+
           return { message: 'Unexpected error occurred.' };
         }
     };
@@ -114,28 +159,30 @@ export class PlexTvApi {
      * @returns Promise<any> - TODO
      */
     static signIn = async (): Promise<any> => {
-        const response = await this.client.post(this.PLEX_PINS_URL, {
-          data: {
-              strong: true,
-              ...this.requestBaseParams,
-              ...this.requestTokenParam
+        const response = await this.client.post(this.PLEX_PINS_URL, null, {
+          params: {
+            strong: true,
+            ...this.requestBaseParams
           }
         });
 
         // TODO: where should formatUrl live?
         const data = response.data;
-        const authAppUrl = formatUrl(`${this.PLEX_BASE_URL}/auth#`, {
-            clientID: BASE_PARAMS['X-Plex-Client-Identifier'],
+        const authAppUrl = formatUrl(`https://app.plex.tv/auth#`, {
+            clientID: this.requestBaseParams['X-Plex-Client-Identifier'],
             code: data.code,
             forwardUrl: window.location.href,
             context: {
                 device: {
-                    product: BASE_PARAMS['X-Plex-Product'],
+                    product: this.requestBaseParams['X-Plex-Product'],
                 },
             },
         });
-    
-        return { id: data.id, redirectUrl: authAppUrl };
+
+        // Save the pin to browser storage.
+        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.loginRedirectId, data.id);
+
+        return { url: authAppUrl };
     };
 
     /**
@@ -144,9 +191,25 @@ export class PlexTvApi {
      * @returns Promise<any> - TODO
      */
     static validatePin = async (id: string): Promise<any> => {
-      const url = `${this.PLEX_BASE_URL}${this.PLEX_PINS_URL}/${id}?${qs.stringify({ 'X-Plex-Client-Identifier': BASE_PARAMS['X-Plex-Client-Identifier'] })}`;
+
+      const clientIdParams = { 'X-Plex-Client-Identifier': this.requestBaseParams['X-Plex-Client-Identifier'] };
+      const url = `${this.PLEX_BASE_URL}${this.PLEX_PINS_URL}/${id}?${qs.stringify(clientIdParams)}`;
       const response = await axios.get(url);
-      return response.data;
+
+      Settings.removeSettingFromStorage(Settings.SETTINGS_KEYS.loginRedirectId);
+      Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.token, response.data.authToken);
+      Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.clientIdentifier, this.requestBaseParams['X-Plex-Client-Identifier']);
+    
+      return { token: response.data.authToken };
+    };
+
+    /**
+     * After login redirect - get the id from storage to finish authentication.
+     */    
+    static getAuthenticationId = (): string | null => {
+      const authId = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.loginRedirectId);
+      if (authId && authId !== '') return authId;
+      return null;
     };
 
     /**
@@ -167,6 +230,13 @@ export class PlexTvApi {
         if (!resourceType) return resources; // return the unfilters resource reponse.   
         return resources.filter((resource: Resource) => resource.provides === resourceType);
     };
+
+    /**
+     * Clear application storage to log out of the application.
+     */   
+    static logout = (): void => {
+      Settings.clearSettings();
+    };
 };
 
 export class PlexServerApi {
@@ -183,27 +253,45 @@ export class PlexServerApi {
     // };
 
     private static client: AxiosInstance;
-    
-    static initialize = async (resource: any): Promise<void> => {
+    private static baseUrl: string;
+    private static requestTokenParam: Object = {
+      'X-Plex-Token': null
+    };
+
+    static initialize = async (resource: any): Promise<PlexServerConnection> => {
 
         // This class is initialized by a server being selected.
         // This can happen on load or from the Settings page.
-        const baseUrl = await this.determineBaseUrl(resource);
+        const connection = await this.serverConnectionTest(resource.connections, resource.accessToken);
+        this.baseUrl = connection.uri ?? '';
 
         this.client = axios.create({
-          baseURL: baseUrl,
+          baseURL: this.baseUrl,
           headers: {
             'Accept': 'application/json',
             'Content-type': 'application/json'
           }
         });
 
+        // Return the connection information - the url in the future
+        // should not be needed in redux, but if an error has occurred 
+        // we need to be able to handle it.
+        return connection;
     };
 
-    private static determineBaseUrl = async (resource: any): Promise<string> => {
-        // TODO: refactor server connection test.
-        const url = await this.serverConnectionTest(resource.connections, resource.accessToken);
-        return url;
+    private static fetchWithTimeout = async (resource: any, options: any): Promise<any> => {
+      const { timeout = 8000 } = options;
+    
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeout);
+    
+      const response = await fetch(resource, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(id);
+    
+      return response;
     };
 
     /**
@@ -211,15 +299,19 @@ export class PlexServerApi {
      * @param {array[uri]} connections - An array of the server connections to be tested.
      * @param {string} token
      */
-    private static serverConnectionTest = (connections: any, token: string): Promise<any> => new Promise((resolve, reject) => {
-      const params = { ...BASE_PARAMS, 'X-Plex-Token': token };
+    private static serverConnectionTest = (connections: any, token: string): Promise<PlexServerConnection> => new Promise((resolve, reject) => {
+      
+      // TODO: handle this better with base params.
+      this.requestTokenParam['X-Plex-Token'] = token;
+
+      const params = { ...PlexTvApi.baseParams, ...this.requestTokenParam };
 
       const connectionPromises = connections.map((connection) => {
         // Use different timeout lengths for local vs remote servers.
         const timeout = (connection.local) ? 1000 : 5000;
 
         // Identity endpoint is very small, used by other projects.
-        return fetchWithTimeout(formatUrl(`${connection.uri}/identity`, params), {
+        return this.fetchWithTimeout(formatUrl(`${connection.uri}/identity`, params), {
           timeout,
         });
       });
@@ -242,282 +334,249 @@ export class PlexServerApi {
         reject({ message: 'Failed to resolve connection to server.', error });
       });
     });
-};
-
-
-
-
-/// ****************   Old API   *********************
-const BASE_PARAMS: any = {
-  'X-Plex-Device-Name': 'Onyx',
-  'X-Plex-Product': 'Onyx Audiobook Player',
-  'X-Plex-Version': '0.9.1',
-  'X-Plex-Client-Identifier': '616647cf-a68b-4474-8b4f-3ad72ed95cf9',
-  'X-Plex-Platform': 'Chrome', // fill in with found browser....
-  'X-Plex-Device': 'Windows',
-};
-
-const BASE_REQUEST: any = {
-  mode: 'cors',
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-};
-const GET_REQUEST: any = { method: 'GET', ...BASE_REQUEST };
-//const POST_REQUEST: any = { method: 'POST', ...BASE_REQUEST };
-
-const fetchWithTimeout = async (resource: any, options: any): Promise<any> => {
-  const { timeout = 8000 } = options;
-
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-
-  const response = await fetch(resource, {
-    ...options,
-    signal: controller.signal,
-  });
-  clearTimeout(id);
-
-  return response;
-};
-
-/**
- * Run connection tests for a server to determine the best connection to use.
- * @param {array[uri]} connections - An array of the server connections to be tested.
- * @param {string} token
- */
-export const serverConnectionTest = (connections: any, token: string): Promise<any> => new Promise((resolve, reject) => {
-  const params = { ...BASE_PARAMS, 'X-Plex-Token': token };
-
-  const connectionPromises = connections.map((connection) => {
-    // Use different timeout lengths for local vs remote servers.
-    const timeout = (connection.local) ? 1000 : 5000;
-
-    // Identity endpoint is very small, used by other projects.
-    return fetchWithTimeout(formatUrl(`${connection.uri}/identity`, params), {
-      timeout,
-    });
-  });
-
-  Promise.allSettled(connectionPromises).then((values: any) => {
-    let preferredConnection = null;
-    for (let i = 0; i < connections.length; i++) {
-      for (let j = 0; j < values.length; j++) {
-        if (values[i].status === 'fulfilled' && values[i].value.url.includes(connections[j].uri)) {
-          preferredConnection = connections[j].uri;
-          break;
+   
+    /**
+     * Get a list of libraries for the currently selection server connection.
+     */
+    static getLibraries = async (): Promise<any> => {
+      const response = await this.client.get(`/library/sections`, {
+        params: {
+            ...PlexTvApi.baseParams,
+            ...this.requestTokenParam
         }
+      });
+      const data = response.data;
+      const sections = data.MediaContainer.Directory;
+    
+      if (sections.length === 0) return [];
+      return sections.filter((section: any) => section.type === LIBRARYTYPES.music);
+    };
+
+    /**
+     * Get the url of an image from plex media server.
+     * @param {number} h - the height in pixels of the requested image
+     * @param {number} w - the width in pixels of the requested image
+     * @param {string} thumb - the url of the requested image.
+     * @returns {string} - the url of the transcoded image.
+     */
+    static getThumbnailTranscodeUrl = (h: number, w: number, thumb: string): string => {
+      const params = {
+        width: w,
+        height: h,
+        minSize: 1,
+        upscale: 1,
+        url: `${thumb}?X-Plex-Token=${this.requestTokenParam['X-Plex-Token']}`,
+        ...this.requestTokenParam
+      };
+      return formatUrl(`${this.baseUrl}/photo/:/transcode`, params);
+    };
+
+    /**
+     * Mark the track referenced by the key as watched/listened.
+     * @param {string} key - the key of the requested track.
+     */
+    static scrobble = async (key: string): Promise<void> => {
+
+      await this.client.get(`/:/scrobble`, {
+        params: {
+            key, // ratingKey
+            identifier: 'com.plexapp.plugins.library',
+            ...PlexTvApi.baseParams,
+            ...this.requestTokenParam
+        }
+      });
+    
+      // we don't need to do anything, need to handle error.
+    };
+    
+    /**
+     * Mark the track referenced by the key as watched/listened.
+     * @param {string} key - the key of the requested track.
+     */
+    static unscrobble = async (key: string): Promise<void> => {
+      await this.client.get(`/:/unscrobble`, {
+        params: {
+            key, // ratingKey
+            identifier: 'com.plexapp.plugins.library',
+            ...PlexTvApi.baseParams,
+            ...this.requestTokenParam
+        }
+      });
+       
+      // we don't need to do anything, need to handle error.
+    };
+
+    /**
+     * @deprecated
+     * I'm not really sure what this does anymore - it doesn't appear to be used.
+     */
+    static progress = async (args: any): Promise<any> => {
+    
+      const response = await this.client.get(`/:/progress`, {
+        params: {
+            identifier: 'com.plexapp.plugins.library',
+            ...PlexTvApi.baseParams,
+            ...this.requestTokenParam,
+            ...args
+        }
+      });
+      return response.data;
+    };
+
+    /**
+     * Update the play progress of the current track on the server
+     * @param {any} args - TODO: this is a bunch of information to process the request, break up.
+     */
+    static updateTimeline = async (args: any): Promise<any> => {
+
+      const response = await this.client.get(`/:/timeline`, {
+        params: {
+            identifier: 'com.plexapp.plugins.library',
+            ...PlexTvApi.baseParams,
+            ...this.requestTokenParam,
+            ...args,
+            hasMDE: 0,
+            'X-Plex-Text-Format': 'plain',
+        }
+      });
+      return response.data;
+    };
+
+    /**
+     * Determine the correct media to play from the server.
+     * TODO: this doesn't do much, just grabs the first item.
+     * @param {any} track - The track object to determine media.
+     */
+    static getTrackMediaUrl = (track: any): string => {
+        return formatUrl(`${this.baseUrl}${track.Part[0].key}`, this.requestTokenParam);
+    };
+ 
+    /**
+     * Get the metadata of the requested Album.
+     * @param {string} ratingKey - The key of the requested item
+     */
+    static getAlbumMetadata = async (ratingKey: string): Promise<PlexAlbumMetadata> => {
+
+      const response = await this.client.get(`/library/metadata/${ratingKey}/children`, {
+        params: {
+            ...PlexTvApi.baseParams,
+            ...this.requestTokenParam
+        }
+      });
+
+      const data: PlexAlbumMediaContainer = response.data;
+      return data.MediaContainer;
+    };
+
+    /**
+     * Get the metadata of the requested Artist.
+     * @param {string} ratingKey - The key of the requested item
+     */
+    static getArtistMetadata = async (ratingKey: string): Promise<PlexArtistMetadata> => {
+      const response = await this.client.get(`/library/metadata/${ratingKey}/children`, {
+        params: {
+            ...PlexTvApi.baseParams,
+            ...this.requestTokenParam
+        }
+      });
+
+      const data: PlexArtistMediaContainer = response.data;
+      return data.MediaContainer;
+    };
+
+    // TODO: this whole thing needs to be cleaned up and refactored. It's really rough.
+    static createLibrarySortQuery = ({ order, display }): any => {
+      const args: any = {};
+    
+      // Set the default value for display
+      if (!display) args.type = MUSIC_LIBRARY_DISPAY_TYPE.album.key;
+      else if (display === MUSIC_LIBRARY_DISPAY_TYPE.album.title) args.type = MUSIC_LIBRARY_DISPAY_TYPE.album.key;
+      else args.type = MUSIC_LIBRARY_DISPAY_TYPE.artist.key;
+    
+      if (!order) {
+      // set a default order based on the album type.
+        if (args.type === MUSIC_LIBRARY_DISPAY_TYPE.album.key) args.order = 'artist.titleSort,album.titleSort,album.index,album.id,album.originallyAvailableAt';
+        else args.order = 'titleSort';
+      } else {
+        let desc = '';
+        if (order === SORT_ORDER.descending) desc = ':desc';
+        if (args.type === MUSIC_LIBRARY_DISPAY_TYPE.album.key) args.order = `artist.titleSort${desc},album.titleSort,album.index,album.id,album.originallyAvailableAt`;
+        else args.order = `titleSort${desc}`;
       }
-      if (preferredConnection) break;
-    }
+    
+      return args;
+    };
 
-    if (preferredConnection) resolve({ uri: preferredConnection });
-    reject({ message: 'Failed to resolve connection to server.', error: 'No server connection found.' });
-  }).catch((error) => {
-    reject({ message: 'Failed to resolve connection to server.', error });
-  });
-});
+    /**
+     * Get the recently added and listened hub items.
+     * @param {string} section - The library section.
+     * @param {any} args - The information for sorting.
+     */
+    static getLibraryHubItems = async (section: string, args: any): Promise<any> => {
+        const localParams = {
+          type: 9,
+          includeAdvanced: 1,
+          includeMeta: 1,
+          includeCollections: 1,
+          includeExternalMedia: 1
+        };
 
-export const findServerBaseUrl = async (resource: any): Promise<any> => {
-  // TODO: refactor server connection test.
-  const url = await serverConnectionTest(resource.connections, resource.accessToken);
-  return url;
-};
+        const response = await this.client.get(`/library/sections/${section}/all`, {
+          params: {
+              ...PlexTvApi.baseParams,
+              ...localParams,
+              ...args,
+              ...this.requestTokenParam
+          }
+        });
 
-export const getSections = async (baseUrl: string, token: string): Promise<any> => {
-  const params = { ...BASE_PARAMS, 'X-Plex-Token': token };
-  const url = formatUrl(`${baseUrl}/library/sections`, params);
+        return response.data.MediaContainer;
+    };
 
-  const response = await fetch(url, GET_REQUEST);
-  const data = await response.json();
-  return data;
-};
+    /**
+     * The the media items to display in the library.
+     * @param {string} section - The library section.
+     * @param {any} sortArgs - The information for sorting.
+     */
+    static getLibraryItems = async (section: string, sortArgs?: any): Promise<any> => {
+      if (!sortArgs) {
+        sortArgs = this.createLibrarySortQuery({ order: null, display: null });
+      }
+    
+      const localParams = {
+        type: sortArgs.type,
+        includeAdvanced: 1,
+        includeMeta: 1,
+        includeCollections: 1,
+        includeExternalMedia: 1,
+        sort: sortArgs.order,
+      };
 
-export const getLibraries = async (url: string, token: string): Promise<any> => {
-  const mediaContainer = await getSections(url, token);
-  const sections = mediaContainer.MediaContainer.Directory;
+      const response = await this.client.get(`/library/sections/${section}/all`, {
+        params: {
+            ...PlexTvApi.baseParams,
+            ...localParams,
+            ...this.requestTokenParam
+        }
+      });
 
-  if (sections.length === 0) return [];
-  return sections.filter((section: any) => section.type === LIBRARYTYPES.music);
-};
-
-export const getSectionHubs = async (baseUrl: string, section: string, token: string): Promise<any> => {
-  const localParams = {
-    excludeFields: 'summary',
-  };
-  const params = { ...BASE_PARAMS, ...localParams, 'X-Plex-Token': token };
-  const url = formatUrl(`${baseUrl}/hubs/sections/${section}`, params);
-
-  const response = await fetch(url, GET_REQUEST);
-  const data = await response.json();
-  return data;
-};
-
-export const getThumbnailUrl = (baseUrl: string, thumb: string, args: any): string => formatUrl(`${baseUrl}${thumb}`, args);
-
-export const getThumbnailTranscodeUrl = (h: number, w: number, baseUrl: string, thumb: string, token: string): string => {
-  const params = {
-    width: w,
-    height: h,
-    minSize: 1,
-    upscale: 1,
-    url: `${thumb}?X-Plex-Token=${token}`,
-    'X-Plex-Token': token,
-  };
-
-  return formatUrl(`${baseUrl}/photo/:/transcode`, params);
-};
-
-export const MUSIC_LIBRARY_DISPAY_TYPE = {
-  artist: { title: 'Author', key: 8 },
-  album: { title: 'Book', key: 9 },
-};
-
-export const SORT_ORDER = {
-  ascending: 'Ascending',
-  descending: 'Decending',
-};
-
-// TODO: this whole thing needs to be cleaned up and refactored. It's really rough.
-export const createLibrarySortQuery = ({ order, display }): any => {
-  const args: any = {};
-
-  // Set the default value for display
-  if (!display) args.type = MUSIC_LIBRARY_DISPAY_TYPE.album.key;
-  else if (display === MUSIC_LIBRARY_DISPAY_TYPE.album.title) args.type = MUSIC_LIBRARY_DISPAY_TYPE.album.key;
-  else args.type = MUSIC_LIBRARY_DISPAY_TYPE.artist.key;
-
-  if (!order) {
-  // set a default order based on the album type.
-    if (args.type === MUSIC_LIBRARY_DISPAY_TYPE.album.key) args.order = 'artist.titleSort,album.titleSort,album.index,album.id,album.originallyAvailableAt';
-    else args.order = 'titleSort';
-  } else {
-    let desc = '';
-    if (order === SORT_ORDER.descending) desc = ':desc';
-    if (args.type === MUSIC_LIBRARY_DISPAY_TYPE.album.key) args.order = `artist.titleSort${desc},album.titleSort,album.index,album.id,album.originallyAvailableAt`;
-    else args.order = `titleSort${desc}`;
-  }
-
-  return args;
-};
-
-type PlexLibraryItem = {
-
-};
-
-export const getLibraryItems = async (baseUrl: string, section: string, args: any, sortArgs?: any): Promise<any> => {
-  if (!sortArgs) {
-    sortArgs = createLibrarySortQuery({ order: null, display: null });
-  }
-
-  const localParams = {
-    type: sortArgs.type,
-    includeAdvanced: 1,
-    includeMeta: 1,
-    includeCollections: 1,
-    includeExternalMedia: 1,
-    sort: sortArgs.order,
-  };
-  const params = { ...BASE_PARAMS, ...localParams, ...args };
-  const url = formatUrl(`${baseUrl}/library/sections/${section}/all`, params);
-
-  const response = await fetch(url, GET_REQUEST);
-
-  ///if (sortArgs.type === MUSIC_LIBRARY_DISPAY_TYPE.artist.key) {
-    //const data: PlexArtistMediaContainer = await response.json();
-    //console.log("getArtistLibraryItems", data.MediaContainer);
-    //return data.MediaContainer;
-  //}
-  ///const data: PlexAlbumMediaContainer = await response.json();
-  //console.log("getAlbumLibraryItems", data.MediaContainer);
-  const data = await response.json();
-  return data.MediaContainer;
-};
-
-export const getAlbumMetadata = async (baseUrl: string, itemId: string, args: any): Promise<PlexAlbumMetadata> => {
-  const localParams = { };
-  const params = { ...BASE_PARAMS, ...localParams, ...args };
-  const url = formatUrl(`${baseUrl}/library/metadata/${itemId}/children`, params);
-
-  const response = await fetch(url, GET_REQUEST);
-  const data: PlexAlbumMediaContainer = await response.json();
-  return data.MediaContainer;
-};
-
-export const getArtistMetadata = async (baseUrl: string, itemId: string, args: any): Promise<PlexArtistMetadata> => {
-  const localParams = { };
-  const params = { ...BASE_PARAMS, ...localParams, ...args };
-  const url = formatUrl(`${baseUrl}/library/metadata/${itemId}/children`, params);
-
-  const response = await fetch(url, GET_REQUEST);
-  const data: PlexArtistMediaContainer = await response.json();
-  return data.MediaContainer;
-};
-
-export const scrobble = async (baseUrl: string, key: string, token: string): Promise<void> => {
-  const localParams = {
-    key, // ratingKey
-    'X-Plex-Token': token,
-    identifier: 'com.plexapp.plugins.library',
-  };
-
-  // Using unscrobble to not add to play count - scrobble endpoint takes same
-  // params and does effectively the same thing however.
-  const params = { ...BASE_PARAMS, ...localParams };
-  const url = formatUrl(`${baseUrl}/:/scrobble`, params);
-  // const response =
-  await fetch(url, GET_REQUEST);
-  // const data = await response.json();
-
-  // we don't need to do anything, need to handle error.
-};
-
-export const unscrobble = async (baseUrl: string, key: string, token: string): Promise<void> => {
-  const localParams = {
-    key, // ratingKey
-    'X-Plex-Token': token,
-    identifier: 'com.plexapp.plugins.library',
-  };
-
-  const params = { ...BASE_PARAMS, ...localParams };
-  const url = formatUrl(`${baseUrl}/:/unscrobble`, params);
-
-  // const response =
-  await fetch(url, GET_REQUEST);
-  // const data = await response.json();
-
-  // we don't need to do anything, need to handle error.
-};
-
-export const progress = async (baseUrl: string, args: any): Promise<any> => {
-  const localParams = {
-    identifier: 'com.plexapp.plugins.library',
-  };
-
-  const params = { ...BASE_PARAMS, ...localParams, ...args };
-  const url = formatUrl(`${baseUrl}/:/progress`, params);
-
-  const response = await fetch(url, GET_REQUEST);
-  const data = await response.json();
-  return data;
-};
-
-export const updateTimeline = async (baseUrl: string, args: any): Promise<any> => {
-  const localParams = {
-    hasMDE: 0,
-    'X-Plex-Text-Format': 'plain',
-  };
-
-  const params = { ...BASE_PARAMS, ...localParams, ...args };
-  const url = formatUrl(`${baseUrl}/:/timeline`, params);
-
-  const response = await fetch(url, GET_REQUEST);
-  const data = await response.json();
-  return data;
+      ///if (sortArgs.type === MUSIC_LIBRARY_DISPAY_TYPE.artist.key) {
+        //const data: PlexArtistMediaContainer = await response.json();
+        //console.log("getArtistLibraryItems", data.MediaContainer);
+        //return data.MediaContainer;
+      //}
+      return response.data.MediaContainer;
+    };
 };
 
 declare global {
+
+  type PlexServerConnection = {
+      uri?: string,
+      message?: string,
+      error?: string
+  }
+
   type PlexArtistMediaContainer = {
       MediaContainer: PlexArtistMetadata
   }

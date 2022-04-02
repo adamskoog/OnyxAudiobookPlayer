@@ -44,7 +44,7 @@ const appStateReducer = (state: ApplicationState = defaultState, action: AppActi
     case actionTypes.CHECK_TOKEN:
       return { ...state, isLoading: true };
     case actionTypes.TOKEN_VALID:
-      return { ...state, user: action.payload.user, isLoading: false };
+      return { ...state, user: action.payload, isLoading: false };
     case actionTypes.TOKEN_INVALID:
       return { ...state, applicationState: 'loggedout', isLoading: false };
     case actionTypes.LOGIN_REQUEST:

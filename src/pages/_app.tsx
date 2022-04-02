@@ -31,7 +31,6 @@ function Authentication() {
 
     useEffect(() => {
       PlexTvApi.initialize();
-      
       if (!user) {
         // We have no user logged in, check for tokens.
         dispatch(getToken());
@@ -40,17 +39,18 @@ function Authentication() {
       }
     }, [user, dispatch]);
   
-    useEffect(() => {
-      // TODO: this doesn't seem to work....
-      if (applicationState === 'loggedout') {
-        router.push({
-          pathname: '/login',
-          query: { returnUrl: router.asPath }
-        });
-      }
-    }, [applicationState]);
+    // useEffect(() => {
+    //   // TODO: this doesn't seem to work....
+    //   if (applicationState === 'loggedout') {
+    //     router.push({
+    //       pathname: '/login',
+    //       query: { returnUrl: router.asPath }
+    //     });
+    //   }
+    // }, [applicationState]);
 
     useEffect(() => {
+      PlexTvApi.initialize();
       if (authToken) {
         // We have a token stored, attempt to authenticate.
         dispatch(checkToken(authToken));

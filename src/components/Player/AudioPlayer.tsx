@@ -15,7 +15,7 @@ import NexTrackControl from './controls/NextTrack';
 import StopControl from './controls/Stop';
 
 import { convertSecondsToMs, convertMsToSeconds } from '../../utility/time';
-import { updateTimeline as updateTimelineApi, formatUrl } from '../../plex/Api';
+import { PlexServerApi } from '../../plex/Api';
 
 import { clearPlayQueue, nextTrackInQueue } from '../../context/actions/playQueueActions';
 import { changePlayState, changePlayerTime, PlayState } from '../../context/actions/playerActions';
@@ -79,7 +79,7 @@ function AudioPlayer(): ReactElement {
       'X-Plex-Token': accessToken,
     };
     // console.log("updateTimeline", args);
-    updateTimelineApi(baseUrl, args);
+    PlexServerApi.updateTimeline(args);
     // .then((data) => { /* console.log("data", data); TODO: This doesn't seem to return anything, and errors out often. */ });
   };
 
@@ -177,7 +177,7 @@ function AudioPlayer(): ReactElement {
       // Probably need to handle multiparts in some way? Even if it's just a warning?
       if (currentTrack.Part[0]) {
         // console.log("START: Add source and start playing.", currentTrack);
-        const src = formatUrl(`${baseUrl}${currentTrack.Part[0].key}`, { 'X-Plex-Token': accessToken });
+        const src = PlexServerApi.getTrackMediaUrl(currentTrack);
 
         // get the reference to the audio tag.
         const playerElement: HTMLAudioElement = playerRef.current;

@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
 import { setPlayQueue } from '../../context/actions/playQueueActions';
 
-import { getAlbumMetadata } from '../../plex/Api';
+import { PlexServerApi } from '../../plex/Api';
 import {
   getAlbumQueue, updateOnDeck, isTrackOnDeck, findOnDeck,
 } from '../../plex/Playback';
@@ -101,7 +101,7 @@ function Album({ ratingKey }: Props): ReactElement {
 
   const fetchAlbumMetadata = async (): Promise<any> => {
     if (baseUrl && accessToken && ratingKey) {
-      const data: PlexAlbumMetadata = await getAlbumMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
+      const data: PlexAlbumMetadata = await PlexServerApi.getAlbumMetadata(ratingKey);
         const newOnDeck: any = findOnDeck(data);
         setAlbum(data);
         setOnDeck(newOnDeck);

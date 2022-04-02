@@ -4,7 +4,7 @@ import React, {
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../context/hooks';
-import { getLibraryItems } from '../../plex/Api';
+import { PlexServerApi } from '../../plex/Api';
 
 import Hub from './Hub';
 
@@ -28,8 +28,7 @@ function Home(): ReactElement {
     if (baseUrl && section) {
       const fetchLibraryItems = async (): Promise<void> => {
         if (!baseUrl || !section || !accessToken) return;
-        const data = await getLibraryItems(baseUrl, section, {
-          'X-Plex-Token': accessToken,
+        const data = await PlexServerApi.getLibraryHubItems(section, {
           'X-Plex-Container-Start': 0,
           'X-Plex-Container-Size': 10,
           sort: 'addedAt:desc',
@@ -43,8 +42,7 @@ function Home(): ReactElement {
   useEffect(() => {
     if (baseUrl && section) {
       const fetchLibraryItems = async (): Promise<void> => {
-        const data = await getLibraryItems(baseUrl, section, {
-          'X-Plex-Token': accessToken,
+        const data = await PlexServerApi.getLibraryHubItems(section, {
           'X-Plex-Container-Start': 0,
           'X-Plex-Container-Size': 10,
           sort: 'lastViewedAt:desc',

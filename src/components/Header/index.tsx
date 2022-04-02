@@ -7,7 +7,7 @@ import { useAppSelector, useAppDispatch } from '../../context/hooks';
 import * as Responsive from '../util/responsive';
 
 import { logout } from '../../context/actions/appStateActions';
-import { prepareLoginRequest } from '../../plex/Authentication';
+import { PlexTvApi } from '../../plex/Api';
 
 import UserMenu from './UserMenu';
 import { SrOnly } from '../util/common';
@@ -181,7 +181,7 @@ const TitleMenuItemButton = styled.button`
 `;
 
 const doUserLogin = async (): Promise<void> => {
-  const response = await prepareLoginRequest();
+  const response = await PlexTvApi.signIn();
   window.location.href = response.url;
 };
 

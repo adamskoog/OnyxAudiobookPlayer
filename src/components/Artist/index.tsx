@@ -2,7 +2,7 @@ import React, { useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../context/hooks';
-import { getArtistMetadata } from '../../plex/Api';
+import { PlexServerApi } from '../../plex/Api';
 
 import AlbumItem from '../Library/AlbumItem';
 import AlbumSummary from '../Album/AlbumSummary';
@@ -84,7 +84,7 @@ function Artist({ ratingKey }: Props): ReactElement {
   useEffect(() => {
     const fetchMetadata = async (): Promise<void> => {
       if (accessToken && baseUrl && ratingKey) {
-        const data = await getArtistMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
+        const data = await PlexServerApi.getArtistMetadata(ratingKey);
         setArtist(data);
       }
     };

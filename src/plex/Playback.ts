@@ -1,4 +1,4 @@
-import { scrobble, unscrobble } from './Api';
+import { PlexServerApi } from './Api';
 
 // Plex has updated PMS so that libraries using stored track progress now complete at 99% officially.
 const TRACK_COMPLETE_PERCENT = 0.99;
@@ -28,12 +28,12 @@ export const trackIsComplete = (trackInfo: any): boolean => {
 };
 
 export const markTrackPlayed = async (trackInfo: any, baseUrl: string, token: string): Promise<any> => {
-  await scrobble(baseUrl, trackInfo.ratingKey, token);
+  await PlexServerApi.scrobble(trackInfo.ratingKey);
   return { status: 'success' };
 };
 
 export const markTrackUnplayed = async (trackInfo: any, baseUrl: string, token: string): Promise<any> => {
-  await unscrobble(baseUrl, trackInfo.ratingKey, token);
+  await PlexServerApi.unscrobble(trackInfo.ratingKey);
   return { status: 'success' };
 };
 

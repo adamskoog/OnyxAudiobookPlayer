@@ -1,9 +1,11 @@
 import * as actionTypes from './actionTypes';
 import * as SettingsUtils from '../../utility/settings';
 import {
-  RESOURCETYPES, findServerBaseUrl, getLibraries as getPlexLibraries,
-  PlexTvApi
+  RESOURCETYPES,
+  PlexTvApi,
+  PlexServerApi
 } from '../../plex/Api';
+
 export const loadSettingsValues = (): AppAction => {
   const settings = SettingsUtils.loadSettingsFromStorage();
   return {
@@ -23,7 +25,9 @@ export const getLibraries = (): AppThunk => async (dispatch, getState) => {
   const resource = state.settings.currentServer;
 
   if (baseUrl && resource) {
-    const libraries = await getPlexLibraries(baseUrl, resource.accessToken);
+    // TODO: remove the state reference above, handle missing values
+    // with error in getLibraries.
+    const libraries = await PlexServerApi.getLibraries();
     dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libraries });
   }
 };
@@ -33,7 +37,7 @@ export const setServerBaseUrl = (): AppThunk => async (dispatch, getState) => {
   const state = getState();
   const server = state.settings.currentServer;
 
-  const baseUrl = await findServerBaseUrl(server);
+  const baseUrl = await PlexServerApi.initialize(server);
   dispatch({ type: actionTypes.SET_SERVER_URL, payload: baseUrl.uri });
   dispatch(getLibraries());
 };
@@ -73,6 +77,7 @@ export const setServerSetting = (serverId: string): AppThunk => async (dispatch,
   SettingsUtils.saveSettingToStorage(SettingsUtils.SETTINGS_KEYS.libraryId, '');
 
   dispatch({ type: actionTypes.SAVE_SETTING_SERVER, payload: serverId });
+  
   dispatch(setActiveServer());
 };
 
@@ -105,8 +110,6 @@ export const getServers = (): AppThunk => async (dispatch, getState) => {
 
   // Call our plex api to get the resources.
   if (authToken) {
-    // TODO: move this initialization.
-    PlexTvApi.initialize();
     const servers = await PlexTvApi.getResources(RESOURCETYPES.server);
     dispatch({ type: actionTypes.LOAD_SERVER_LIST, payload: servers });
     dispatch(setActiveServer());

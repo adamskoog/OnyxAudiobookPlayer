@@ -1,5 +1,5 @@
 import * as actionTypes from './actionTypes';
-import { getLibraryItems, createLibrarySortQuery } from '../../plex/Api';
+import { PlexServerApi } from '../../plex/Api';
 
 export const setLibrarySortOrder = (order: any): AppAction => ({
   type: actionTypes.SET_LIBRARY_SORT_TYPE,
@@ -24,7 +24,7 @@ export const fetchLibraryItems = (): AppThunk => async (dispatch, getState) => {
   const { sortType } = state.library;
 
   if (baseUrl && section && resource) {
-    const data = await getLibraryItems(baseUrl, section, { 'X-Plex-Token': resource.accessToken }, createLibrarySortQuery({ display: displayType, order: sortType }));
+    const data = await PlexServerApi.getLibraryItems(section, PlexServerApi.createLibrarySortQuery({ display: displayType, order: sortType }));
     if (data.Metadata) dispatch({ type: actionTypes.SET_LIBRARY_ITEMS, payload: data.Metadata });
   }
 };

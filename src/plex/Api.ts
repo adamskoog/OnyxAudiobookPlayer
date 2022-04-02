@@ -81,13 +81,14 @@ export class PlexTvApi {
         if (this.isInitialized) return;
 
         // We have not initialized, we need to check the browser storage
-        // for plex.tv token and client identifier.
+        // for plex.tv token, client identifier, and saved auth token.
         let token = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.token);
         let clientIdentifier = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.clientIdentifier);
         let authId = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.loginRedirectId);
 
         if (!clientIdentifier) {
-            // clear token - we need to re-authenticate due to client identifier change.
+            // Set token to null - if we have no clientIdentifier, then we
+            // are logged out and need to re-authenticate.
             token = null;
             Settings.clearSettings();
 
@@ -105,22 +106,20 @@ export class PlexTvApi {
             }
         });
 
-        // If either of the above is not available, we need to process
-        // a login with plex.tv.
+        // Check if we have an auth id saved, if so, we need
+        // to validate the pin and get a token.
         if (authId) {
             const response = await this.validatePin(authId);
             token = response.token;
         }
 
         if (!token) {
-            console.log("we don't have a token - logged out");
+            // No token - we are logged out.
             this.needsLogin = true;
         } else {
             // The user is logged in, we need to save the token and client id
             // for use in query parameters.
-            console.log("we have a token - saving", token);
             this.requestTokenParam['X-Plex-Token'] = token;
-            console.log("token set?", this.requestTokenParam);
         }
 
         this.isInitialized = true;
@@ -140,10 +139,6 @@ export class PlexTvApi {
      */
     static validateToken = async (): Promise<UserInfo> => {
       
-        // Update our currently stored token with the value passed.
-        // this.plexToken = token;
-        //this.requestTokenParam['X-Plex-Token'] = token;
-        console.log("have token??", this.requestTokenParam);
         try {
           const response = await this.client.get(this.PLEX_USER_URL, {
             params: {

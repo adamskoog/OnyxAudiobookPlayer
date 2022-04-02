@@ -46,12 +46,12 @@ function Library(): ReactElement {
   const sortType = useAppSelector((state) => state.library.sortType);
 
   const user = useAppSelector((state) => state.application.user);
-  const baseUrl = useAppSelector((state) => state.application.baseUrl);
+  const applicationState = useAppSelector((state) => state.application.applicationState);
   const librarySection = useAppSelector((state) => state.settings.librarySection);
 
   useEffect(() => {
-    if (user && baseUrl && librarySection) dispatch(fetchLibraryItems());
-  }, [user, baseUrl, librarySection, displayType, sortType]);
+    if (user && applicationState === 'ready' && librarySection) dispatch(fetchLibraryItems());
+  }, [user, applicationState, librarySection, displayType, sortType]);
 
   return (
     <>

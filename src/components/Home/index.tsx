@@ -14,9 +14,8 @@ const ErrorMessage = styled.div`
 
 function Home(): ReactElement {
   const userInfo = useAppSelector((state) => state.application.user);
-  const baseUrl = useAppSelector((state) => state.application.baseUrl);
   const section = useAppSelector((state) => state.settings.librarySection);
-  const accessToken = useAppSelector((state) => state.settings.accessToken);
+  const applicationState = useAppSelector((state) => state.application.applicationState);
 
   const [recentlyAddedInfo, setRecentlyAddedInfo] = useState([]);
   const [recentlyPlayedInfo, setRecentlyPlayedInfo] = useState([]);
@@ -25,22 +24,21 @@ function Home(): ReactElement {
   useEffect(() => () => { isMountedRef.current = false; }, []);
 
   useEffect(() => {
-    if (baseUrl && section) {
+    if (applicationState === 'ready' && section) {
       const fetchLibraryItems = async (): Promise<void> => {
-        if (!baseUrl || !section || !accessToken) return;
         const data = await PlexServerApi.getLibraryHubItems(section, {
           'X-Plex-Container-Start': 0,
           'X-Plex-Container-Size': 10,
           sort: 'addedAt:desc',
         });
         if (data.Metadata && isMountedRef.current) setRecentlyAddedInfo(data.Metadata);
-      };
+      }; 
       fetchLibraryItems();
     } else setRecentlyAddedInfo([]);
-  }, [baseUrl, section, accessToken]);
+  }, [applicationState, section]);
 
   useEffect(() => {
-    if (baseUrl && section) {
+    if (applicationState === 'ready' && section) {
       const fetchLibraryItems = async (): Promise<void> => {
         const data = await PlexServerApi.getLibraryHubItems(section, {
           'X-Plex-Container-Start': 0,
@@ -51,14 +49,11 @@ function Home(): ReactElement {
       };
       fetchLibraryItems();
     } else setRecentlyPlayedInfo([]);
-  }, [baseUrl, section, accessToken]);
+  }, [applicationState, section]);
 
   return (
     <>
-      {!userInfo && (
-      <ErrorMessage>Must login to view library.</ErrorMessage>
-      )}
-      {userInfo && accessToken && baseUrl && (
+      {userInfo && applicationState === 'ready' && (
         <>
           {recentlyAddedInfo.length > 0 && (
           <Hub title="Recently Added" items={recentlyAddedInfo} />

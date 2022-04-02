@@ -89,8 +89,7 @@ type Props = {
 function Album({ ratingKey }: Props): ReactElement {
   const dispatch = useAppDispatch();
 
-  const accessToken = useAppSelector((state) => state.settings.accessToken);
-  const baseUrl = useAppSelector((state) => state.application.baseUrl);
+  const applicationState = useAppSelector((state) => state.application.applicationState);
 
   const [album, setAlbum]: [any, any] = useState({ Metadata: [] });
   const [onDeck, setOnDeck]: [any, any] = useState(null);
@@ -100,7 +99,7 @@ function Album({ ratingKey }: Props): ReactElement {
   };
 
   const fetchAlbumMetadata = async (): Promise<any> => {
-    if (baseUrl && accessToken && ratingKey) {
+    if (applicationState === 'ready' && ratingKey) {
       const data: PlexAlbumMetadata = await PlexServerApi.getAlbumMetadata(ratingKey);
         const newOnDeck: any = findOnDeck(data);
         setAlbum(data);
@@ -112,8 +111,8 @@ function Album({ ratingKey }: Props): ReactElement {
   };
 
   const playSelectedTrack = async (trackInfo: any): Promise<void> => {
-    if (baseUrl && accessToken && !isTrackOnDeck(trackInfo, album)) {
-      await updateOnDeck(trackInfo, album, baseUrl, accessToken);
+    if (applicationState === 'ready' && !isTrackOnDeck(trackInfo, album)) {
+      await updateOnDeck(trackInfo, album);
       const albumInfo: any = await fetchAlbumMetadata();
       dispatch(setPlayQueue(getAlbumQueue(albumInfo.track, albumInfo.album)));
     } else playOnDeckTrack(trackInfo);
@@ -121,15 +120,15 @@ function Album({ ratingKey }: Props): ReactElement {
 
   useEffect(() => {
     const fetchMetadata = async (): Promise<void> => {
-      if (accessToken && baseUrl && ratingKey) fetchAlbumMetadata();
+      if (applicationState === 'ready' && ratingKey) fetchAlbumMetadata();
     };
     fetchMetadata();
-  }, [baseUrl, accessToken, ratingKey]);
+  }, [applicationState, ratingKey]);
 
   // https://tailwindcomponents.com/component/button-component-default
   return (
     <Container>
-      {accessToken && (
+      {applicationState === 'ready' && (
         <>
           <AlbumContainer>
             <PlexImage width={200} height={200} url={album.thumb} alt={`${album.parentTitle} Cover`} />

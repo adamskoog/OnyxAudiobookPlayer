@@ -27,12 +27,12 @@ export const trackIsComplete = (trackInfo: any): boolean => {
   return false;
 };
 
-export const markTrackPlayed = async (trackInfo: any, baseUrl: string, token: string): Promise<any> => {
+export const markTrackPlayed = async (trackInfo: any): Promise<any> => {
   await PlexServerApi.scrobble(trackInfo.ratingKey);
   return { status: 'success' };
 };
 
-export const markTrackUnplayed = async (trackInfo: any, baseUrl: string, token: string): Promise<any> => {
+export const markTrackUnplayed = async (trackInfo: any): Promise<any> => {
   await PlexServerApi.unscrobble(trackInfo.ratingKey);
   return { status: 'success' };
 };
@@ -65,7 +65,7 @@ export const isTrackOnDeck = (trackInfo: any, album: any): boolean => {
   return true;
 };
 
-export const updateOnDeck = (trackInfo: any, album: any, baseUrl: string, token: string): Promise<any> => new Promise((resolve) => {
+export const updateOnDeck = (trackInfo: any, album: any): Promise<any> => new Promise((resolve) => {
   // We need to queue up promises for all the tracks in the album
   // if they select a current track that was in progress, it will not be updated.
   const promises: Array<any> = [];
@@ -73,10 +73,10 @@ export const updateOnDeck = (trackInfo: any, album: any, baseUrl: string, token:
     const track = album.Metadata[i];
     if (trackInfo.index > track.index) {
       // previous tracks need to be marked as played
-      promises.push(markTrackPlayed(track, baseUrl, token));
+      promises.push(markTrackPlayed(track));
     } else if (trackInfo.index <= track.index) {
       // upcoming tracks should be marked as unplayed.
-      promises.push(markTrackUnplayed(track, baseUrl, token));
+      promises.push(markTrackUnplayed(track));
     }
   }
 

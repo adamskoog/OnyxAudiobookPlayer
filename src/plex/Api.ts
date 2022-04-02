@@ -76,33 +76,26 @@ export class PlexTvApi {
         return clientIdentifier;
     };
 
-    static initialize(): void {
+    static initialize = async (): Promise<void> => {
 
         if (this.isInitialized) return;
 
         // We have not initialized, we need to check the browser storage
         // for plex.tv token and client identifier.
-        const token = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.token);
+        let token = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.token);
         let clientIdentifier = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.clientIdentifier);
+        let authId = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.loginRedirectId);
 
         if (!clientIdentifier) {
+            // clear token - we need to re-authenticate due to client identifier change.
+            token = null;
+            Settings.clearSettings();
+
             // The client id is no longer available or valid, generate a new one.
             clientIdentifier = this.generateClientId();
         }
-
-        // We now defintely have a cliend id to set, update params.
         this.requestBaseParams['X-Plex-Client-Identifier'] = clientIdentifier;
         
-        // If either of the above is not available, we need to process
-        // a login with plex.tv.
-        if (!token) {
-            this.needsLogin = true;
-        } else {
-            // The user is logged in, we need to save the token and client id
-            // for use in query parameters.
-            this.requestTokenParam['X-Plex-Token'] = token;
-        }
-
         // Create a client for plex.tv requests
         this.client = axios.create({
             baseURL: this.PLEX_BASE_URL,
@@ -111,6 +104,24 @@ export class PlexTvApi {
               'Content-type': 'application/json'
             }
         });
+
+        // If either of the above is not available, we need to process
+        // a login with plex.tv.
+        if (authId) {
+            const response = await this.validatePin(authId);
+            token = response.token;
+        }
+
+        if (!token) {
+            console.log("we don't have a token - logged out");
+            this.needsLogin = true;
+        } else {
+            // The user is logged in, we need to save the token and client id
+            // for use in query parameters.
+            console.log("we have a token - saving", token);
+            this.requestTokenParam['X-Plex-Token'] = token;
+            console.log("token set?", this.requestTokenParam);
+        }
 
         this.isInitialized = true;
     };
@@ -127,12 +138,12 @@ export class PlexTvApi {
      * @param token string - the auth token to validate.
      * @returns Promise<UserInfo> - a promise for the plex.tv user information.
      */
-    static validateToken = async (token: string): Promise<UserInfo> => {
+    static validateToken = async (): Promise<UserInfo> => {
       
         // Update our currently stored token with the value passed.
         // this.plexToken = token;
-        this.requestTokenParam['X-Plex-Token'] = token;
-
+        //this.requestTokenParam['X-Plex-Token'] = token;
+        console.log("have token??", this.requestTokenParam);
         try {
           const response = await this.client.get(this.PLEX_USER_URL, {
             params: {

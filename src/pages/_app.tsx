@@ -1,17 +1,13 @@
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
-
-import { useAppSelector, useAppDispatch } from '../context/hooks';
-
 import type { AppProps } from 'next/app';
-
-import Layout from '../components/Layout';
+import { useAppSelector, useAppDispatch } from '../context/hooks';
 
 import { Provider } from 'react-redux';
 import store from '../context/reducers';
 
+import Layout from '../components/Layout';
 import { PlexTvApi } from '../plex/Api';
-import { getToken, checkToken, checkAuthId } from '../context/actions/appStateActions';
+import { checkToken } from '../context/actions/appStateActions';
 import { getServers } from '../context/actions/settingsActions';
 
 // Note: this is a temporary fix to avoid the login
@@ -21,45 +17,24 @@ import { getServers } from '../context/actions/settingsActions';
 // need to make sure servers array is cleared when user changes (edge case, TODO).
 function Authentication() {
     const dispatch = useAppDispatch();
-    const router = useRouter();
-
     const user = useAppSelector((state) => state.application.user);
-    const authToken = useAppSelector((state) => state.application.authToken);
-    const authId = useAppSelector((state) => state.application.authId);
-    const servers = useAppSelector((state) => state.settings.servers);
-    const applicationState = useAppSelector((state) => state.application.applicationState);
 
     useEffect(() => {
-      PlexTvApi.initialize();
-      if (!user) {
-        // We have no user logged in, check for tokens.
-        dispatch(getToken());
-      } else if (!servers) {
-        dispatch(getServers());
-      }
-    }, [user, dispatch]);
-  
-    // useEffect(() => {
-    //   // TODO: this doesn't seem to work....
-    //   if (applicationState === 'loggedout') {
-    //     router.push({
-    //       pathname: '/login',
-    //       query: { returnUrl: router.asPath }
-    //     });
-    //   }
-    // }, [applicationState]);
+        const initialize = async () => {
+            await PlexTvApi.initialize();
+            if (!PlexTvApi.isLoggedOut) {
+                dispatch(checkToken());
+            } else {
+              // set application state to 'loggedOut'
+            }
+        }
+        initialize();
+    }, []);
 
     useEffect(() => {
-      PlexTvApi.initialize();
-      if (authToken) {
-        // We have a token stored, attempt to authenticate.
-        dispatch(checkToken(authToken));
-      } else if (authId) {
-        // We have been redirected and now have an authorization id to handle.
-        dispatch(checkAuthId(authId));
-      }
-    }, [authToken, authId, dispatch]);
-
+        if (user) dispatch(getServers());
+    }, [user]);
+ 
     return (
         <></>
     );

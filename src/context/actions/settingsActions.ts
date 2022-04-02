@@ -102,18 +102,12 @@ export const setApplicationTheme = (isDarkMode: boolean): AppAction => {
 // let in these actions, this action will only get the server
 // resources from plex.tv.
 export const getServers = (): AppThunk => async (dispatch, getState) => {
-  // Get the current state and retrieve the authToken.
-  dispatch(loadSettingsValues());
+    // Get the current state and retrieve the authToken.
+    dispatch(loadSettingsValues());
 
-  const state = getState();
-  const { authToken } = state.application;
-
-  // Call our plex api to get the resources.
-  if (authToken) {
     const servers = await PlexTvApi.getResources(RESOURCETYPES.server);
     dispatch({ type: actionTypes.LOAD_SERVER_LIST, payload: servers });
     dispatch(setActiveServer());
-  }
 
-  // TODO: reset state to no server active???
+    // TODO: reset state to no server active???
 };

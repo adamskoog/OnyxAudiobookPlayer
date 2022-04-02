@@ -23,10 +23,11 @@ export const getToken = (): AppThunk => (dispatch, getState) => {
   });
 };
 
-export const checkToken = (token: string): AppThunk => async (dispatch, getState) => {
+export const checkToken = (): AppThunk => async (dispatch, getState) => {
     dispatch({ type: actionTypes.CHECK_TOKEN });
 
-    const response = await PlexTvApi.validateToken(token);
+    const response = await PlexTvApi.validateToken();
+    console.log("auth response", response);
     if (response.message) {
         dispatch({ type: actionTypes.TOKEN_INVALID });
     } else {

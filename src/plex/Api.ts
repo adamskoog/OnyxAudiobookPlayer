@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import qs from 'qs';
+import * as Bowser from "bowser";
 import { v4 as uuidv4 } from 'uuid';
 
 import * as Settings from '../utility/settings';
@@ -48,12 +49,10 @@ export class PlexTvApi {
       'X-Plex-Token': null
     };
     private static requestBaseParams: Object = {
-        'X-Plex-Device-Name': 'Onyx',
+        'X-Plex-Device-Name': "Onyx",
         'X-Plex-Product': 'Onyx Audiobook Player',
-        'X-Plex-Version': '0.9.1',
-        'X-Plex-Client-Identifier': null,
-        'X-Plex-Platform': 'Chrome', // fill in with found browser....
-        'X-Plex-Device': 'Windows'
+        'X-Plex-Version': '0.9.2',
+        'X-Plex-Client-Identifier': null
     };
 
     static get baseParams() {
@@ -72,6 +71,7 @@ export class PlexTvApi {
         // We need to auto generate a guid to pass to the server
         // when this value doesn't exist
         const clientIdentifier = uuidv4();
+
         Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.clientIdentifier, clientIdentifier);
         return clientIdentifier;
     };
@@ -79,6 +79,11 @@ export class PlexTvApi {
     static initialize = async (): Promise<void> => {
 
         if (this.isInitialized) return;
+
+        // Setup the browser information.
+        const browser = Bowser.parse(window.navigator.userAgent);
+        this.requestBaseParams['X-Plex-Device'] = browser.os.name;
+        this.requestBaseParams['X-Plex-Platform'] = browser.browser.name;
 
         // We have not initialized, we need to check the browser storage
         // for plex.tv token, client identifier, and saved auth token.

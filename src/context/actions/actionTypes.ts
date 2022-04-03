@@ -26,7 +26,7 @@ export const LOGIN_REQUEST_NOT_VALID = 'authentication/loginRequestNotValid';
 export const USER_LOGGED_OUT = 'authentication/userLoggedOut';
 
 // Get the current auth token of the user.
-export const GET_TOKEN = 'authentication/getUserAuthToken';
+//export const GET_TOKEN = 'authentication/getUserAuthToken';
 
 export const UPDATE_SELECTED_SERVER = 'updateSelectedServer';
 

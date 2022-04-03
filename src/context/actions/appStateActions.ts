@@ -8,21 +8,6 @@ export const setApplicationState = (applicationState: string): AppAction => ({
   },
 });
 
-// TODO - refactor this out, no longer needed with new class
-// based api, token will be removed from redux.
-export const getToken = (): AppThunk => (dispatch, getState) => {
-  const token = PlexTvApi.authToken;
-  const authId = PlexTvApi.getAuthenticationId();
-
-  dispatch({
-    type: actionTypes.GET_TOKEN,
-    payload: {
-      authToken: token,
-      authId,
-    },
-  });
-};
-
 export const checkToken = (): AppThunk => async (dispatch, getState) => {
     dispatch({ type: actionTypes.CHECK_TOKEN });
 
@@ -34,14 +19,14 @@ export const checkToken = (): AppThunk => async (dispatch, getState) => {
     }
 };
 
-export const checkAuthId = (id: string): AppThunk => async (dispatch, getState) => {
-  dispatch({ type: actionTypes.LOGIN_REQUEST });
+// export const checkAuthId = (id: string): AppThunk => async (dispatch, getState) => {
+//   dispatch({ type: actionTypes.LOGIN_REQUEST });
 
-  const response = await PlexTvApi.validatePin(id);
-  dispatch({ type: actionTypes.LOGIN_REQUEST_VALIDATED, payload: { authToken: response.token } });
+//   const response = await PlexTvApi.validatePin(id);
+//   dispatch({ type: actionTypes.LOGIN_REQUEST_VALIDATED, payload: { authToken: response.token } });
 
-  // on error: dispatch({ type: actionTypes.LOGIN_REQUEST_NOT_VALID });
-};
+//   // on error: dispatch({ type: actionTypes.LOGIN_REQUEST_NOT_VALID });
+// };
 
 export const logout = (): AppThunk => (dispatch, getState) => {
 

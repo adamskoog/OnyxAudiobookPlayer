@@ -201,7 +201,7 @@ export class PlexTvApi {
      * @param id string - the auth id obtained from plex.tv
      * @returns Promise<any> - TODO
      */
-    static validatePin = async (id: string): Promise<any> => {
+    private static validatePin = async (id: string): Promise<any> => {
 
       const clientIdParams = { 'X-Plex-Client-Identifier': this.requestBaseParams['X-Plex-Client-Identifier'] };
       const url = `${this.PLEX_BASE_URL}${this.PLEX_PINS_URL}/${id}?${qs.stringify(clientIdParams)}`;

@@ -37,9 +37,13 @@ export const setServerBaseUrl = (): AppThunk => async (dispatch, getState) => {
   const state = getState();
   const server = state.settings.currentServer;
 
-  const baseUrl = await PlexServerApi.initialize(server);
-  dispatch({ type: actionTypes.SET_SERVER_URL, payload: baseUrl.uri });
-  dispatch(getLibraries());
+  const connection = await PlexServerApi.initialize(server);
+  if (!connection.message) {
+      dispatch({ type: actionTypes.SET_SERVER_URL, payload: connection.uri });
+      dispatch(getLibraries());
+  } else {
+      console.warn("Failed to get connection", connection);
+  }
 };
 
 const matchServer = (serverId: string, resources: Array<any> | null): any => {

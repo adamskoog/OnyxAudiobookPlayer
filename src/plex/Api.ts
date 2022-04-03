@@ -264,7 +264,7 @@ export class PlexServerApi {
     // };
 
     private static client: AxiosInstance;
-    private static baseUrl: string;
+    private static baseUrl: string | null;
     private static requestTokenParam: Object = {
       'X-Plex-Token': null
     };
@@ -273,16 +273,19 @@ export class PlexServerApi {
 
         // This class is initialized by a server being selected.
         // This can happen on load or from the Settings page.
-        const connection = await this.serverConnectionTest(resource.connections, resource.accessToken);
-        this.baseUrl = connection.uri ?? '';
+        const connection = await this.serverConnectionTest(resource);
+        
 
-        this.client = axios.create({
-          baseURL: this.baseUrl,
-          headers: {
-            'Accept': 'application/json',
-            'Content-type': 'application/json'
-          }
-        });
+        if (connection.uri) {
+          this.baseUrl = connection.uri ?? null;
+          this.client = axios.create({
+            baseURL: this.baseUrl,
+            headers: {
+              'Accept': 'application/json',
+              'Content-type': 'application/json'
+            }
+          });
+        }
 
         // Return the connection information - the url in the future
         // should not be needed in redux, but if an error has occurred 
@@ -310,16 +313,18 @@ export class PlexServerApi {
      * @param {array[uri]} connections - An array of the server connections to be tested.
      * @param {string} token
      */
-    private static serverConnectionTest = (connections: any, token: string): Promise<PlexServerConnection> => new Promise((resolve, reject) => {
+    private static serverConnectionTest = (resource: any): Promise<PlexServerConnection> => new Promise((resolve, reject) => {
       
       // TODO: handle this better with base params.
-      this.requestTokenParam['X-Plex-Token'] = token;
+      this.requestTokenParam['X-Plex-Token'] = resource.accessToken;
 
       const params = { ...PlexTvApi.baseParams, ...this.requestTokenParam };
+      const connections = resource.connections;
+      const connectionPromises = connections.map((connection: any) => {
 
-      const connectionPromises = connections.map((connection) => {
         // Use different timeout lengths for local vs remote servers.
-        const timeout = (connection.local) ? 1000 : 5000;
+        // TODO: the local timeout was too short and failing after login.
+        const timeout = 5000; ///(connection.local) ? 1000 : 5000;
 
         // Identity endpoint is very small, used by other projects.
         return this.fetchWithTimeout(formatUrl(`${connection.uri}/identity`, params), {

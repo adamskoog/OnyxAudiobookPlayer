@@ -22,13 +22,13 @@ const MenuButton = styled.button`
 
 const markPlayed = async (trackInfo: any, baseUrl: string | null, accessToken: string | null, updateAlbumInfo: any): Promise<void> => {
   if (!baseUrl || !accessToken) return;
-  await markTrackPlayed(trackInfo, baseUrl, accessToken);
+  await markTrackPlayed(trackInfo);
   updateAlbumInfo();
 };
 
 const markUnplayed = async (trackInfo: any, baseUrl: string | null, accessToken: string | null, updateAlbumInfo: any): Promise<void> => {
   if (!baseUrl || !accessToken) return;
-  await markTrackUnplayed(trackInfo, baseUrl, accessToken);
+  await markTrackUnplayed(trackInfo);
   updateAlbumInfo();
 };
 

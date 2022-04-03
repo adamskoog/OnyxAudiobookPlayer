@@ -2,7 +2,7 @@ export const SETTINGS_KEYS: {[key: string]: string} = {
   serverId: 'settings_serverIdentifier',
   libraryId: 'settings_library',
   token: 'authToken',
-  clientIdentifier: '',
+  clientIdentifier: 'clientIdentifier',
   loginRedirectId: 'login_redirect_id',
   theme: 'dark_mode',
 };
@@ -34,4 +34,11 @@ export const saveSettingToStorage = (key: string, value: string): void => {
 
 export const removeSettingFromStorage = (key: string): void => {
   localStorage.removeItem(key);
+};
+
+export const clearSettings = (): void => {
+    const keys = Object.keys(SETTINGS_KEYS);
+    keys.forEach((key) => {
+        removeSettingFromStorage(SETTINGS_KEYS[key]);
+    });
 };

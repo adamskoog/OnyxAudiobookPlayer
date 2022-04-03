@@ -1,8 +1,13 @@
 import React, { useState, useEffect, ReactElement } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
+import { useAppSelector, useAppDispatch } from '../../context/hooks';
 
-import { Link, useLocation } from 'react-router-dom';
 import * as Responsive from '../util/responsive';
+
+import { logout } from '../../context/actions/appStateActions';
+import { PlexTvApi } from '../../plex/Api';
 
 import UserMenu from './UserMenu';
 import { SrOnly } from '../util/common';
@@ -47,10 +52,10 @@ const MobileMenuContainer: any = styled.div`
     `)}
 `;
 
-const MobileMenuItem = styled(Link)`
+const MobileMenuItem = styled.span`
     display: block;
     border-radius: 0.375rem;
-
+    cursor: pointer;
     color: ${({ theme }) => theme.NAV_TEXT};
     font-size: 1rem;
     line-height: 1.5rem;
@@ -127,9 +132,9 @@ const TitleMenuItem = styled.div`
     `)}
 `;
 
-const TitleMenuItemLink = styled(Link)`
+const TitleMenuItemLink = styled.span`
     color: ${({ theme }) => theme.NAV_TEXT};
-
+    cursor: pointer;
     padding-top: 0.5rem;
     padding-left: 0.75rem;
     padding-right: 0.75rem;
@@ -175,20 +180,21 @@ const TitleMenuItemButton = styled.button`
     }
 `;
 
-type Props = {
-    containerRef: any,
-    userInfo: any,
-    doUserLogin: any,
-    doUserLogout: any
-}
+const doUserLogin = async (): Promise<void> => {
+  const response = await PlexTvApi.signIn();
+  window.location.href = response.url;
+};
 
-function Header({
-  containerRef, userInfo, doUserLogin, doUserLogout,
-}: Props): ReactElement {
+function Header(): ReactElement {
+  const dispatch = useAppDispatch();
+
   const TITLE = 'Onyx Player';
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
-  const location = useLocation();
+  const userInfo = useAppSelector((state) => state.application.user);
+
+  const router = useRouter();
+  const pathname = router.pathname;
 
   const navButtonCss = (active: string): void => {
     const elems = document.querySelectorAll('.nav-menu');
@@ -201,24 +207,13 @@ function Header({
     });
   };
 
-  const menuCss = (isOpen: boolean): void => {
-    const main = containerRef.current;
-    if (main) {
-      main.classList.remove('menu-open');
-    }
-    if (main && isOpen) {
-      main.classList.add('menu-open');
-    }
-  };
-
   const closeMainMenu = (): void => {
     if (menuIsOpen) setMenuIsOpen(false);
   };
 
   useEffect(() => {
-    if (!location) return;
-
-    switch (location.pathname) {
+    if (!pathname) return;
+    switch (pathname) {
       case '/library':
         navButtonCss('nav-library');
         break;
@@ -228,11 +223,9 @@ function Header({
       default:
         navButtonCss('nav-empty');
     }
-  }, [location]);
+  }, [pathname]);
 
   useEffect(() => {
-    menuCss(menuIsOpen);
-
     if (!menuIsOpen) return;
     document.addEventListener('click', closeMainMenu);
     return () => { document.removeEventListener('click', closeMainMenu); };
@@ -252,10 +245,10 @@ function Header({
           <TitleContainer>
             <Title>{TITLE}</Title>
             <TitleMenuItem>
-              <TitleMenuItemLink className="nav-menu nav-home" to="/">Home</TitleMenuItemLink>
+              <Link href="/"><TitleMenuItemLink className={'nav-menu nav-home'}>Home</TitleMenuItemLink></Link>
             </TitleMenuItem>
             <TitleMenuItem>
-              <TitleMenuItemLink className="nav-menu nav-library" to="/library">Library</TitleMenuItemLink>
+              <Link href="/library"><TitleMenuItemLink className={'nav-menu nav-library'}>Library</TitleMenuItemLink></Link>
             </TitleMenuItem>
           </TitleContainer>
 
@@ -263,13 +256,13 @@ function Header({
             <TitleMenuItemButton className="nav-menu nav-signin" onClick={() => doUserLogin()}>Login</TitleMenuItemButton>
           )}
 
-          <UserMenu userInfo={userInfo} doUserLogout={doUserLogout} />
+          <UserMenu userInfo={userInfo} doUserLogout={() => dispatch(logout())} />
         </NavContent>
       </Container>
 
       <MobileMenuContainer isOpen={menuIsOpen}>
-        <MobileMenuItem to="/">Home</MobileMenuItem>
-        <MobileMenuItem to="/library">Library</MobileMenuItem>
+        <Link href="/"><MobileMenuItem>Home</MobileMenuItem></Link>
+        <Link href="/library"><MobileMenuItem>Library</MobileMenuItem></Link>
       </MobileMenuContainer>
     </NavContainer>
   );

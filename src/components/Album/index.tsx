@@ -1,11 +1,11 @@
 import React, { useState, useEffect, ReactElement } from 'react';
+import Link from 'next/link';
 import styled from 'styled-components';
-import { Link, useParams } from 'react-router-dom';
 
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
 import { setPlayQueue } from '../../context/actions/playQueueActions';
 
-import { getAlbumMetadata } from '../../plex/Api';
+import { PlexServerApi } from '../../plex/Api';
 import {
   getAlbumQueue, updateOnDeck, isTrackOnDeck, findOnDeck,
 } from '../../plex/Playback';
@@ -51,6 +51,7 @@ const AlbumAuthor = styled.div`
 
     font-size: 1.125rem;
     line-height: 1.125rem;
+    cursor: pointer;
 `;
 const AlbumYear = styled.div`
     margin-top: .25rem;
@@ -81,24 +82,25 @@ const TrackCount = styled.div`
     margin-bottom: 0.5rem;
 `;
 
-function Album(): ReactElement {
+type Props = {
+  ratingKey: any
+}
+
+function Album({ ratingKey }: Props): ReactElement {
   const dispatch = useAppDispatch();
 
-  const accessToken = useAppSelector((state) => state.settings.accessToken);
-  const baseUrl = useAppSelector((state) => state.application.baseUrl);
+  const applicationState = useAppSelector((state) => state.application.applicationState);
 
   const [album, setAlbum]: [any, any] = useState({ Metadata: [] });
   const [onDeck, setOnDeck]: [any, any] = useState(null);
-
-  const { ratingKey } = useParams();
 
   const playOnDeckTrack = (trackInfo: any): void => {
     dispatch(setPlayQueue(getAlbumQueue(trackInfo, album)));
   };
 
   const fetchAlbumMetadata = async (): Promise<any> => {
-    if (baseUrl && accessToken && ratingKey) {
-      const data: PlexAlbumMetadata = await getAlbumMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
+    if (applicationState === 'ready' && ratingKey) {
+      const data: PlexAlbumMetadata = await PlexServerApi.getAlbumMetadata(ratingKey);
         const newOnDeck: any = findOnDeck(data);
         setAlbum(data);
         setOnDeck(newOnDeck);
@@ -109,8 +111,8 @@ function Album(): ReactElement {
   };
 
   const playSelectedTrack = async (trackInfo: any): Promise<void> => {
-    if (baseUrl && accessToken && !isTrackOnDeck(trackInfo, album)) {
-      await updateOnDeck(trackInfo, album, baseUrl, accessToken);
+    if (applicationState === 'ready' && !isTrackOnDeck(trackInfo, album)) {
+      await updateOnDeck(trackInfo, album);
       const albumInfo: any = await fetchAlbumMetadata();
       dispatch(setPlayQueue(getAlbumQueue(albumInfo.track, albumInfo.album)));
     } else playOnDeckTrack(trackInfo);
@@ -118,21 +120,21 @@ function Album(): ReactElement {
 
   useEffect(() => {
     const fetchMetadata = async (): Promise<void> => {
-      if (accessToken && baseUrl && ratingKey) fetchAlbumMetadata();
+      if (applicationState === 'ready' && ratingKey) fetchAlbumMetadata();
     };
     fetchMetadata();
-  }, [baseUrl, accessToken, ratingKey]);
+  }, [applicationState, ratingKey]);
 
   // https://tailwindcomponents.com/component/button-component-default
   return (
     <Container>
-      {accessToken && (
+      {applicationState === 'ready' && (
         <>
           <AlbumContainer>
             <PlexImage width={200} height={200} url={album.thumb} alt={`${album.parentTitle} Cover`} />
             <AlbumInfo>
               <AlbumTitle>{album.parentTitle}</AlbumTitle>
-              <Link to={`/artist/${album.grandparentRatingKey}`}>
+              <Link href={'/artist/[ratingKey]'} as={`/artist/${album.grandparentRatingKey}`}>
                 <AlbumAuthor>{album.grandparentTitle}</AlbumAuthor>
               </Link>
               <AlbumYear>{album.parentYear}</AlbumYear>

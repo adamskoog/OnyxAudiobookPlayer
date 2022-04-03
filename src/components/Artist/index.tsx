@@ -1,9 +1,8 @@
 import React, { useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
-import { useParams } from 'react-router-dom';
 
 import { useAppSelector } from '../../context/hooks';
-import { getArtistMetadata } from '../../plex/Api';
+import { PlexServerApi } from '../../plex/Api';
 
 import AlbumItem from '../Library/AlbumItem';
 import AlbumSummary from '../Album/AlbumSummary';
@@ -72,27 +71,28 @@ const AlbumCount = styled.div`
     margin-bottom: 0.5rem;
 `;
 
-function Artist(): ReactElement {
-  const accessToken = useAppSelector((state) => state.settings.accessToken);
-  const baseUrl = useAppSelector((state) => state.application.baseUrl);
+type Props = {
+  ratingKey: any
+}
+
+function Artist({ ratingKey }: Props): ReactElement {
+  const applicationState = useAppSelector((state) => state.application.applicationState);
 
   const [artist, setArtist]: [any, any] = useState({ Metadata: [] });
 
-  const { ratingKey } = useParams();
-
   useEffect(() => {
     const fetchMetadata = async (): Promise<void> => {
-      if (accessToken && baseUrl && ratingKey) {
-        const data = await getArtistMetadata(baseUrl, ratingKey, { 'X-Plex-Token': accessToken });
+      if (applicationState === 'ready' && ratingKey) {
+        const data = await PlexServerApi.getArtistMetadata(ratingKey);
         setArtist(data);
       }
     };
     fetchMetadata();
-  }, [baseUrl, accessToken, ratingKey]);
+  }, [applicationState, ratingKey]);
 
   return (
     <>
-      {accessToken && (
+      {applicationState === 'ready' && (
       <>
         <Container>
           <PlexImage width={200} height={200} url={artist.thumb} alt={`${artist.parentTitle}`} />

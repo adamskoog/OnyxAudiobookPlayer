@@ -13,7 +13,7 @@ declare global {
     type SettingsState = {
         serverIdentifier: string,
         librarySection: string,
-        servers: Array<any>,
+        servers: Array<any> | null,
         libraries: Array<any>,
         currentServer: any | null,
         accessToken: string | null,
@@ -24,7 +24,7 @@ declare global {
 const defaultState: SettingsState = {
   serverIdentifier: '',
   librarySection: '',
-  servers: [],
+  servers: null,
   libraries: [],
   currentServer: null,
   accessToken: null,

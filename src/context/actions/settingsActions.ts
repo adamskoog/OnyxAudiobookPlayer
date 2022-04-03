@@ -1,7 +1,9 @@
 import * as actionTypes from './actionTypes';
 import * as SettingsUtils from '../../utility/settings';
 import {
-  RESOURCETYPES, getResources, findServerBaseUrl, getLibraries as getPlexLibraries,
+  RESOURCETYPES,
+  PlexTvApi,
+  PlexServerApi
 } from '../../plex/Api';
 
 export const loadSettingsValues = (): AppAction => {
@@ -23,7 +25,9 @@ export const getLibraries = (): AppThunk => async (dispatch, getState) => {
   const resource = state.settings.currentServer;
 
   if (baseUrl && resource) {
-    const libraries = await getPlexLibraries(baseUrl, resource.accessToken);
+    // TODO: remove the state reference above, handle missing values
+    // with error in getLibraries.
+    const libraries = await PlexServerApi.getLibraries();
     dispatch({ type: actionTypes.LOAD_LIBRARY_LIST_COMPLETE, payload: libraries });
   }
 };
@@ -33,12 +37,13 @@ export const setServerBaseUrl = (): AppThunk => async (dispatch, getState) => {
   const state = getState();
   const server = state.settings.currentServer;
 
-  const baseUrl = await findServerBaseUrl(server);
+  const baseUrl = await PlexServerApi.initialize(server);
   dispatch({ type: actionTypes.SET_SERVER_URL, payload: baseUrl.uri });
   dispatch(getLibraries());
 };
 
-const matchServer = (serverId: string, resources: Array<any>): any => {
+const matchServer = (serverId: string, resources: Array<any> | null): any => {
+  if (!resources) throw 'No Servers Found.'
   for (let i = 0; i < resources.length; i++) {
     if (serverId === resources[i].clientIdentifier) {
       return resources[i];
@@ -72,6 +77,7 @@ export const setServerSetting = (serverId: string): AppThunk => async (dispatch,
   SettingsUtils.saveSettingToStorage(SettingsUtils.SETTINGS_KEYS.libraryId, '');
 
   dispatch({ type: actionTypes.SAVE_SETTING_SERVER, payload: serverId });
+  
   dispatch(setActiveServer());
 };
 
@@ -96,18 +102,12 @@ export const setApplicationTheme = (isDarkMode: boolean): AppAction => {
 // let in these actions, this action will only get the server
 // resources from plex.tv.
 export const getServers = (): AppThunk => async (dispatch, getState) => {
-  // Get the current state and retrieve the authToken.
-  dispatch(loadSettingsValues());
+    // Get the current state and retrieve the authToken.
+    dispatch(loadSettingsValues());
 
-  const state = getState();
-  const { authToken } = state.application;
-
-  // Call our plex api to get the resources.
-  if (authToken) {
-    const servers = await getResources(authToken, RESOURCETYPES.server);
+    const servers = await PlexTvApi.getResources(RESOURCETYPES.server);
     dispatch({ type: actionTypes.LOAD_SERVER_LIST, payload: servers });
     dispatch(setActiveServer());
-  }
 
-  // TODO: reset state to no server active???
+    // TODO: reset state to no server active???
 };

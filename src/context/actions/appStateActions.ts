@@ -1,7 +1,5 @@
 import * as actionTypes from './actionTypes';
-import {
-  getAuthTokenFromStorage, getAuthenticationId, validateToken, validateAuthId, logout as authLogout,
-} from '../../plex/Authentication';
+import { PlexTvApi } from '../../plex/Api';
 
 export const setApplicationState = (applicationState: string): AppAction => ({
   type: actionTypes.CHANGE_APP_STATE,
@@ -10,39 +8,29 @@ export const setApplicationState = (applicationState: string): AppAction => ({
   },
 });
 
-export const getToken = (): AppThunk => (dispatch, getState) => {
-  const token = getAuthTokenFromStorage();
-  const authId = getAuthenticationId();
+export const checkToken = (): AppThunk => async (dispatch, getState) => {
+    dispatch({ type: actionTypes.CHECK_TOKEN });
 
-  dispatch({
-    type: actionTypes.GET_TOKEN,
-    payload: {
-      authToken: token,
-      authId,
-    },
-  });
+    const response = await PlexTvApi.validateToken();
+    if (response.message) {
+        dispatch({ type: actionTypes.TOKEN_INVALID });
+    } else {
+        dispatch({ type: actionTypes.TOKEN_VALID, payload: response });
+    }
 };
 
-export const checkToken = (token: string): AppThunk => async (dispatch, getState) => {
-  dispatch({ type: actionTypes.CHECK_TOKEN });
+// export const checkAuthId = (id: string): AppThunk => async (dispatch, getState) => {
+//   dispatch({ type: actionTypes.LOGIN_REQUEST });
 
-  const response = await validateToken(token);
-  dispatch({ type: actionTypes.TOKEN_VALID, payload: response });
+//   const response = await PlexTvApi.validatePin(id);
+//   dispatch({ type: actionTypes.LOGIN_REQUEST_VALIDATED, payload: { authToken: response.token } });
 
-  // on error: dispatch({ type: actionTypes.TOKEN_INVALID });
-};
-
-export const checkAuthId = (id: string): AppThunk => async (dispatch, getState) => {
-  dispatch({ type: actionTypes.LOGIN_REQUEST });
-
-  const response = await validateAuthId(id);
-  dispatch({ type: actionTypes.LOGIN_REQUEST_VALIDATED, payload: { authToken: response.token } });
-
-  // on error: dispatch({ type: actionTypes.LOGIN_REQUEST_NOT_VALID });
-};
+//   // on error: dispatch({ type: actionTypes.LOGIN_REQUEST_NOT_VALID });
+// };
 
 export const logout = (): AppThunk => (dispatch, getState) => {
-  authLogout();
+
+  PlexTvApi.logout();
 
   dispatch({
     type: actionTypes.USER_LOGGED_OUT,

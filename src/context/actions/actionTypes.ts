@@ -26,7 +26,7 @@ export const LOGIN_REQUEST_NOT_VALID = 'authentication/loginRequestNotValid';
 export const USER_LOGGED_OUT = 'authentication/userLoggedOut';
 
 // Get the current auth token of the user.
-export const GET_TOKEN = 'authentication/getUserAuthToken';
+//export const GET_TOKEN = 'authentication/getUserAuthToken';
 
 export const UPDATE_SELECTED_SERVER = 'updateSelectedServer';
 
@@ -56,3 +56,12 @@ export const SET_LIBRARY_LOADING = 'libary/setLoading';
 export const SET_LIBRARY_DISPLAY_TYPE = 'libary/setDisplayType';
 export const SET_LIBRARY_SORT_TYPE = 'libary/setSortOrder';
 export const SET_LIBRARY_ITEMS = 'libary/setLibraryItems';
+
+
+export const APP_STATES = {
+    LOGGED_OUT: 'loggedout',
+    LOADING: 'loading',
+    NEED_SERVER: 'need_server',
+    NEED_LIBRARY: 'need_library',
+    READY: 'ready'
+}

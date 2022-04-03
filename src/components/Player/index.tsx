@@ -1,6 +1,6 @@
 import React, { useEffect, useState, ReactElement } from 'react';
+import Link from 'next/link';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../context/hooks';
 
 import * as Responsive from '../util/responsive';
@@ -67,7 +67,7 @@ function NowPlaying(): ReactElement {
       setTrackThumbUrl(currentTrack.thumb);
       setTrackTitle(currentTrack.title);
       setAlbumTitle(currentTrack.parentTitle);
-      setAlbumKey(currentTrack.ratingKey);
+      setAlbumKey(currentTrack.parentRatingKey);
       setArtistName(currentTrack.grandparentTitle);
     } else {
       setTrackThumbUrl(null);
@@ -86,7 +86,9 @@ function NowPlaying(): ReactElement {
       <InfoContainer>
         <TextBlock>{trackTitle}</TextBlock>
         <TextBlock muted>
-          <Link to={`/album/${albumKey}`}>{albumTitle}</Link>
+          <Link href={'/album/[ratingKey]'} as={`/album/${albumKey}`}>
+            {albumTitle}
+          </Link>
         </TextBlock>
         <TextBlock muted>{artistName}</TextBlock>
         <PlayerTime />

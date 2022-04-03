@@ -2,7 +2,7 @@ import React, { useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../context/hooks';
-import { getThumbnailTranscodeUrl } from '../../plex/Api';
+import { PlexServerApi } from '../../plex/Api';
 
 const Image: any = styled.img`
     ${(props: any) => ((props.xheight) ? `height: ${props.xheight}px;` : '')}
@@ -36,7 +36,7 @@ function PlexImage({
 
   useEffect(() => {
     if (accessToken && baseUrl && url) {
-      setImageUrl(getThumbnailTranscodeUrl(height, width, baseUrl, url, accessToken));
+      setImageUrl(PlexServerApi.getThumbnailTranscodeUrl(height, width, url));
     } else {
       setImageUrl(null);
     }

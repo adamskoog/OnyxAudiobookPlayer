@@ -270,7 +270,10 @@ export class PlexServerApi {
       'X-Plex-Token': null
     };
 
-    static initialize = async (resource: PlexResource): Promise<ServerConnection> => {
+    static initialize = async (resource: PlexResource | null): Promise<ServerConnection> => {
+
+        if (!resource)
+            return { message: 'No resource selected' };
 
         // This class is initialized by a server being selected.
         // This can happen on load or from the Settings page.
@@ -294,13 +297,13 @@ export class PlexServerApi {
         return connection;
     };
 
-    private static fetchWithTimeout = async (resource: any, options: any): Promise<any> => {
+    private static fetchWithTimeout = async (url: string, options: any): Promise<any> => {
       const { timeout = 8000 } = options;
     
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeout);
     
-      const response = await fetch(resource, {
+      const response = await fetch(url, {
         ...options,
         signal: controller.signal,
       });
@@ -354,8 +357,9 @@ export class PlexServerApi {
    
     /**
      * Get a list of libraries for the currently selection server connection.
+     * @returns Promise<Array<PlexLibrary>> - array of libraries that match audio type.
      */
-    static getLibraries = async (): Promise<any> => {
+    static getLibraries = async (): Promise<Array<PlexLibrary>> => {
       const response = await this.client.get(`/library/sections`, {
         params: {
             ...PlexTvApi.baseParams,
@@ -462,10 +466,9 @@ export class PlexServerApi {
     /**
      * Determine the correct media to play from the server.
      * TODO: this doesn't do much, just grabs the first item.
-     * @param {any} track - The track object to determine media.
+     * @param {PlexTrackMedia} track - The track object to determine media.
      */
     static getTrackMediaUrl = (track: PlexTrackMedia): string => {
-        console.log("track object", track);
         return formatUrl(`${this.baseUrl}${track.Part[0].key}`, this.requestTokenParam);
     };
  
@@ -621,7 +624,28 @@ declare global {
       uri: string,
       local: boolean
   }
-
+  type PlexLibrary = {
+    agent: string,
+    allowSync: boolean,
+    art: string,
+    composite: string,
+    content: boolean,
+    contentChangedAt: number,
+    createdAt: number,
+    directory: boolean,
+    filters: boolean,
+    hidden: number,
+    key: string,
+    language: string,
+    refreshing: boolean,
+    scannedAt: number,
+    scanner: string,
+    thumb: string,
+    title: string,
+    type: string,
+    updatedAt: number,
+    uuid: string
+  }
 
   type PlexTrack = {
       ratingKey: string,

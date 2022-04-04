@@ -3,7 +3,7 @@ import React, { useEffect, useState, ReactElement } from 'react';
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
 import { setServerSetting, setLibrarySetting, setApplicationTheme } from '../../context/actions/settingsActions';
 
-import { ToggleSwitch, Combobox } from '../util/controls';
+import { ToggleSwitch, Combobox, ComboOption } from '../util/controls';
 
 function Settings(): ReactElement {
   const dispatch = useAppDispatch();
@@ -15,12 +15,12 @@ function Settings(): ReactElement {
   const isDarkMode = useAppSelector((state) => state.settings.isDarkMode);
 
   // Local state for option arrays.
-  const [serverOptions, setServerOptions]: [any, any] = useState([]);
-  const [libraryOptions, setLibraryOptions]: [any, any] = useState([]);
+  const [serverOptions, setServerOptions] = useState<Array<ComboOption>>([]);
+  const [libraryOptions, setLibraryOptions] = useState<Array<ComboOption>>([]);
 
   useEffect(() => {
     if (resources && resources.length > 0) {
-      setServerOptions(resources.map((resource: any) => ({
+      setServerOptions(resources.map((resource) => ({
         displayValue: resource.name, value: resource.clientIdentifier,
       })));
     } else setServerOptions([]);
@@ -28,7 +28,7 @@ function Settings(): ReactElement {
 
   useEffect(() => {
     if (libraries && libraries.length > 0) {
-      setLibraryOptions(libraries.map((library: any) => ({
+      setLibraryOptions(libraries.map((library) => ({
         displayValue: library.title, value: library.key,
       })));
     } else setLibraryOptions([]);

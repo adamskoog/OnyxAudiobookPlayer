@@ -599,6 +599,17 @@ declare global {
 
 
   // Plex Types
+  type PlexUser = {
+      id: number,
+      authToken: string,
+      email: string,
+      friendlyName: string,
+      pin: string,
+      thumb: string,
+      title: string,
+      username: string
+  }
+
   type PlexResource = {
       accessToken: string,
       clientIdentifier: string,
@@ -616,6 +627,10 @@ declare global {
       ratingKey: string,
       key: string,
       title: string,
+      thumb: string,
+      parentTitle: string,
+      parentRatingKey: string,
+      grandparentTitle: string,
       viewOffset: number,
       Media: Array<PlexTrackMedia>
   }

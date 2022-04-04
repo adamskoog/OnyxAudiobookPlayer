@@ -11,7 +11,7 @@ export const clearPlayQueue = (): AppAction => ({
   },
 });
 
-export const setPlayQueue = (playQueue: Array<any>): AppAction => {
+export const setPlayQueue = (playQueue: Array<PlexTrack>): AppAction => {
   const queue = playQueue ?? [];
   const index = (queue && queue.length > 0) ? 0 : -1;
   return {

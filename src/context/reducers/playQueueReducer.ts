@@ -14,7 +14,7 @@ declare global {
         queue: Array<PlexTrack>,
         id: string,
         index: number,
-        currentTrack: PlexTrackMedia | null
+        currentTrack: PlexTrack | null
     }
 }
 

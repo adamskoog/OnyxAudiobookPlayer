@@ -144,16 +144,17 @@ function AudioPlayer(): ReactElement {
     }
   }, [queueIndex, queue]);
 
-  const throttleTimeline = throttle(() => {
-    const playerElement: HTMLAudioElement = playerRef.current;
-    if (!playerElement.paused) {
-      updateTimeline(queue[queueIndex], PlayState.PLAY_STATE_PLAYING, playerElement.currentTime, playerElement.duration);
-    }
-  }, 4000, { trailing: false });
-
   useEffect(() => {
     const playerElement: HTMLAudioElement = playerRef.current;
     if (!playerElement) return;
+
+    // Add throttling to the timeupdate event.
+    const throttleTimeline = throttle(() => {
+      if (!playerElement.paused) {
+        updateTimeline(queue[queueIndex], PlayState.PLAY_STATE_PLAYING, playerElement.currentTime, playerElement.duration);
+      }
+    }, 4000, { trailing: false });
+
     playerElement.addEventListener('timeupdate', throttleTimeline);
     return () => playerElement.removeEventListener('timeupdate', throttleTimeline);
   }, [queueId, queueIndex]);

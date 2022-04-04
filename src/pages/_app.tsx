@@ -7,7 +7,7 @@ import store from '../context/reducers';
 
 import Layout from '../components/Layout';
 import { PlexTvApi } from '../plex/Api';
-import { checkToken } from '../context/actions/appStateActions';
+import { checkToken, setApplicationState } from '../context/actions/appStateActions';
 import { getServers } from '../context/actions/settingsActions';
 
 // Note: this is a temporary fix to avoid the login
@@ -26,6 +26,8 @@ function Authentication() {
                 dispatch(checkToken());
             } else {
               // set application state to 'loggedOut'
+              console.log("set app state");
+              dispatch(setApplicationState('loggedout'));
             }
         }
         initialize();

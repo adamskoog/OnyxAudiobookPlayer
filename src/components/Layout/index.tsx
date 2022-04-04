@@ -3,7 +3,7 @@ import styled, { ThemeProvider } from 'styled-components';
 import { useAppSelector } from '../../context/hooks';
 
 import { NormalizeGlobalStyle, GlobalStyle } from '../util/global';
-import { lightMode, darkMode } from '../util/colors';
+import { lightMode, darkMode } from '../util/theme/theme';
 
 import Loader from '../Loader';
 import Header from '../Header';
@@ -27,7 +27,7 @@ function Layout({ children }) {
         <NormalizeGlobalStyle />
         <GlobalStyle />
 
-        {/* <Loader /> */}
+        <Loader />
         <Header />
         <FilterMenu />
         <MainContainer>

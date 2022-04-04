@@ -6,7 +6,7 @@ import { useAppSelector } from '../context/hooks';
 const showLoading = (loading: boolean, state: string): boolean => {
   // TODO: we should utilize the state to determine when
   // this is shown.
-  if (loading) return true;
+  if (loading && state === 'loading') return true;
   return false;
 };
 

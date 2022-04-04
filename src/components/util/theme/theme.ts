@@ -1,10 +1,12 @@
+export type ThemeType = typeof lightMode;
+
 // Found side for color mixing/complementary colors:
 //          https://rgbcolorcode.com/color/4DA6FF
 // TODO: make type for themes.
 // ##############################################
 // Light Theme Colors
 // ##############################################
-export const lightMode: any = {
+export const lightMode = {
 // ####    Body    ####
   BODY_BG: 'rgba(229, 231, 235, 1)',
   BODY_TEXT: '#000',
@@ -52,7 +54,7 @@ export const lightMode: any = {
 // Dark Theme Colors
 // ##############################################
 
-export const darkMode: any = {
+export const darkMode: ThemeType = {
 // ####    Body    ####
   BODY_BG: '#000',
   BODY_TEXT: '#fff',
@@ -95,3 +97,6 @@ export const darkMode: any = {
   SPINNER: 'rgba(255, 255, 255, .3)',
   SPINNER_BG: 'rgba(229, 231, 235, 1)',
 };
+
+const colors = lightMode;
+export default colors;

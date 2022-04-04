@@ -270,8 +270,8 @@ export class PlexServerApi {
       'X-Plex-Token': null
     };
 
-    static initialize = async (resource: PlexResource | null): Promise<ServerConnection> => {
-
+    static initialize = async (resource: any | null): Promise<ServerConnection> => {
+        console.log("PLEX RESOURCE", resource);
         if (!resource)
             return { message: 'No resource selected' };
 

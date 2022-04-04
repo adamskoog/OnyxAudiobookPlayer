@@ -154,9 +154,14 @@ const ComboboxUnchecked = styled.div`
     ${checkMarkCss}
 `;
 
+export type ComboOption = {
+  displayValue: string,
+  value: string
+}
+
 type ComboboxProps = {
     value: string,
-    options: Array<any>,
+    options: Array<ComboOption>,
     defaultLabel?: string,
     noOptionsLabel?: string,
     callback?: any

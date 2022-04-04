@@ -26,7 +26,7 @@ const Avatar = styled.img`
 `;
 
 type Props = {
-    userInfo: any,
+    userInfo: PlexUser | null,
     doUserLogout: any
 }
 

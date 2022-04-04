@@ -64,7 +64,7 @@ function AudioPlayer(): ReactElement {
     return false;
   };
 
-  const updateTimeline = (trackInfo: any, playerState: any, currentTime: any, duration: any): void => {
+  const updateTimeline = (trackInfo: PlexTrack, playerState: string, currentTime: number, duration: number): void => {
     // we need a way to update the album info if the user is looking at the album
     // page, It should keep the on deck updated.
     // Should this be done while playing, or only when user pauses/kills the stream.
@@ -83,9 +83,9 @@ function AudioPlayer(): ReactElement {
     // .then((data) => { /* console.log("data", data); TODO: This doesn't seem to return anything, and errors out often. */ });
   };
 
-  const playerRangeChanged = (evt): void => {
+  const playerRangeChanged = (evt: React.ChangeEvent<HTMLInputElement>): void => {
     const playerElement: HTMLAudioElement = playerRef.current;
-    playerElement.currentTime = evt.target.value;
+    playerElement.currentTime = evt.target.value as any as number;
   };
 
   const playTrack = (): void => {
@@ -131,11 +131,11 @@ function AudioPlayer(): ReactElement {
     playerElement.currentTime = newTime;
   };
 
-  const timeUpdated = (event: any): void => {
+  const timeUpdated = (event: React.ChangeEvent<HTMLAudioElement>): void => {
     dispatch(changePlayerTime(event.target.currentTime, event.target.duration));
   };
 
-  const audioPlayerEnded = useCallback((event: any): void => {
+  const audioPlayerEnded = useCallback((): void => {
     const nextIndex = queueIndex + 1;
     if (queue && queue.length > nextIndex) {
       dispatch(nextTrackInQueue());

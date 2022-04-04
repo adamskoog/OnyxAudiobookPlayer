@@ -13,9 +13,9 @@ declare global {
     type SettingsState = {
         serverIdentifier: string,
         librarySection: string,
-        servers: Array<any> | null,
-        libraries: Array<any>,
-        currentServer: any | null,
+        servers: Array<PlexResource> | null,
+        libraries: Array<PlexLibrary>,
+        currentServer: PlexResource | null,
         accessToken: string | null,
         isDarkMode: boolean
     }

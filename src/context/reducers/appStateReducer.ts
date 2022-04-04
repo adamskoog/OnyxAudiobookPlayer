@@ -14,7 +14,7 @@ declare global {
     type ApplicationState = {
         isLoading: boolean,
         applicationState: string,
-        user: any,
+        user: PlexUser | null,
         baseUrl: string | null
     }
 }
@@ -35,6 +35,7 @@ const appStateReducer = (state: ApplicationState = defaultState, action: AppActi
     case actionTypes.CHECK_TOKEN:
       return { ...state, isLoading: true };
     case actionTypes.TOKEN_VALID:
+      console.log("USER", action.payload);
       return { ...state, user: action.payload, isLoading: false };
     case actionTypes.TOKEN_INVALID:
       return { ...state, applicationState: 'loggedout', isLoading: false };

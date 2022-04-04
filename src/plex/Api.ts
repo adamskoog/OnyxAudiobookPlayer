@@ -4,6 +4,7 @@ import * as Bowser from "bowser";
 import { v4 as uuidv4 } from 'uuid';
 
 import * as Settings from '../utility/settings';
+import { StyledInterface } from 'styled-components';
 
 export const RESOURCETYPES = {
   server: 'server',
@@ -269,7 +270,10 @@ export class PlexServerApi {
       'X-Plex-Token': null
     };
 
-    static initialize = async (resource: any): Promise<PlexServerConnection> => {
+    static initialize = async (resource: PlexResource | null): Promise<ServerConnection> => {
+
+        if (!resource)
+            return { message: 'No resource selected' };
 
         // This class is initialized by a server being selected.
         // This can happen on load or from the Settings page.
@@ -293,13 +297,13 @@ export class PlexServerApi {
         return connection;
     };
 
-    private static fetchWithTimeout = async (resource: any, options: any): Promise<any> => {
+    private static fetchWithTimeout = async (url: string, options: any): Promise<any> => {
       const { timeout = 8000 } = options;
     
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeout);
     
-      const response = await fetch(resource, {
+      const response = await fetch(url, {
         ...options,
         signal: controller.signal,
       });
@@ -310,10 +314,10 @@ export class PlexServerApi {
 
     /**
      * Run connection tests for a server to determine the best connection to use.
-     * @param {array[uri]} connections - An array of the server connections to be tested.
-     * @param {string} token
+     * @param {PlexResource} resource - The plex resource instance that represents the active server.
+     * @returns {Promise<ServerConnection>} - the preferred connection uri or error.
      */
-    private static serverConnectionTest = (resource: any): Promise<PlexServerConnection> => new Promise((resolve, reject) => {
+    private static serverConnectionTest = (resource: PlexResource): Promise<ServerConnection> => new Promise((resolve, reject) => {
       
       // TODO: handle this better with base params.
       this.requestTokenParam['X-Plex-Token'] = resource.accessToken;
@@ -333,7 +337,7 @@ export class PlexServerApi {
       });
 
       Promise.allSettled(connectionPromises).then((values: any) => {
-        let preferredConnection = null;
+        let preferredConnection: string | null = null;
         for (let i = 0; i < connections.length; i++) {
           for (let j = 0; j < values.length; j++) {
             if (values[i].status === 'fulfilled' && values[i].value.url.includes(connections[j].uri)) {
@@ -353,8 +357,9 @@ export class PlexServerApi {
    
     /**
      * Get a list of libraries for the currently selection server connection.
+     * @returns Promise<Array<PlexLibrary>> - array of libraries that match audio type.
      */
-    static getLibraries = async (): Promise<any> => {
+    static getLibraries = async (): Promise<Array<PlexLibrary>> => {
       const response = await this.client.get(`/library/sections`, {
         params: {
             ...PlexTvApi.baseParams,
@@ -461,9 +466,9 @@ export class PlexServerApi {
     /**
      * Determine the correct media to play from the server.
      * TODO: this doesn't do much, just grabs the first item.
-     * @param {any} track - The track object to determine media.
+     * @param {PlexTrackMedia} track - The track object to determine media.
      */
-    static getTrackMediaUrl = (track: any): string => {
+    static getTrackMediaUrl = (track: PlexTrackMedia): string => {
         return formatUrl(`${this.baseUrl}${track.Part[0].key}`, this.requestTokenParam);
     };
  
@@ -587,10 +592,91 @@ export class PlexServerApi {
 
 declare global {
 
-  type PlexServerConnection = {
+  // API Types
+  type ServerConnection = {
       uri?: string,
       message?: string,
       error?: string
+  }
+
+
+
+  // Plex Types
+  type PlexUser = {
+      id: number,
+      authToken: string,
+      email: string,
+      friendlyName: string,
+      pin: string,
+      thumb: string,
+      title: string,
+      username: string
+  }
+
+  type PlexResource = {
+      accessToken: string,
+      clientIdentifier: string,
+      name: string,
+      connections: Array<PlexResourceConnection>
+  }
+
+  type PlexResourceConnection = {
+      uri: string,
+      local: boolean
+  }
+  type PlexLibrary = {
+    agent: string,
+    allowSync: boolean,
+    art: string,
+    composite: string,
+    content: boolean,
+    contentChangedAt: number,
+    createdAt: number,
+    directory: boolean,
+    filters: boolean,
+    hidden: number,
+    key: string,
+    language: string,
+    refreshing: boolean,
+    scannedAt: number,
+    scanner: string,
+    thumb: string,
+    title: string,
+    type: string,
+    updatedAt: number,
+    uuid: string
+  }
+
+  type PlexTrack = {
+      ratingKey: string,
+      key: string,
+      title: string,
+      thumb: string,
+      parentTitle: string,
+      parentRatingKey: string,
+      grandparentTitle: string,
+      viewOffset: number,
+      Media: Array<PlexTrackMedia>
+  }
+
+  type PlexTrackMedia = {
+      id: number,
+      audioChannels: number,
+      audioCodec: string,
+      bitrate: number,
+      container: string,
+      duration: number,
+      Part: Array<PlexTrackMediaPart>
+  }
+  type PlexTrackMediaPart = {
+      id: number,
+      container: string,
+      duration: number,
+      file: string,
+      hasThumbnail: string,
+      key: string,
+      size: number
+
   }
 
   type PlexArtistMediaContainer = {

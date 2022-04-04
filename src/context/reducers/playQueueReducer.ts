@@ -11,10 +11,10 @@ state: {
 declare global {
 
     type PlayQueueState = {
-        queue: Array<any>,
+        queue: Array<PlexTrack>,
         id: string,
         index: number,
-        currentTrack: any
+        currentTrack: PlexTrack | null
     }
 }
 

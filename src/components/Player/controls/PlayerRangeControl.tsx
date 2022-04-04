@@ -14,7 +14,7 @@ const checkValid = (value: number | any): number => {
 };
 
 type Props = {
-    playerRangeChanged: (evt: any) => void
+    playerRangeChanged: (evt: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 function PlayerRangeControl({ playerRangeChanged }: Props): ReactElement {

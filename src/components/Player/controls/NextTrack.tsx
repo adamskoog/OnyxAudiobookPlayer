@@ -15,7 +15,7 @@ const PlayerSmallButton = styled.button`
     line-height: 2rem;
 `;
 
-const hasNextTrack = (queueIndex: number, queue: Array<any>): boolean => {
+const hasNextTrack = (queueIndex: number, queue: Array<PlexTrack>): boolean => {
   const newTrackIndex = queueIndex + 1;
   if (newTrackIndex < queue.length) {
     return true;

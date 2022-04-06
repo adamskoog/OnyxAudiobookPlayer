@@ -204,10 +204,15 @@ export class PlexTvApi {
      */
     private static validatePin = async (id: string): Promise<any> => {
 
+      // console.log("ID", id);
       const clientIdParams = { 'X-Plex-Client-Identifier': this.requestBaseParams['X-Plex-Client-Identifier'] };
-      const url = `${this.PLEX_BASE_URL}${this.PLEX_PINS_URL}/${id}?${qs.stringify(clientIdParams)}`;
-      const response = await axios.get(url);
+      // console.log("TEST", { ...clientIdParams });
 
+      const url = `${this.PLEX_BASE_URL}${this.PLEX_PINS_URL}/${id}?${qs.stringify(clientIdParams)}`;
+      // console.log("URL", url);
+
+      const response = await axios.get(url);
+      // console.log("RESP", response);
       Settings.removeSettingFromStorage(Settings.SETTINGS_KEYS.loginRedirectId);
       Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.token, response.data.authToken);
       Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.clientIdentifier, this.requestBaseParams['X-Plex-Client-Identifier']);
@@ -617,13 +622,39 @@ declare global {
       accessToken: string,
       clientIdentifier: string,
       name: string,
-      connections: Array<PlexResourceConnection>
+      connections: Array<PlexResourceConnection>,
+      createdAt: string,
+      device: string,
+      dnsRebindingProtection: boolean,
+      home: boolean,
+      httpsRequired: boolean,
+      lastSeenAt: string,
+      natLoopbackSupported: boolean
+      owned: boolean
+      //ownerId: null
+      platform: string,
+      platformVersion: string,
+      presence: boolean,
+      product: string,
+      productVersion: string,
+      provides: string,
+      publicAddress: string,
+      publicAddressMatches: boolean
+      relay: boolean,
+      //sourceTitle: null
+      synced: boolean
   }
 
   type PlexResourceConnection = {
       uri: string,
-      local: boolean
+      local: boolean,
+      IPv6: boolean,
+      address: string,
+      port: number,
+      protocol: string,
+      relay: boolean
   }
+
   type PlexLibrary = {
     agent: string,
     allowSync: boolean,

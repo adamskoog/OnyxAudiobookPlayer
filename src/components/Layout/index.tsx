@@ -15,11 +15,14 @@ const MainContainer = styled.main`
     flex: auto;
     flex-grow: 1;
     overflow: auto;
+    position: relative;
 `;
 
 function Layout({ children }) {
 
   const isDarkMode = useAppSelector((state) => state.settings.isDarkMode);
+  //const isLoading = useAppSelector((state) => state.application.isLoading);
+  const appState = useAppSelector((state) => state.application.applicationState);
 
   return (
   <>
@@ -27,7 +30,7 @@ function Layout({ children }) {
         <NormalizeGlobalStyle />
         <GlobalStyle />
 
-        <Loader />
+        <Loader isLoading={appState === 'loading'} />
         <Header />
         <FilterMenu />
         <MainContainer>

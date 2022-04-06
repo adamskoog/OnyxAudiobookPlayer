@@ -1,29 +1,27 @@
 import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 
-import { useAppSelector } from '../context/hooks';
-
-const showLoading = (loading: boolean, state: string): boolean => {
-  // TODO: we should utilize the state to determine when
-  // this is shown.
-  if (loading && state === 'loading') return true;
-  return false;
-};
-
 const LoaderContainer: any = styled.div`
-    display: ${(props: any) => ((showLoading(props.isLoading, props.applicationState)) ? 'block' : 'none')};
-    z-index: 50;
+    display: ${(props: any) => ((props.isLoading) ? 'flex' : 'none')};
+    align-items: center;
+    justify-content: center;
+    z-index: ${(props: any) => ((props.zIndex) ? props.zIndex : '50' )};
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: ${({ theme }: any) => theme.NAV_BACKGROUND};
+    background-color: ${({ theme }) => theme.NAV_BACKGROUND};
+
+    ${(props: any) => (props.hideBackground) ? `background-color: ${props.theme.BODY_BG};` : ''}
+`;
+
+const InnerContainer = styled.div`
+    width: 100%;
 `;
 
 const Spinner = styled.div`
     margin: auto;
-    margin-top: 12rem;
     
     width: 50px;
     height: 50px;
@@ -37,13 +35,17 @@ const Spinner = styled.div`
     }
 `;
 
-function Loader(): ReactElement {
-  const isLoading = useAppSelector((state) => state.application.isLoading);
-  const applicationState = useAppSelector((state) => state.application.applicationState);
-
+type Props = {
+  isLoading: boolean,
+  hideBackground?: boolean,
+  zIndex?: number
+}
+function Loader({ isLoading, zIndex, hideBackground }: Props): ReactElement {
   return (
-    <LoaderContainer isLoading={isLoading} applicationState={applicationState}>
-      <Spinner role="status" />
+    <LoaderContainer isLoading={isLoading} zIndex={zIndex} hideBackground={hideBackground}>
+      <InnerContainer>
+        <Spinner role="status" />
+      </InnerContainer>
     </LoaderContainer>
   );
 }

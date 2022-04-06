@@ -139,9 +139,8 @@ export class PlexTvApi {
     // https://plex.tv/api/users?X-Plex-Product=Plex%20Web&X-Plex-Version=4.48.1&X-Plex-Client-Identifier=0bkgja3athsl27xtz5mh7m49&X-Plex-Platform=Microsoft%20Edge&X-Plex-Platform-Version=87.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=hosted&X-Plex-Device=Windows&X-Plex-Device-Name=Microsoft%20Edge&X-Plex-Device-Screen-Resolution=1500x858%2C1500x1000&X-Plex-Token=mnjYNhmCzSzYxmazHtoj&X-Plex-Language=en
 
     /**
-     * Check the auth token to make sure it is still valid for use.
-     * @param token string - the auth token to validate.
-     * @returns Promise<UserInfo> - a promise for the plex.tv user information.
+     * Check the stored auth token to make sure it is still valid for use.
+     * @returns {Promise<UserInfo>} - a promise for the plex.tv user information.
      */
     static validateToken = async (): Promise<UserInfo> => {
       
@@ -168,7 +167,7 @@ export class PlexTvApi {
 
     /**
      * Do user sign in request
-     * @returns Promise<any> - TODO
+     * @returns {Promise<any>} - TODO
      */
     static signIn = async (): Promise<any> => {
         const response = await this.client.post(this.PLEX_PINS_URL, null, {
@@ -199,8 +198,8 @@ export class PlexTvApi {
 
     /**
      * Get the resources based on the authenticated user.
-     * @param id string - the auth id obtained from plex.tv
-     * @returns Promise<any> - TODO
+     * @param {string} id - the auth id obtained from plex.tv
+     * @returns {Promise<any>} - TODO
      */
     private static validatePin = async (id: string): Promise<any> => {
 
@@ -222,6 +221,7 @@ export class PlexTvApi {
 
     /**
      * After login redirect - get the id from storage to finish authentication.
+     * @returns {string | null}
      */    
     static getAuthenticationId = (): string | null => {
       const authId = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.loginRedirectId);
@@ -231,8 +231,8 @@ export class PlexTvApi {
 
     /**
      * Get the resources based on the authenticated user.
-     * @param resourceType string - a specific resource to be retrieved.
-     * @returns Array<Resource> - an array of the resources that match the request.
+     * @param {string} resourceType - a specific resource to be retrieved.
+     * @returns {Promise<Array<Resource>>} - an array of the resources that match the request.
      */
     static getResources = async (resourceType?: string): Promise<Array<Resource>> => {
         const response = await this.client.get(this.PLEX_RESOURCES_URL, {
@@ -362,7 +362,7 @@ export class PlexServerApi {
    
     /**
      * Get a list of libraries for the currently selection server connection.
-     * @returns Promise<Array<PlexLibrary>> - array of libraries that match audio type.
+     * @returns {Promise<Array<PlexLibrary>>} - array of libraries that match audio type.
      */
     static getLibraries = async (): Promise<Array<PlexLibrary>> => {
       const response = await this.client.get(`/library/sections`, {

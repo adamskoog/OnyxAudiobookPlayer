@@ -15,7 +15,7 @@ declare global {
         librarySection: string,
         servers: Array<PlexResource> | null,
         libraries: Array<PlexLibrary>,
-        currentServer: PlexResource | null,
+        currentServer: any | null,
         accessToken: string | null,
         isDarkMode: boolean
     }

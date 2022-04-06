@@ -4,11 +4,13 @@ import styled from 'styled-components';
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
 import * as Responsive from '../util/responsive';
 
+import Loader from '../Loader';
 import AlbumItem from './AlbumItem';
 import ArtistItem from './ArtistItem';
 
 import { fetchLibraryItems } from '../../context/actions/libraryActions';
 import { MUSIC_LIBRARY_DISPAY_TYPE } from '../../plex/Api';
+import { usePatchesInScope } from 'immer/dist/internal';
 
 const ErrorMessage = styled.div`
     margin: 30px;
@@ -48,13 +50,17 @@ function Library(): ReactElement {
   const user = useAppSelector((state) => state.application.user);
   const applicationState = useAppSelector((state) => state.application.applicationState);
   const librarySection = useAppSelector((state) => state.settings.librarySection);
+  const isLoading = useAppSelector((state) => state.library.isLoading);
 
   useEffect(() => {
-    if (user && applicationState === 'ready' && librarySection) dispatch(fetchLibraryItems());
+    if (user && applicationState === 'ready' && librarySection) {
+      dispatch(fetchLibraryItems());
+    }
   }, [user, applicationState, librarySection, displayType, sortType]);
 
   return (
     <>
+      <Loader isLoading={isLoading} zIndex={45} />
       {!user && (
       <ErrorMessage>Must login to view library.</ErrorMessage>
       )}

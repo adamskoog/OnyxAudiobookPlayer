@@ -3,7 +3,7 @@ import styled, { ThemeProvider } from 'styled-components';
 import { useAppSelector } from '../../context/hooks';
 
 import { NormalizeGlobalStyle, GlobalStyle } from '../util/global';
-import { lightMode, darkMode } from '../util/colors';
+import { lightMode, darkMode } from '../util/theme/theme';
 
 import Loader from '../Loader';
 import Header from '../Header';
@@ -15,11 +15,14 @@ const MainContainer = styled.main`
     flex: auto;
     flex-grow: 1;
     overflow: auto;
+    position: relative;
 `;
 
 function Layout({ children }) {
 
   const isDarkMode = useAppSelector((state) => state.settings.isDarkMode);
+  //const isLoading = useAppSelector((state) => state.application.isLoading);
+  const appState = useAppSelector((state) => state.application.applicationState);
 
   return (
   <>
@@ -27,7 +30,7 @@ function Layout({ children }) {
         <NormalizeGlobalStyle />
         <GlobalStyle />
 
-        {/* <Loader /> */}
+        <Loader isLoading={appState === 'loading'} />
         <Header />
         <FilterMenu />
         <MainContainer>

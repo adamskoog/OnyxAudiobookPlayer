@@ -44,12 +44,16 @@ const InfoContainer = styled.div`
     `)}
     
 `;
-const TextBlock: any = styled.div`
+
+const TextBlock = styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: ${(props) => props.theme.PLAYER_TEXT};
+`;
 
-    color: ${(props: any) => ((props.muted) ? props.theme.PLAYER_TEXT_MUTED : props.theme.PLAYER_TEXT)}; 
+const TextBlockMuted = styled(TextBlock)`
+    color: ${(props) => props.theme.PLAYER_TEXT_MUTED};
 `;
 
 function NowPlaying(): ReactElement {
@@ -85,12 +89,12 @@ function NowPlaying(): ReactElement {
       </AlbumImageContainer>
       <InfoContainer>
         <TextBlock>{trackTitle}</TextBlock>
-        <TextBlock muted>
+        <TextBlockMuted>
           <Link href={'/album/[ratingKey]'} as={`/album/${albumKey}`}>
             {albumTitle}
           </Link>
-        </TextBlock>
-        <TextBlock muted>{artistName}</TextBlock>
+        </TextBlockMuted>
+        <TextBlockMuted>{artistName}</TextBlockMuted>
         <PlayerTime />
       </InfoContainer>
       <AudioPlayer />

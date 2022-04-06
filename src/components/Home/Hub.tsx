@@ -3,12 +3,16 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 
+import { useAppSelector } from '../../context/hooks';
+
 import LibraryItem from '../Library/AlbumItem';
+import Loader from '../Loader';
 
 import HubScrollLeftSvg from '-!svg-react-loader!../../assets/hubScrollLeft.svg';
 import HubScrollRightSvg from '-!svg-react-loader!../../assets/hubScrollRight.svg';
 
-const Container = styled.div``;
+const Container = styled.div`
+`;
 
 const Title = styled.div`
     display: inline-block;
@@ -35,6 +39,9 @@ const HubContainer = styled.div`
     overflow-x: auto;
     overflow-y: hidden;
     margin-bottom: 1.5rem;
+    min-height: 240px;
+    position: relative;
+
     &::-webkit-scrollbar {
         display: none;
     }
@@ -53,11 +60,18 @@ const HubContents = styled.div`
 
 type Props = {
     title: string,
-    items: Array<any>
+    getItems: any
 }
 
 // Horizontal scrolling based on: https://webdevtrick.com/horizontal-scroll-navigation/
-function Hub({ title, items }: Props): ReactElement {
+function Hub({ title, getItems }: Props): ReactElement {
+
+  const section = useAppSelector((state) => state.settings.librarySection);
+  const applicationState = useAppSelector((state) => state.application.applicationState);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [hubItems, setHubItems]: [any, any] = useState([]);
+
   const [leftScrollDisabled, setLeftScrollDisabled] = useState(true);
   const [rightScrollDisabled, setRightScrollDisabled] = useState(true);
 
@@ -189,6 +203,18 @@ function Hub({ title, items }: Props): ReactElement {
     };
   });
 
+  useEffect(() => {
+    const doFetch = async (): Promise<void> => {
+      if (applicationState === 'ready' && section) {
+        setIsLoading(true);
+        const data = await getItems();
+        setHubItems(data);
+        setIsLoading(false);
+      } else setHubItems([]);
+    }; 
+    doFetch();
+  }, [section, applicationState]);
+
   return (
     <Container>
       <Title>{title}</Title>
@@ -201,8 +227,9 @@ function Hub({ title, items }: Props): ReactElement {
         </HubScrollButton>
       </ButtonContainer>
       <HubContainer ref={containerRef}>
+        <Loader isLoading={isLoading} zIndex={49} hideBackground={true}/>
         <HubContents ref={contentRef}>
-          {items.map((item) => (
+          {hubItems.map((item) => (
             <LibraryItem key={item.ratingKey} metadata={item} showAuthor />
           ))}
         </HubContents>

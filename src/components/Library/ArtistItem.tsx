@@ -17,6 +17,9 @@ const ArtistImageContainer = styled.div`
 `;
 const ArtistText = styled.div`
     padding-bottom: 1px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 `;
 
 type Props = {

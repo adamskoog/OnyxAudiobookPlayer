@@ -1,20 +1,19 @@
 import { useMemo, useEffect, useState, useRef } from 'react'
 import nanobounce from 'nanobounce'
 
-const useVirtualGridFirstRowIndex = ({ layout, cell, rowOffset, scrollContainer }) => {
+const useVirtualGridFirstRowIndex = ({ layout, cell, rowOffset }, scrollContainer) => {
   const isClient = typeof window === 'object'
   const computeFirstRowIndex = useRef()
   const debounce = useMemo(() => nanobounce(200), [])
 
   // Utilize the container that was passed in if so.
-  const container = scrollContainer ?? window;
+  const container = scrollContainer ?? window
 
   computeFirstRowIndex.current = () => {
 
     // window and divs use a different property for scroll
     // position. Determine what we can get.
-    let scrollTop = window.scrollY;
-    if (container.scrollTop) scrollTop = container.scrollTop; 
+    const scrollTop = container === window ? container.scrollY : container.scrollTop
 
     const position = isClient ? Math.max(0, scrollTop - layout.top) : 0
     const firstVisibleRowIndex = Math.floor(position / cell.height)

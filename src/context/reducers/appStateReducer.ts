@@ -4,7 +4,7 @@ import * as actionTypes from '../actions/actionTypes';
 state: {
     isLoading: boolean - indicate application loading (show spinner).
     applicationState: string - the current app state, value = ['ready', 'loggedout', 'loading'],
-    userInfo: object - user information obtained from plex.tv),
+    userInfo: PlexUser | null - user information obtained from plex.tv),
     baseUrl: string - the users server base connection url
 }
 */

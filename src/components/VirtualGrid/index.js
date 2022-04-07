@@ -29,7 +29,7 @@ VirtualGrid.propTypes = {
   child: PropTypes.elementType.isRequired,
   childProps: PropTypes.object,
   useChildProps: PropTypes.func,
-  scrollContainer: PropTypes.node
+  scrollContainer: PropTypes.object
 }
 
 export default memo(VirtualGrid)

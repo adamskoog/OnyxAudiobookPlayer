@@ -24,16 +24,16 @@ export const SORT_ORDER = {
   descending: 'Decending',
 };
 
-// Placeholder types
-type UserInfo = any;
-type Resource = any;
-
 export const formatUrl = (url: string, args: any): string => {
   const params = qs.stringify(args);
   if (params && params !== '') return `${url}?${params}`;
   return url;
 };
 
+/*
+ * Static class for interacting with the plex.tv api to
+ * provide authentication and available resources.
+ */
 export class PlexTvApi {
 
     private static client: AxiosInstance;
@@ -140,9 +140,9 @@ export class PlexTvApi {
 
     /**
      * Check the stored auth token to make sure it is still valid for use.
-     * @returns {Promise<UserInfo>} - a promise for the plex.tv user information.
+     * @returns {Promise<PlexUser>} - a promise for the plex.tv user information.
      */
-    static validateToken = async (): Promise<UserInfo> => {
+    static validateToken = async (): Promise<PlexUser> => {
       
         try {
           const response = await this.client.get(this.PLEX_USER_URL, {
@@ -153,15 +153,15 @@ export class PlexTvApi {
           });
           const data = response.data;
           if (data.errors) {
-            return { message: data.errors[0].message };
+            throw { message: data.errors[0].message };
           }
           // Return the user information
-          return data as UserInfo;
+          return data as PlexUser;
         } catch {
           this.requestTokenParam['X-Plex-Token'] = null;
           this.logout();
 
-          return { message: 'Unexpected error occurred.' };
+          throw { message: 'Unexpected error occurred.' };
         }
     };
 
@@ -232,9 +232,9 @@ export class PlexTvApi {
     /**
      * Get the resources based on the authenticated user.
      * @param {string} resourceType - a specific resource to be retrieved.
-     * @returns {Promise<Array<Resource>>} - an array of the resources that match the request.
+     * @returns {Promise<Array<PlexResource>>} - an array of the resources that match the request.
      */
-    static getResources = async (resourceType?: string): Promise<Array<Resource>> => {
+    static getResources = async (resourceType?: string): Promise<Array<PlexResource>> => {
         const response = await this.client.get(this.PLEX_RESOURCES_URL, {
             params: {
                 includeHttps: 1,
@@ -243,9 +243,9 @@ export class PlexTvApi {
                 ...this.requestTokenParam
             }
         });
-        const resources: Array<Resource> = response.data;
+        const resources: Array<PlexResource> = response.data;
         if (!resourceType) return resources; // return the unfilters resource reponse.   
-        return resources.filter((resource: Resource) => resource.provides === resourceType);
+        return resources.filter((resource: PlexResource) => resource.provides === resourceType);
     };
 
     /**
@@ -256,18 +256,10 @@ export class PlexTvApi {
     };
 };
 
+/*
+ * Static class for interacting with the selected server resource.
+ */
 export class PlexServerApi {
-    // private static plexToken: string | null = null;
-    // private static clientIdentifier: string | null = null;
-    // private static requestBaseParams: Object = {
-    //   'X-Plex-Device-Name': 'Onyx',
-    //   'X-Plex-Product': 'Onyx Audiobook Player',
-    //   'X-Plex-Version': '0.9.1',
-    //   'X-Plex-Client-Identifier': null,
-    //   'X-Plex-Platform': 'Chrome', // fill in with found browser....
-    //   'X-Plex-Device': 'Windows',
-    //   'X-Plex-Token': null
-    // };
 
     private static client: AxiosInstance;
     private static baseUrl: string | null;
@@ -275,8 +267,7 @@ export class PlexServerApi {
       'X-Plex-Token': null
     };
 
-    static initialize = async (resource: any | null): Promise<ServerConnection> => {
-        console.log("PLEX RESOURCE", resource);
+    static initialize = async (resource: PlexResource | null): Promise<ServerConnection> => {
         if (!resource)
             return { message: 'No resource selected' };
 
@@ -451,10 +442,9 @@ export class PlexServerApi {
 
     /**
      * Update the play progress of the current track on the server
-     * @param {any} args - TODO: this is a bunch of information to process the request, break up.
+     * @param {PlexTimelineArgs} args - the arguments needed to update the timeline.
      */
-    static updateTimeline = async (args: any): Promise<any> => {
-
+    static updateTimeline = async (args: PlexTimelineArgs): Promise<PlexProgress> => {
       const response = await this.client.get(`/:/timeline`, {
         params: {
             identifier: 'com.plexapp.plugins.library',
@@ -465,7 +455,7 @@ export class PlexServerApi {
             'X-Plex-Text-Format': 'plain',
         }
       });
-      return response.data;
+      return response.data.MediaContainer;
     };
 
     /**
@@ -483,6 +473,17 @@ export class PlexServerApi {
      */
     static getAlbumMetadata = async (ratingKey: string): Promise<PlexAlbumMetadata> => {
 
+      // Merging the album information with the tracks so we have a consistent format.
+      // It seems the plex web app makes two seperate requests to get this information
+      // as well.
+      const albumResponse = await this.client.get(`/library/metadata/${ratingKey}`, {
+        params: {
+            ...PlexTvApi.baseParams,
+            ...this.requestTokenParam
+        }
+      });
+
+      let album: PlexAlbumMetadata = albumResponse.data.MediaContainer.Metadata[0];
       const response = await this.client.get(`/library/metadata/${ratingKey}/children`, {
         params: {
             ...PlexTvApi.baseParams,
@@ -490,8 +491,9 @@ export class PlexServerApi {
         }
       });
 
-      const data: PlexAlbumMediaContainer = response.data;
-      return data.MediaContainer;
+      // Combine the tracks with the album metadata.
+      album.Metadata = response.data.MediaContainer.Metadata;
+      return album;
     };
 
     /**
@@ -506,8 +508,7 @@ export class PlexServerApi {
         }
       });
 
-      const data: PlexArtistMediaContainer = response.data;
-      return data.MediaContainer;
+      return response.data.MediaContainer;
     };
 
     // TODO: this whole thing needs to be cleaned up and refactored. It's really rough.
@@ -535,10 +536,12 @@ export class PlexServerApi {
 
     /**
      * Get the recently added and listened hub items.
+     * The return type for this is a bit odd - the queries are actually against
+     * the artists, so we get the artist metadata type back.
      * @param {string} section - The library section.
-     * @param {any} args - The information for sorting.
+     * @param {Promise<Array<PlexAlbumMetadata>>} args - The albums matching the query.
      */
-    static getLibraryHubItems = async (section: string, args: any): Promise<any> => {
+    static getLibraryHubItems = async (section: string, args: any): Promise<Array<PlexAlbumMetadata>> => {
         const localParams = {
           type: 9,
           includeAdvanced: 1,
@@ -555,14 +558,16 @@ export class PlexServerApi {
               ...this.requestTokenParam
           }
         });
-
-        return response.data.MediaContainer;
+        const data = response?.data?.MediaContainer as PlexArtistMetadata;
+        if (!data) return [];
+        return data.Metadata;
     };
 
     /**
      * The the media items to display in the library.
      * @param {string} section - The library section.
      * @param {any} sortArgs - The information for sorting.
+     * @return {Promise<any>}
      */
     static getLibraryItems = async (section: string, sortArgs?: any): Promise<any> => {
       if (!sortArgs) {
@@ -602,9 +607,7 @@ declare global {
       uri?: string,
       message?: string,
       error?: string
-  }
-
-
+  };
 
   // Plex Types
   type PlexUser = {
@@ -616,7 +619,7 @@ declare global {
       thumb: string,
       title: string,
       username: string
-  }
+  };
 
   type PlexResource = {
       accessToken: string,
@@ -643,7 +646,7 @@ declare global {
       relay: boolean,
       //sourceTitle: null
       synced: boolean
-  }
+  };
 
   type PlexResourceConnection = {
       uri: string,
@@ -653,7 +656,7 @@ declare global {
       port: number,
       protocol: string,
       relay: boolean
-  }
+  };
 
   type PlexLibrary = {
     agent: string,
@@ -676,7 +679,7 @@ declare global {
     type: string,
     updatedAt: number,
     uuid: string
-  }
+  };
 
   type PlexTrack = {
       ratingKey: string,
@@ -688,7 +691,7 @@ declare global {
       grandparentTitle: string,
       viewOffset: number,
       Media: Array<PlexTrackMedia>
-  }
+  };
 
   type PlexTrackMedia = {
       id: number,
@@ -698,7 +701,8 @@ declare global {
       container: string,
       duration: number,
       Part: Array<PlexTrackMediaPart>
-  }
+  };
+
   type PlexTrackMediaPart = {
       id: number,
       container: string,
@@ -708,16 +712,9 @@ declare global {
       key: string,
       size: number
 
-  }
+  };
 
-  type PlexArtistMediaContainer = {
-      MediaContainer: PlexArtistMetadata
-  }
-  type PlexAlbumMediaContainer = {
-      MediaContainer: PlexAlbumMetadata
-  }
-
-  // Artist?? Is this the same as others???
+   // Artist?? Is this the same as others???
   type PlexArtistMetadata = {
       Metadata: Array<PlexAlbumMetadata>,
       allowSync: boolean,
@@ -742,6 +739,7 @@ declare global {
 
   /// This comes from under Artist, same as media container on album view??
   type PlexAlbumMetadata = {
+      Metadata: Array<PlexTrack>,
       addedAt: number,
       guid: string,
       index: number,
@@ -764,10 +762,37 @@ declare global {
       updatedAt: number,
       viewCount: number,
       year: number,
+      parentYear: 2005
+      size: 46
       Collection: Array<PlexTag>
   };
 
   type PlexTag = {
       tag: string
-  }
+  };
+
+  /* Timeline Update related */
+  type PlexTimelineArgs = {
+    ratingKey: string,
+    key: string,
+    state: string,
+    time: number,
+    playbackTime: number,
+    duration: number,
+  };
+
+  type PlexBandwidth = {
+    bandwidth: number,
+    resolution: string,
+    time: number
+  };
+
+  type PlexProgress = {
+    Bandwidths: Array<PlexBandwidth>,
+    playbackState: string,
+    size: number,
+    skipCount: number,
+    viewCount: number,
+    viewOffset: number
+  };
 }

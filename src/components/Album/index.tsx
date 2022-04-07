@@ -83,7 +83,11 @@ const TrackCount = styled.div`
 `;
 
 type Props = {
-  ratingKey: any
+  ratingKey: string
+}
+type FetchAlbumProps = {
+  album: PlexAlbumMetadata,
+  track: PlexTrack
 }
 
 function Album({ ratingKey }: Props): ReactElement {
@@ -91,30 +95,32 @@ function Album({ ratingKey }: Props): ReactElement {
 
   const applicationState = useAppSelector((state) => state.application.applicationState);
 
-  const [album, setAlbum]: [any, any] = useState({ Metadata: [] });
-  const [onDeck, setOnDeck]: [any, any] = useState(null);
+  const [album, setAlbum] = useState(null as PlexAlbumMetadata | null);
+  const [onDeck, setOnDeck] = useState(null as PlexTrack | null);
 
-  const playOnDeckTrack = (trackInfo: any): void => {
+  const playOnDeckTrack = (trackInfo: PlexTrack): void => {
     dispatch(setPlayQueue(getAlbumQueue(trackInfo, album)));
   };
 
-  const fetchAlbumMetadata = async (): Promise<any> => {
+  const fetchAlbumMetadata = async (): Promise<FetchAlbumProps | null> => {
     if (applicationState === 'ready' && ratingKey) {
-      const data: PlexAlbumMetadata = await PlexServerApi.getAlbumMetadata(ratingKey);
-        const newOnDeck: any = findOnDeck(data);
-        setAlbum(data);
+        const albumInfo = await PlexServerApi.getAlbumMetadata(ratingKey);
+        const newOnDeck = findOnDeck(albumInfo);
+
+        setAlbum(albumInfo);
         setOnDeck(newOnDeck);
 
-        return { album: data, track: newOnDeck };
+        return { album: albumInfo, track: newOnDeck };
     }
     return null;
   };
 
-  const playSelectedTrack = async (trackInfo: any): Promise<void> => {
+  const playSelectedTrack = async (trackInfo: PlexTrack): Promise<void> => {
     if (applicationState === 'ready' && !isTrackOnDeck(trackInfo, album)) {
       await updateOnDeck(trackInfo, album);
-      const albumInfo: any = await fetchAlbumMetadata();
-      dispatch(setPlayQueue(getAlbumQueue(albumInfo.track, albumInfo.album)));
+      const albumInfo = await fetchAlbumMetadata();
+      if (albumInfo)
+          dispatch(setPlayQueue(getAlbumQueue(albumInfo.track, albumInfo.album)));
     } else playOnDeckTrack(trackInfo);
   };
 
@@ -128,16 +134,16 @@ function Album({ ratingKey }: Props): ReactElement {
   // https://tailwindcomponents.com/component/button-component-default
   return (
     <Container>
-      {applicationState === 'ready' && (
+      {applicationState === 'ready' && album && (
         <>
           <AlbumContainer>
-            <PlexImage width={200} height={200} url={album.thumb} alt={`${album.parentTitle} Cover`} />
+            <PlexImage width={200} height={200} url={album.thumb} alt={`${album.title} Cover`} />
             <AlbumInfo>
-              <AlbumTitle>{album.parentTitle}</AlbumTitle>
-              <Link href={'/artist/[ratingKey]'} as={`/artist/${album.grandparentRatingKey}`}>
-                <AlbumAuthor>{album.grandparentTitle}</AlbumAuthor>
+              <AlbumTitle>{album.title}</AlbumTitle>
+              <Link href={'/artist/[ratingKey]'} as={`/artist/${album.parentRatingKey}`}>
+                <AlbumAuthor>{album.parentTitle}</AlbumAuthor>
               </Link>
-              <AlbumYear>{album.parentYear}</AlbumYear>
+              <AlbumYear>{album.year}</AlbumYear>
               {onDeck && (
               <OnDeck>
                 <OnDeckButton onClick={() => playOnDeckTrack(onDeck)}>
@@ -157,7 +163,7 @@ function Album({ ratingKey }: Props): ReactElement {
               {(album.size > 1) ? 's' : ''}
             </TrackCount>
             <Tracks>
-              {album.Metadata.map((track: any) => (
+              {album.Metadata.map((track) => (
                 <AlbumItem key={track.key} trackInfo={track} playSelectedTrack={playSelectedTrack} updateAlbumInfo={fetchAlbumMetadata} />
               ))}
             </Tracks>

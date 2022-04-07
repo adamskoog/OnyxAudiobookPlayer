@@ -76,7 +76,6 @@ function AudioPlayer(): ReactElement {
       time: convertSecondsToMs(currentTime),
       playbackTime: convertSecondsToMs(currentTime),
       duration: convertSecondsToMs(duration),
-      'X-Plex-Token': accessToken,
     };
     // console.log("updateTimeline", args);
     PlexServerApi.updateTimeline(args);

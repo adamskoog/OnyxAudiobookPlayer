@@ -36,12 +36,14 @@ export const markTrackUnplayed = async (trackInfo: any): Promise<any> => {
   await PlexServerApi.unscrobble(trackInfo.ratingKey);
   return { status: 'success' };
 };
-
-// On Deck - this is the first in progress or unplayed track that is encountered when
-// going through the tracks in order. Trying to mimic what Plex does with TV shows,
-// but for a single audio album.
-export const findOnDeck = (albumInfo: any): any => {
-  // console.log("album", albumInfo);
+/**
+ * On Deck - this is the first in progress or unplayed track that is encountered when
+ * going through the tracks in order. Trying to mimic what Plex does with TV shows,
+ * but for a single audio album.
+ * @param {PlexAlbumMetadata} albumInfo - the album we are finding next track on
+ * @returns {PlexTrack} - the determined next track to play.
+ */
+export const findOnDeck = (albumInfo: PlexAlbumMetadata): PlexTrack => {
   for (let i = 0; i < albumInfo.Metadata.length; i++) {
     const track = albumInfo.Metadata[i];
 

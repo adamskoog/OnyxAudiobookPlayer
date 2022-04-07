@@ -60,7 +60,7 @@ const HubContents = styled.div`
 
 type Props = {
     title: string,
-    getItems: any
+    getItems: () => Promise<Array<PlexAlbumMetadata>>
 }
 
 // Horizontal scrolling based on: https://webdevtrick.com/horizontal-scroll-navigation/
@@ -70,19 +70,19 @@ function Hub({ title, getItems }: Props): ReactElement {
   const applicationState = useAppSelector((state) => state.application.applicationState);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [hubItems, setHubItems]: [any, any] = useState([]);
+  const [hubItems, setHubItems] = useState([] as Array<PlexAlbumMetadata>);
 
   const [leftScrollDisabled, setLeftScrollDisabled] = useState(true);
   const [rightScrollDisabled, setRightScrollDisabled] = useState(true);
 
-  const containerRef: any = useRef(null);
-  const contentRef: any = useRef(null);
+  const containerRef = useRef(null as HTMLDivElement | null);
+  const contentRef = useRef(null as HTMLDivElement | null);
 
   const isTickingRef = useRef(false);
   const isTravelingRef = useRef(false);
   const directionRef = useRef('');
 
-  const determineOverflow = (container: any, content: any): string => {
+  const determineOverflow = (container: HTMLDivElement, content: HTMLDivElement): string => {
     const containerMetrics = container.getBoundingClientRect();
     const containerMetricsRight = Math.floor(containerMetrics.right);
     const containerMetricsLeft = Math.floor(containerMetrics.left);
@@ -100,79 +100,97 @@ function Hub({ title, getItems }: Props): ReactElement {
   };
 
   const checkOverflow = (): void => {
-    const overflow = determineOverflow(containerRef.current, contentRef.current);
+    const container = containerRef.current;
+    const content = contentRef.current;
+    if (container && content) {
+        const overflow = determineOverflow(container, content);
 
-    setLeftScrollDisabled(!((overflow === 'both' || overflow === 'left')));
-    setRightScrollDisabled(!((overflow === 'both' || overflow === 'right')));
-    containerRef.current.setAttribute('data-overflowing', overflow);
+        setLeftScrollDisabled(!((overflow === 'both' || overflow === 'left')));
+        setRightScrollDisabled(!((overflow === 'both' || overflow === 'right')));
+        container.setAttribute('data-overflowing', overflow);
+    }
   };
 
   const advanceRight = (): void => {
     // If in the middle of a move return
     if (isTravelingRef.current === true) return;
-    // If we have content overflowing both sides or on the right
-    if (determineOverflow(containerRef.current, contentRef.current) === 'right' || determineOverflow(containerRef.current, contentRef.current) === 'both') {
-      // Get the right edge of the container and content
-      const navBarRightEdge = contentRef.current.getBoundingClientRect().right;
-      const navBarScrollerRightEdge = containerRef.current.getBoundingClientRect().right;
-      // get width of scroll area - this will change all contents
-      const navBarScrollerWidth = containerRef.current.getBoundingClientRect().width;
-      // Now we know how much space we have available to scroll
-      const availableScrollRight = Math.floor(navBarRightEdge - navBarScrollerRightEdge);
-      // If the space available is less than two lots of our desired distance, just move the whole amount
-      // otherwise, move by the amount in the settings
-      if (availableScrollRight < navBarScrollerWidth) {
-        contentRef.current.style.transform = `translateX(-${availableScrollRight}px)`;
-      } else {
-        contentRef.current.style.transform = `translateX(-${navBarScrollerWidth}px)`;
+
+    const container = containerRef.current;
+    const content = contentRef.current;
+    if (container && content) {
+      // If we have content overflowing both sides or on the right
+      if (determineOverflow(container, content) === 'right' || determineOverflow(container, content) === 'both') {
+        // Get the right edge of the container and content
+        const navBarRightEdge = content.getBoundingClientRect().right;
+        const navBarScrollerRightEdge = container.getBoundingClientRect().right;
+        // get width of scroll area - this will change all contents
+        const navBarScrollerWidth = container.getBoundingClientRect().width;
+        // Now we know how much space we have available to scroll
+        const availableScrollRight = Math.floor(navBarRightEdge - navBarScrollerRightEdge);
+        // If the space available is less than two lots of our desired distance, just move the whole amount
+        // otherwise, move by the amount in the settings
+        if (availableScrollRight < navBarScrollerWidth) {
+          content.style.transform = `translateX(-${availableScrollRight}px)`;
+        } else {
+          content.style.transform = `translateX(-${navBarScrollerWidth}px)`;
+        }
+        // We do want a transition (this is set in CSS) when moving so remove the class that would prevent that
+        content.classList.remove('hub-no-transition');
+        // Update our settings
+        directionRef.current = 'right';
+        isTravelingRef.current = true;
       }
-      // We do want a transition (this is set in CSS) when moving so remove the class that would prevent that
-      contentRef.current.classList.remove('hub-no-transition');
-      // Update our settings
-      directionRef.current = 'right';
-      isTravelingRef.current = true;
+      // Now update the attribute in the DOM
+      container.setAttribute('data-overflowing', determineOverflow(container, content));
     }
-    // Now update the attribute in the DOM
-    containerRef.current.setAttribute('data-overflowing', determineOverflow(containerRef.current, contentRef.current));
   };
 
   const advanceLeft = (): void => {
     if (isTravelingRef.current === true) return;
-    // If we have content overflowing both sides or on the left
-    if (determineOverflow(containerRef.current, contentRef.current) === 'left' || determineOverflow(containerRef.current, contentRef.current) === 'both') {
-      // Find how far this panel has been scrolled
-      const availableScrollLeft = containerRef.current.scrollLeft;
-      const navBarScrollerWidth = containerRef.current.getBoundingClientRect().width;
-      // If the space available is less than two lots of our desired distance, just move the whole amount
-      // otherwise, move by the amount in the settings
-      if (availableScrollLeft < navBarScrollerWidth) {
-        contentRef.current.style.transform = `translateX(${availableScrollLeft}px)`;
-      } else {
-        contentRef.current.style.transform = `translateX(${navBarScrollerWidth}px)`;
+
+    const container = containerRef.current;
+    const content = contentRef.current;
+    if (container && content) {
+      // If we have content overflowing both sides or on the left
+      if (determineOverflow(container, content) === 'left' || determineOverflow(container, content) === 'both') {
+        // Find how far this panel has been scrolled
+        const availableScrollLeft = container.scrollLeft;
+        const navBarScrollerWidth = container.getBoundingClientRect().width;
+        // If the space available is less than two lots of our desired distance, just move the whole amount
+        // otherwise, move by the amount in the settings
+        if (availableScrollLeft < navBarScrollerWidth) {
+          content.style.transform = `translateX(${availableScrollLeft}px)`;
+        } else {
+          content.style.transform = `translateX(${navBarScrollerWidth}px)`;
+        }
+        // We do want a transition (this is set in CSS) when moving so remove the class that would prevent that
+        content.classList.remove('hub-no-transition');
+        // Update our settings
+        directionRef.current = 'left';
+        isTravelingRef.current = true;
       }
-      // We do want a transition (this is set in CSS) when moving so remove the class that would prevent that
-      contentRef.current.classList.remove('hub-no-transition');
-      // Update our settings
-      directionRef.current = 'left';
-      isTravelingRef.current = true;
+      // Now update the attribute in the DOM
+      container.setAttribute('data-overflowing', determineOverflow(container, content));
     }
-    // Now update the attribute in the DOM
-    containerRef.current.setAttribute('data-overflowing', determineOverflow(containerRef.current, contentRef.current));
   };
 
   const navTransition = (): void => {
-    // get the value of the transform, apply that to the current scroll position (so get the scroll pos first) and then remove the transform
-    const styleOfTransform = window.getComputedStyle(contentRef.current, null);
-    const tr = styleOfTransform.getPropertyValue('-webkit-transform') || styleOfTransform.getPropertyValue('transform');
-    // If there is no transition we want to default to 0 and not null
-    const amount = Math.abs(parseInt(tr.split(',')[4]) || 0);
-    contentRef.current.style.transform = 'none';
-    contentRef.current.classList.add('hub-no-transition');
-    // Now lets set the scroll position
-    if (directionRef.current === 'left') {
-      containerRef.current.scrollLeft -= amount;
-    } else {
-      containerRef.current.scrollLeft += amount;
+    const container = containerRef.current;
+    const content = contentRef.current;
+    if (container && content) {
+      // get the value of the transform, apply that to the current scroll position (so get the scroll pos first) and then remove the transform
+      const styleOfTransform = window.getComputedStyle(content, null);
+      const tr = styleOfTransform.getPropertyValue('-webkit-transform') || styleOfTransform.getPropertyValue('transform');
+      // If there is no transition we want to default to 0 and not null
+      const amount = Math.abs(parseInt(tr.split(',')[4]) || 0);
+      content.style.transform = 'none';
+      content.classList.add('hub-no-transition');
+      // Now lets set the scroll position
+      if (directionRef.current === 'left') {
+        container.scrollLeft -= amount;
+      } else {
+        container.scrollLeft += amount;
+      }
     }
     isTravelingRef.current = false;
   };
@@ -190,16 +208,19 @@ function Hub({ title, getItems }: Props): ReactElement {
   useEffect(() => {
     const container = containerRef.current;
     const content = contentRef.current;
-    if (!container && !content) return;
-    container.addEventListener('scroll', scroller);
-    content.addEventListener('transitionend', navTransition);
-    window.addEventListener('resize', checkOverflow);
+    if (container && content) {
+        container.addEventListener('scroll', scroller);
+        content.addEventListener('transitionend', navTransition);
+        window.addEventListener('resize', checkOverflow);
+    }
 
     checkOverflow();
     return () => {
-      container.removeEventListener('scroll', scroller);
-      content.removeEventListener('transitionend', navTransition);
-      window.removeEventListener('resize', checkOverflow);
+      if (container && content) {
+          container.removeEventListener('scroll', scroller);
+          content.removeEventListener('transitionend', navTransition);
+          window.removeEventListener('resize', checkOverflow);
+      }
     };
   });
 

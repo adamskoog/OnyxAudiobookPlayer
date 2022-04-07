@@ -9,15 +9,16 @@ const AlbumPage: NextPage = () => {
     const router = useRouter();
     const { query: { ratingKey }} = router;
 
-  return (
-    <>
-      <Head>
-        <title>Onyx Player</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      </Head>
-      <Album ratingKey={ratingKey} />
-    </>
-  )
-}
+    const key = ratingKey as string;
+    return (
+      <>
+        <Head>
+          <title>Onyx Player</title>
+          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        </Head>
+        <Album ratingKey={key} />
+      </>
+    );
+};
 
-export default AlbumPage
+export default AlbumPage;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, createContext } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { useAppSelector } from '../../context/hooks';
 
@@ -10,6 +10,8 @@ import Header from '../Header';
 import FilterMenu from '../Library/FilterMenu';
 import NowPlaying from '../Player';
 import { ScrollContainer, ScrollContent } from '../util/container';
+
+export const ScrollerRefContext: any = createContext({ ref: null });
 
 const MainContainer = styled.main`
     flex: auto;
@@ -24,6 +26,8 @@ function Layout({ children }) {
   //const isLoading = useAppSelector((state) => state.application.isLoading);
   const appState = useAppSelector((state) => state.application.applicationState);
 
+  const scrollerRef = useRef();
+
   return (
   <>
       <ThemeProvider theme={(isDarkMode) ? darkMode : lightMode}>
@@ -34,9 +38,11 @@ function Layout({ children }) {
         <Header />
         <FilterMenu />
         <MainContainer>
-          <ScrollContainer>
+          <ScrollContainer ref={scrollerRef}>
               <ScrollContent>
-                {children}
+                <ScrollerRefContext.Provider value={{ ref: scrollerRef }}>
+                  {children}
+                </ScrollerRefContext.Provider>
               </ScrollContent>
           </ScrollContainer>
         </MainContainer>

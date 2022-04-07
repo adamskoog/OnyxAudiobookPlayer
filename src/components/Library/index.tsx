@@ -1,4 +1,4 @@
-import React, { useEffect, ReactElement } from 'react';
+import React, { useEffect, ReactElement, useContext } from 'react';
 import styled from 'styled-components';
 
 import { useAppSelector, useAppDispatch } from '../../context/hooks';
@@ -11,6 +11,9 @@ import ArtistItem from './ArtistItem';
 import { fetchLibraryItems } from '../../context/actions/libraryActions';
 import { MUSIC_LIBRARY_DISPAY_TYPE } from '../../plex/Api';
 import { usePatchesInScope } from 'immer/dist/internal';
+
+import VirtualGrid from '../VirtualGrid';
+import { ScrollerRefContext } from '../Layout';
 
 const ErrorMessage = styled.div`
     margin: 30px;
@@ -39,6 +42,22 @@ const Grid = styled.div`
     `)}
 `;
 
+function GridChild({ style, index, type, items, readyInViewport, scrolling }: any): ReactElement {
+
+    const item = items[index];
+    return (
+      <div style={{ ...style }}>
+        {type === MUSIC_LIBRARY_DISPAY_TYPE.album.title &&          
+            <AlbumItem key={item.key} metadata={item} showAuthor />
+        }
+        {type === MUSIC_LIBRARY_DISPAY_TYPE.artist.title &&          
+            <ArtistItem key={item.key} metadata={item} />
+        }
+      </div>
+    );
+};
+
+
 function Library(): ReactElement {
   const dispatch = useAppDispatch();
 
@@ -52,11 +71,13 @@ function Library(): ReactElement {
   const librarySection = useAppSelector((state) => state.settings.librarySection);
   const isLoading = useAppSelector((state) => state.library.isLoading);
 
+  const containerRef: any = useContext(ScrollerRefContext);
+
   useEffect(() => {
-    if (user && applicationState === 'ready' && librarySection) {
+    if (applicationState === 'ready' && librarySection) {
       dispatch(fetchLibraryItems());
     }
-  }, [user, applicationState, librarySection, displayType, sortType]);
+  }, [applicationState, librarySection, displayType, sortType]);
 
   return (
     <>
@@ -64,15 +85,15 @@ function Library(): ReactElement {
       {!user && (
       <ErrorMessage>Must login to view library.</ErrorMessage>
       )}
-      {user && !loading && (
-      <Grid>
-        {(displayType === MUSIC_LIBRARY_DISPAY_TYPE.album.title) && (libraryItems.map((item: any) => (
-          <AlbumItem key={item.key} metadata={item} showAuthor />
-        )))}
-        {(displayType === MUSIC_LIBRARY_DISPAY_TYPE.artist.title) && (libraryItems.map((item: any) => (
-          <ArtistItem key={item.key} metadata={item} />
-        )))}
-      </Grid>
+      {user && !loading && (libraryItems.length > 0) && (
+          <VirtualGrid
+            total={libraryItems.length}
+            cell={{ height: 255, width: 210 }}
+            child={GridChild}
+            childProps={{ type: displayType, items: libraryItems }}
+            viewportRowOffset={10}
+            scrollContainer={containerRef.ref.current}
+          />
       )}
     </>
   );

@@ -7,7 +7,7 @@ import { PlexServerApi } from '../../plex/Api';
 const Image: any = styled.img`
     ${(props: any) => ((props.xheight) ? `height: ${props.xheight}px;` : '')}
     ${(props: any) => ((props.xwidth) ? `width: ${props.xwidth}px;` : '')}
-    object-fit: none;
+    object-fit: cover;
     display: inline-block;
     ${(props: any) => ((props.hideRadius) ? '' : 'border-radius: 0.375rem;')}
 `;

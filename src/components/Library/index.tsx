@@ -88,7 +88,7 @@ function Library(): ReactElement {
       {user && !loading && (libraryItems.length > 0) && (
           <VirtualGrid
             total={libraryItems.length}
-            cell={{ height: 255, width: 210 }}
+            cell={{ height: 255, width: 180 }}
             child={GridChild}
             childProps={{ type: displayType, items: libraryItems }}
             viewportRowOffset={10}

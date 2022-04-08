@@ -10,6 +10,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     cursor: pointer;
+    margin: 0 10px;
 `;
 const AlbumCoverContainer = styled.div`
     margin-bottom: 0.25rem;

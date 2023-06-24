@@ -16,7 +16,7 @@ type AlbumPageProps = {
 
 function AlbumPage({ ratingKey }: AlbumPageProps) {
 
-    const { album, loading } = useAlbumMetadata({ ratingKey });
+    const { album, loading, forceMetadataUpdate } = useAlbumMetadata({ ratingKey });
 
     if (loading) return <Loader loading={loading} />
     if (!album) return <div></div>
@@ -39,7 +39,7 @@ function AlbumPage({ ratingKey }: AlbumPageProps) {
                 </div>
             </div>
             <Summary summary={album.summary} />
-            <Tracks tracks={album.Metadata} />
+            <Tracks album={album} forceMetadataUpdate={forceMetadataUpdate} />
         </>
 
     );

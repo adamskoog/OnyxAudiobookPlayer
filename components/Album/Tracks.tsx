@@ -1,11 +1,12 @@
-import type { PlexTrack } from "@/types/plex.types"
+import type { PlexAlbumMetadata, PlexTrack } from "@/types/plex.types"
 
 import TrackInfo from "./TrackInfo"
 
 import styles from './styles/Tracks.module.css'
 
 type TracksProps = {
-    tracks: PlexTrack[]
+    album: PlexAlbumMetadata,
+    forceMetadataUpdate: () => Promise<void>
 }
 
 const trackCountLabel = (tracks: PlexTrack[]): string => {
@@ -14,16 +15,16 @@ const trackCountLabel = (tracks: PlexTrack[]): string => {
     return `${tracks.length ?? 0} Tracks`;
 }
 
-export default function Tracks({ tracks }: TracksProps) {
+export default function Tracks({ album, forceMetadataUpdate }: TracksProps) {
 
   return (
     <div>
         <div className={`${styles.track_count}`}>
-            {trackCountLabel(tracks)}
+            {trackCountLabel(album.Metadata)}
         </div>
         <div className={`${styles.tracks}`}>
-            {tracks.map(track => (
-                <TrackInfo key={track.key} track={track} />
+            {album.Metadata.map(track => (
+                <TrackInfo key={track.key} track={track} album={album} forceMetadataUpdate={forceMetadataUpdate} />
             ))}
         </div>
     </div>

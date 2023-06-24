@@ -10,7 +10,8 @@ type HookProps = {
 
 type HookReturn = {
     album: PlexAlbumMetadata | null,
-    loading: boolean
+    loading: boolean,
+    forceMetadataUpdate: () => Promise<void>
 }
 
 const useAlbumMetadata = ({ ratingKey }: HookProps): HookReturn => {
@@ -19,6 +20,12 @@ const useAlbumMetadata = ({ ratingKey }: HookProps): HookReturn => {
 
     const [album, setAlbum] = useState<PlexAlbumMetadata | null>(null);
     const [loading, setLoading] = useState(false)
+
+    const forceMetadataUpdate = async (): Promise<void> => {
+        // Do no set loading, doing a background refresh.
+        const albumInfo = await PlexJavascriptApi.getAlbumMetadata(ratingKey);       
+        setAlbum(albumInfo);
+    };
 
     useEffect(() => {
         const fetchMetadata = async (): Promise<void> => {
@@ -32,7 +39,7 @@ const useAlbumMetadata = ({ ratingKey }: HookProps): HookReturn => {
         fetchMetadata();
     }, [activeServer, ratingKey]);
 
-    return { album, loading }
+    return { album, loading, forceMetadataUpdate }
 }
 
 export default useAlbumMetadata;

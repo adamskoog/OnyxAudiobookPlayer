@@ -1,7 +1,11 @@
 import { useState, ReactNode } from 'react'
 import { Menu, UnstyledButton } from '@mantine/core';
 
-import type { PlexTrack } from "@/types/plex.types"
+import { useAppDispatch } from '@/store';
+import { buildPlayQueue } from '@/store/features/playerSlice';
+
+import type { PlexAlbumMetadata, PlexTrack } from "@/types/plex.types"
+import { getAlbumQueue, updateOnDeck } from '@/plex/helpers';
 
 import { formatTrackDisplay } from "@/utility"
 import { trackIsComplete, markTrackPlayed, markTrackUnplayed } from "@/plex/helpers";
@@ -19,11 +23,11 @@ function Cell({ className, children }: CellProps) {
     return (<div className={`${styles.cell} ${className ?? ''}`}>{children}</div>);
 }
 
-type TrackProps = {
-  track: PlexTrack
+type ProgressProps = {
+    track: PlexTrack
 }
 
-function Progress({ track }: TrackProps) {
+function Progress({ track }: ProgressProps) {
     if (track.viewOffset || track.viewCount) {
         if (trackIsComplete(track)) {
             return (
@@ -45,27 +49,48 @@ function Progress({ track }: TrackProps) {
     );
 }
 
-export default function TrackInfo({ track }: TrackProps) {
+type TrackProps = {
+    track: PlexTrack,
+    album: PlexAlbumMetadata,
+    forceMetadataUpdate: () => Promise<void>
+}
+
+export default function TrackInfo({ track, album, forceMetadataUpdate }: TrackProps) {
+
+    const dispatch = useAppDispatch();
 
     const [isOpen, setIsOpen] = useState(false)
     
-    const playSelectedTrack = (trackInfo: PlexTrack) => {};
-    const updateAlbumInfo = () => {};
+    const playTrack = (): void => {
+        const callAsync = async () => {
+            await updateOnDeck(track, album);
+            await forceMetadataUpdate();
+            dispatch(buildPlayQueue(getAlbumQueue(track, album)));
+        }
+        callAsync();
+    };
 
-    const markPlayed = async (trackInfo: any, updateAlbumInfo: any): Promise<void> => {
-        await markTrackPlayed(trackInfo);
-        updateAlbumInfo();
+    const markPlayed = (): void => {
+        const callAsync = async () => {
+            await markTrackPlayed(track);
+            await forceMetadataUpdate();
+        }
+        callAsync();
+
     };
     
-    const markUnplayed = async (trackInfo: any, updateAlbumInfo: any): Promise<void> => {
-        await markTrackUnplayed(trackInfo);
-        updateAlbumInfo();
+    const markUnplayed = (): void => {
+        const callAsync = async () => {
+            await markTrackUnplayed(track);
+            await forceMetadataUpdate();
+        }
+        callAsync();
     };
 
     const menus = [
-        { title: 'Play', callback: () => playSelectedTrack(track) },
-        { title: 'Mark as Played', callback: () => markPlayed(track, updateAlbumInfo) },
-        { title: 'Mark as Unplayed', callback: () => markUnplayed(track, updateAlbumInfo) },
+        { title: 'Play', callback: () => playTrack() },
+        { title: 'Mark as Played', callback: () => markPlayed() },
+        { title: 'Mark as Unplayed', callback: () => markUnplayed() },
     ];
     
     return (

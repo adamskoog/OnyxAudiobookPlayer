@@ -1,0 +1,34 @@
+.container {
+    overflow: hidden;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    margin: 0 10px;
+    max-width: 200px;
+
+    /* Used to make sure we don't shring when
+       enclosed in a flex container [such as in a hub] */
+    flex-shrink: 0;
+}
+
+.image_container {
+    margin-bottom: 0.25rem;
+    overflow:hidden;
+    max-height: 200px;
+    max-width: 200px;
+}
+
+.album_title {
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.artist_title {
+    padding-bottom: 1px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}

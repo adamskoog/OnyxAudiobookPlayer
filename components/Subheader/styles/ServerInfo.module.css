@@ -1,0 +1,5 @@
+.server {
+    display: flex;
+    flex-grow: 1;
+    min-height: 1.5rem;
+}

@@ -1,0 +1,42 @@
+.cover {
+    width: 200px;
+    height: 200px;
+    flex-shrink: 0;
+}
+
+.artist_container {
+    display: flex;
+    gap: 1.75rem;
+
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.meta_container {
+    flex-grow: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+
+    margin: 1rem 0;
+}
+
+.artist_name,
+.summary {
+    font-size: 1.25rem;
+    line-height: 1.125rem;
+}
+
+.summary {
+    font-size: 1rem;
+}
+
+@media (min-width: 768px /*var(--mobile-break)*/) {
+    .artist_container {
+        flex-direction: row;
+        align-items: stretch;
+    }
+}
+

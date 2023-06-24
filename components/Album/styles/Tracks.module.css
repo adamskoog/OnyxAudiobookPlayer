@@ -1,0 +1,13 @@
+.track_count {
+    margin-bottom: 0.5rem;
+}
+
+.tracks {
+    display: grid;
+    grid-template-columns: 30px 30px auto 65px 30px;
+    row-gap: .8rem;
+    align-items: center;
+
+    border-top: solid 1px rgb(var(--body-foreground-rgb));;
+    padding-top: .8rem;
+}

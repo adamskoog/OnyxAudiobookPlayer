@@ -1,0 +1,41 @@
+.title {
+    display: inline-block;
+    font-weight: 700;
+
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+
+    margin-bottom: 0.5rem;
+}
+
+.nav_container {
+    display: flex;
+    gap: 5px;
+    float: right;
+}
+
+.action_button {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.hub_scroller {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin-bottom: 1.5rem;
+    min-height: 240px;
+    position: relative;
+}
+
+.hub_scroller::-webkit-scrollbar {
+    display: none;
+}
+
+.hub_content {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: max-content;
+    transition: transform .6s ease-in-out;
+}

@@ -1,0 +1,22 @@
+.container {
+    color: rgb(var(--subheader-forground-rgb));
+    background-color: rgb(var(--subheader-background-rgb));
+}
+
+.inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: .5rem;
+    max-width: var(--max-width);
+
+    margin: auto;
+    padding: 0.75rem 1rem; 
+}
+
+@media (min-width: 768px /*var(--mobile-break)*/) {
+    .inner {
+        flex-direction: row;
+        justify-content: center;
+    }
+}

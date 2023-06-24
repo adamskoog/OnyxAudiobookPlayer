@@ -1,0 +1,19 @@
+.main {
+  height: 100%;
+  width: 100%;
+
+  overflow: hidden;
+}
+
+.scrollRoot {
+  height: 100%;
+}
+
+/* There is some related styling to the scrollArea in global.
+   I was unable to figure out how to get it referenced here... */
+
+.content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 1.5rem  1rem;
+}

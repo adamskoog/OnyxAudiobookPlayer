@@ -1,0 +1,61 @@
+/* Primary Header Containers */
+.outer {
+    color: rgb(var(--navbar-foreground-rgb));
+    background-color: rgb(var(--navbar-background-rgb));
+}
+
+.inner {
+    display: flex;
+    align-items: center;
+    gap: 3em;
+
+    padding: 0.75rem 1rem;
+    margin: auto;
+    max-width: var(--max-width);    
+}
+
+/* Title Element */
+.title {
+    flex-grow: 1;
+
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Navigation Elements */
+.navigation {
+    flex-grow: 1;
+
+    display: none;
+    gap: 1.5em;
+
+    font-size: 1rem;
+}
+
+.mobile_nav_menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+
+    font-size: 1rem;
+}
+
+@media (min-width: 768px /*var(--mobile-break)*/) {
+    .navigation {
+        display: flex; 
+    }
+
+    .mobile_nav_menu {
+        display: none; 
+    }
+
+    .title {
+        flex-grow: 0;
+    }
+
+    .burger {
+        display: none;
+    }
+}

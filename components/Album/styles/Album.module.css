@@ -1,0 +1,46 @@
+.cover {
+    width: 200px;
+    height: 200px;
+    flex-shrink: 0;
+}
+
+.album_container {
+    display: flex;
+    gap: 1.75rem;
+
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.meta_container {
+    flex-grow: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+
+    margin: 1rem 0;
+}
+
+.album_title,
+.album_author {
+    font-size: 1.25rem;
+    line-height: 1.125rem;
+}
+
+.album_author {
+    font-size: 1.125rem;
+}
+
+.album_year,
+.track_ondeck {
+    flex-grow: 1;
+}
+
+@media (min-width: 768px /*var(--mobile-break)*/) {
+    .album_container {
+        flex-direction: row;
+        align-items: stretch;
+    }
+}

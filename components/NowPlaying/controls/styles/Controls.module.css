@@ -1,0 +1,34 @@
+.control {
+    color: rgb(var(--subheader-forground-rgb));
+
+    font-size: 3rem;
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.play {
+    width: 2rem;
+    height: 2rem;
+}
+
+.stop {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.range {
+    margin: .75rem 0;
+    flex-grow: 1;
+}
+
+@media (min-width: 768px /*var(--mobile-break)*/) {
+    .control {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .play {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+}

@@ -1,0 +1,90 @@
+:root {
+  --max-width: 1100px;
+
+  /* This is not currently used much as @media doesn't support variables. */
+  --mobile-break: 768px;  
+
+  --font-mono: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+
+  /* Body */
+  --body-foreground-rgb: 39, 55, 77;
+  --body-background-rgb: 221, 230, 237;
+
+  /* Nav */
+  --navbar-foreground-rgb: 221, 230, 237;
+  --navbar-background-rgb: 39, 55, 77;
+
+  /* Nav - buttons */
+  --navbar-button-foreground-hover-rgb: 39, 55, 77;
+  --navbar-button-background-hover-rgb: 157, 178, 191;
+  --navbar-button-active-forground-rgb: 255, 255, 255;
+  --navbar-button-active-background-rgb: 82, 109, 130;
+
+  /* Sub Nav */
+  --subheader-forground-rgb: 221, 230, 237;
+  --subheader-background-rgb: 82, 109, 130;
+
+  /* Hub */
+  --disabled-button-fill-rgb: 206, 212, 218;
+}
+
+html .hub-no-transition {
+  transition: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+      /* Body */
+      --body-foreground-rgb: 221, 230, 237;
+      --body-background-rgb: 39, 55, 77;
+
+      --disabled-button-fill-rgb: 82, 109, 130;
+    }
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html { 
+  scroll-behavior: smooth;
+} 
+
+@media screen and (prefers-reduced-motion: reduce) { 
+  html { scroll-behavior: auto; } 
+}
+
+html,
+body,
+#__next {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+nav > div {  
+  max-width: var(--max-width);
+}
+
+body {
+  color: rgb(var(--body-foreground-rgb)) !important;
+  background: rgb(var(--body-background-rgb)) !important;
+}
+
+#__next {
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}

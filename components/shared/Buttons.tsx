@@ -49,7 +49,13 @@ export function NavLinkButton({ title, url }: LinkButtonProps) {
 
     let classes = [styles.btn, styles.nav]
 
-    if (router.asPath === url) classes.push(styles.active)
+
+    if (url === '/') {
+        if (router.asPath === '/' ) classes.push(styles.active)
+    } else {
+        if (router.asPath.startsWith(url)) classes.push(styles.active)
+    }
+
 
     return (
         <MaintineBtn className={classes.join(' ')} component={Link} href={url}>{title}</MaintineBtn>

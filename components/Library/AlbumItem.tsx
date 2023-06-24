@@ -12,7 +12,7 @@ type AlbumItemProps = {
 function AlbumItem({ metadata, showAuthor = false }: AlbumItemProps) {
 
     return (
-        <Link href={'/album/[ratingKey]'} as={`/album/${metadata.ratingKey}`}>
+        <Link href={'/library/album/[ratingKey]'} as={`/library/album/${metadata.ratingKey}`}>
             <div className={`${styles.container}`}>
                 <div className={`${styles.image_container}`}>
                     <PlexImage width={240} height={240} url={metadata.thumb} alt={`${metadata.title}`} isLazy />

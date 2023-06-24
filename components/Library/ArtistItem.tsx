@@ -11,7 +11,7 @@ type ArtistItemProps = {
 function ArtistItem({ metadata }: ArtistItemProps) {
 
     return (
-        <Link href={'/artist/[ratingKey]'} as={`/artist/${metadata.ratingKey}`}>
+        <Link href={'/library/artist/[ratingKey]'} as={`/library/artist/${metadata.ratingKey}`}>
         <div className={`${styles.container}`}>
             <div className={`${styles.image_container}`}>
                 <PlexImage width={240} height={240} url={metadata.thumb} alt={`${metadata.title}`} isLazy />

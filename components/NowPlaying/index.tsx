@@ -24,7 +24,7 @@ function NowPlaying() {
                 </div>
                 <div className={`${styles.track_info}`}>
                     <div className={`${styles.text}`}>{currentTrack?.title}</div>
-                    <Link href={'/album/[ratingKey]'} as={`/album/${currentTrack?.parentRatingKey}`}>
+                    <Link href={'/library/album/[ratingKey]'} as={`/library/album/${currentTrack?.parentRatingKey}`}>
                         <div className={`${styles.text} ${styles.muted}`}>{currentTrack?.parentTitle}</div>
                     </Link>
                     <div className={`${styles.text} ${styles.muted}`}>{currentTrack?.grandparentTitle}</div>

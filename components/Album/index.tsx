@@ -39,7 +39,7 @@ function AlbumPage({ ratingKey }: AlbumPageProps) {
                 <div className={`${styles.meta_container}`}>
                     <div className={`${styles.album_title}`}>{album.title}</div>
                     <div className={`${styles.album_author}`}>
-                        <Link href={'/artist/[ratingKey]'} as={`/artist/${album.parentRatingKey}`}>{album.parentTitle}</Link>
+                        <Link href={'/library/artist/[ratingKey]'} as={`/library/artist/${album.parentRatingKey}`}>{album.parentTitle}</Link>
                     </div>
                     <div className={`${styles.album_year}`}>{album.year}</div>
                     <div className={`${styles.track_ondeck}`}>

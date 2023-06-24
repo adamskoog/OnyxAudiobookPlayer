@@ -80,10 +80,10 @@ function AudioPlayer() {
         }
     }, [queueIndex, queue]);
 
-    const playerRangeChanged = (evt: React.ChangeEvent<HTMLInputElement>): void => {
+    const playerRangeChanged = (value: number): void => {
         const playerElement = playerRef.current;
         if (playerElement) {
-            playerElement.currentTime = parseInt(evt.target.value);
+            playerElement.currentTime = value;
         }
     };
 

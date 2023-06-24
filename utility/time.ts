@@ -42,4 +42,6 @@ const convertFromSeconds = (s: number): string => {
 
 export const formatTrackDisplay = (duration: number): string => convertFromMs(duration);
 
+export const formatProgressLabel = (value: number): string => convertFromSeconds(value);
+
 export const formatPlayerDisplay = (current: number, duration: number): string => `${convertFromSeconds(current)} / ${convertFromSeconds(duration)}`;

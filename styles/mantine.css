@@ -28,3 +28,11 @@
 .hub .mantine-UnstyledButton-root:disabled, .hub .mantine-UnstyledButton-root[data-disabled] {
     color: rgb(var(--disabled-button-fill-rgb));
 }
+
+.mantine-Slider-bar {
+    background-color: rgb(var(--navbar-background-rgb));
+}
+.mantine-Slider-thumb {
+    color: rgb(var(--navbar-background-rgb));
+    border-color: rgb(var(--navbar-background-rgb));
+}

@@ -1,5 +1,6 @@
+import { Slider } from '@mantine/core';
 import { useAppSelector } from '@/store';
-
+import { formatProgressLabel } from '@/utility';
 import styles from './styles/Controls.module.css'
 
 // TODO: need to figure out where/when this might not be a number.
@@ -9,7 +10,7 @@ const checkValid = (value: number | any): number => {
 };
 
 type Props = {
-    playerRangeChanged: (evt: React.ChangeEvent<HTMLInputElement>) => void
+    playerRangeChanged: (value: number) => void
 }
 
 function RangeControl({ playerRangeChanged }: Props) {
@@ -17,12 +18,15 @@ function RangeControl({ playerRangeChanged }: Props) {
     const duration = useAppSelector((state) => state.player.duration);
 
   return (
-    <input className={`${styles.range}`}
-      type="range"
-      min={0}
-      max={checkValid(duration)}
-      value={checkValid(currentTime)}
-      onChange={playerRangeChanged}
+    <Slider 
+        title={'Track Location'}
+        className={`${styles.range}`}
+        thumbSize={16}
+        label={value => formatProgressLabel(value)} 
+        min={0} 
+        max={checkValid(duration)} 
+        value={checkValid(currentTime)} 
+        onChange={playerRangeChanged} 
     />
   );
 }

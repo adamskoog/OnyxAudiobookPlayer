@@ -52,7 +52,7 @@ function Settings() {
             <Select value={activeServer?.clientIdentifier} onChange={changeServer} data={serverOptions} />
             <Select value={libraryId} onChange={changeLibrary} data={libraryOptions} />
 
-            <Button onClick={testing}>{'Switch User'}</Button>
+            <Button disabled={true} onClick={testing}>{'Switch User'}</Button>
             <Button onClick={logout}>{'Log out'}</Button>
             </>
             )}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store';
-import { setPlayerTime, clearPlayQueue, changePlayerMode } from '@/store/features/playerSlice';
+import { setPlayerTime, clearPlayQueue, changePlayerMode, nextTrack } from '@/store/features/playerSlice';
 
 import PlexJavascriptApi from '@/plex';
 import type { PlexTrack } from '@/types/plex.types';
@@ -65,9 +65,9 @@ function AudioPlayer() {
     const audioPlayerEnded = useCallback((): void => {
         const nextIndex = queueIndex + 1;
         if (queue && queue.length > nextIndex) {
-        //   dispatch(nextTrackInQueue());
+            dispatch(nextTrack());
         } else {
-          stopPlayer();
+            stopPlayer();
         }
     }, [queueIndex, queue]);
 

@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import Link from 'next/link';
 
+import { useAppSelector } from '@/store';
 import Loader from '../shared/Loader';
 import PlexImage from '../shared/PlexImage';
 import OnDeck from './OnDeck';
@@ -10,13 +12,20 @@ import useAlbumMetadata from './hooks/useAlbumMetadata';
 
 import styles from './styles/Album.module.css'
 
+
 type AlbumPageProps = {
     ratingKey: string
 }
 
 function AlbumPage({ ratingKey }: AlbumPageProps) {
 
+    const currentTrack = useAppSelector(state => state.player.currentTrack);
+    
     const { album, loading, forceMetadataUpdate } = useAlbumMetadata({ ratingKey });
+
+    useEffect(() => {
+        if (album) forceMetadataUpdate();
+    }, [currentTrack])
 
     if (loading) return <Loader loading={loading} />
     if (!album) return <div></div>

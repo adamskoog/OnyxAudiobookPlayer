@@ -1,7 +1,7 @@
-import { useState, ReactNode } from 'react'
+import { useEffect, useState, ReactNode } from 'react'
 import { Menu, UnstyledButton } from '@mantine/core';
 
-import { useAppDispatch } from '@/store';
+import { useAppSelector, useAppDispatch } from '@/store';
 import { buildPlayQueue } from '@/store/features/playerSlice';
 
 import type { PlexAlbumMetadata, PlexTrack } from "@/types/plex.types"
@@ -28,8 +28,16 @@ type ProgressProps = {
 }
 
 function Progress({ track }: ProgressProps) {
-    if (track.viewOffset || track.viewCount) {
-        if (trackIsComplete(track)) {
+
+    const currentTrack = useAppSelector(state => state.player.currentTrack);
+    const [nowPlaying, setNowPlaying] = useState(false);
+
+    useEffect(() => {
+        setNowPlaying(track.ratingKey === currentTrack?.ratingKey)
+    }, [track, currentTrack])
+
+    if (nowPlaying || track.viewOffset || track.viewCount) {
+        if (!nowPlaying && trackIsComplete(track)) {
             return (
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-circle-fill" viewBox="0 0 16 16">
                   <circle cx="8" cy="8" r="8"/>
@@ -59,8 +67,8 @@ export default function TrackInfo({ track, album, forceMetadataUpdate }: TrackPr
 
     const dispatch = useAppDispatch();
 
-    const [isOpen, setIsOpen] = useState(false)
-    
+    const [isOpen, setIsOpen] = useState(false);
+
     const playTrack = (): void => {
         const callAsync = async () => {
             await updateOnDeck(track, album);

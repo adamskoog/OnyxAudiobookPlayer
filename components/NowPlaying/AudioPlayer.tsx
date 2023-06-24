@@ -6,7 +6,7 @@ import PlexJavascriptApi from '@/plex';
 import type { PlexTrack } from '@/types/plex.types';
 import type { PlayerMode } from '@/store/features/playerSlice';
 
-import throttle from '@/utility/throttle'
+import throttle from 'lodash/throttle';
 import { convertSecondsToMs, convertMsToSeconds } from '@/utility';
 
 import { usePrevious } from '@/hooks';
@@ -23,6 +23,11 @@ import {
 } from './controls'
 
 const updateTimeline = (track: PlexTrack, playerState: PlayerMode, currentTime: number, duration: number): void => {
+
+    // When track first starts we don't immediately have a time sometimes, this can lead
+    // to bad data passed to plex and marking the track played.
+    if (isNaN(duration)) return;
+
     // TODO: We need a way to update the album info if the user is looking at the album
     // page, It should keep the on deck updated.
     const args = {
@@ -34,8 +39,10 @@ const updateTimeline = (track: PlexTrack, playerState: PlayerMode, currentTime: 
       duration: convertSecondsToMs(duration),
     };
 
-    PlexJavascriptApi.updateTimeline(args);
-    // .then((data) => { /* console.log("data", data); TODO: This doesn't seem to return anything, and errors out often. */ });
+    PlexJavascriptApi.updateTimeline(args)
+        .then((data) => { 
+            /* console.log("data", data); TODO: This doesn't seem to return anything, and errors out often. */ 
+    });
 };
 
 function AudioPlayer() {
@@ -45,7 +52,7 @@ function AudioPlayer() {
     const queueId = useAppSelector(state => state.player.queueId);
     const queueIndex = useAppSelector((state) => state.player.queueIndex);
     const queue = useAppSelector(state => state.player.queue);
-    const playState = useAppSelector((state) => state.player.mode);
+    // const playState = useAppSelector((state) => state.player.mode);
 
     const prevIndex: number = usePrevious(queueIndex);
     const prevQueue: string = usePrevious(queueId);
@@ -64,6 +71,8 @@ function AudioPlayer() {
 
     const audioPlayerEnded = useCallback((): void => {
         const nextIndex = queueIndex + 1;
+        updateTimeline(queue[queueIndex], 'stopped', queue[queueIndex].duration, queue[queueIndex].duration);
+        
         if (queue && queue.length > nextIndex) {
             dispatch(nextTrack());
         } else {
@@ -134,14 +143,13 @@ function AudioPlayer() {
     useEffect(() => {
         const playerElement = playerRef.current;
         if (!playerElement) return;
-    
-        // Add throttling to the timeupdate event.
+
         const throttleTimeline = throttle(() => {
-          if (!playerElement.paused) {
-            updateTimeline(queue[queueIndex], 'playing', playerElement.currentTime, playerElement.duration);
-          }
-        }, 4000);
-    
+            if (!playerElement.paused) {
+                updateTimeline(queue[queueIndex], 'playing', playerElement.currentTime, playerElement.duration);
+            }
+        }, 20000, { trailing: false });
+
         playerElement.addEventListener('timeupdate', throttleTimeline);
         return () => playerElement.removeEventListener('timeupdate', throttleTimeline);
     }, [queueId, queueIndex]);
@@ -157,10 +165,13 @@ function AudioPlayer() {
     
           // Stop playback, if you change the source of the audio while
           // it's playing, there is an exception thrown in the console.
-          if (playState === 'playing') {
-            // console.log("STOP: Track is playing, pause and remove source.");
-            stopTrack();
-          }
+        //   TODO: Verify - but this doesn't seem to cause a problem anymore,
+        //          and is actually making extraneous calls when active.
+        //   if (playState === 'playing') {
+        //     // console.log("STOP: Track is playing, pause and remove source.");
+        //     console.log("need stop?")
+        //     stopTrack();
+        //   }
     
           // Probably need to handle multiparts in some way? Even if it's just a warning?
           if (currentTrack.Part[0]) {

@@ -1,0 +1,38 @@
+/* Overrides to support the ScrollArea element
+   not allowing horizontal scrolling for our layout element. */
+.mantine-ScrollArea-viewport {
+    overflow-x: hidden !important;
+}
+
+.mantine-ScrollArea-viewport > div {
+    display: block !important;
+}
+
+.mantine-Burger-burger, .mantine-Burger-burger::before, .mantine-Burger-burger::after {
+    color: rgb(var(--navbar-foreground-rgb));
+    background-color: rgb(var(--navbar-foreground-rgb));
+}
+
+.mantine-Select-item[data-selected] { 
+    color: rgb(var(--subheader-forground-rgb));
+    background-color: rgb(var(--subheader-background-rgb));
+}
+
+.mantine-Spoiler-control {
+    color: rgb(var(--body-foreground-rgb));
+}
+
+.hub .mantine-UnstyledButton-root {
+    color: rgb(var(--body-foreground-rgb));
+}
+.hub .mantine-UnstyledButton-root:disabled, .hub .mantine-UnstyledButton-root[data-disabled] {
+    color: rgb(var(--disabled-button-fill-rgb));
+}
+
+.mantine-Slider-bar {
+    background-color: rgb(var(--navbar-background-rgb));
+}
+.mantine-Slider-thumb {
+    color: rgb(var(--navbar-background-rgb));
+    border-color: rgb(var(--navbar-background-rgb));
+}

@@ -1,0 +1,17 @@
+.container {
+    margin: 0.75rem 0;
+    font-size: 1rem;
+    line-height: 1.25rem;
+}
+
+/* Show the button for spoiler in the center. */
+.spoiler {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary {
+    display:flex;
+    flex-direction: column;
+    gap: .25rem;
+}

@@ -1,0 +1,13 @@
+.cell {
+    display: flex;
+    align-items: center;
+}
+
+.menu_cell {
+    justify-content: center;
+}
+
+.menu_icon {
+    color: rgb(var(--body-foreground-rgb));
+    font-size: 1.25rem;
+}

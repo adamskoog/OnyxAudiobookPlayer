@@ -1,0 +1,44 @@
+.container {
+    margin-top: .5rem;
+}
+
+.album_count {
+    margin-bottom: 0.5rem;
+}
+
+.albums {
+    display: grid;
+    grid-gap: 1rem;
+    gap: 1rem;
+
+    border-top: solid 1px rgb(var(--body-foreground-rgb));
+    padding-top: .8rem;
+
+    grid-template-columns: repeat(2, minmax(0, 180px));
+}
+
+@media (min-width: 640px) {
+    .albums {
+        grid-template-columns: repeat(3, minmax(0, 180px));
+    }
+}
+@media (min-width: 768px) {
+    .container {
+        margin-top: 2.5rem;
+    }
+
+    .albums {
+        grid-template-columns: repeat(4, minmax(0, 180px));;
+    }
+}
+@media (min-width: 1024px) {
+    .albums {
+        grid-template-columns: repeat(5, minmax(0, 180px));
+    }
+}
+
+@media (min-width: 1280px) {
+    .albums {
+        grid-template-columns: repeat(6, minmax(0, 180px));
+    }
+}

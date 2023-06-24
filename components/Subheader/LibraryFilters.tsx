@@ -12,6 +12,7 @@ type FilterButtonProps = {
     isOpen: boolean,
     setIsOpen:Dispatch<SetStateAction<boolean>>
 }
+
 const FilterButton = forwardRef<HTMLButtonElement, FilterButtonProps>(({ title, isOpen, setIsOpen }: FilterButtonProps, ref) => {
 
     let classes = [styles.btn_menu];
@@ -25,6 +26,8 @@ const FilterButton = forwardRef<HTMLButtonElement, FilterButtonProps>(({ title, 
         </UnstyledButton>
     )
 })
+
+FilterButton.displayName = 'FilterButton';
 
 type FilterMenuProps = {
     caption: string,

@@ -8,6 +8,7 @@ import Hub from "./Hub";
 function HomePage() {
     
     const userInfo = useAppSelector((state) => state.application.user);
+    const activeServer = useAppSelector(state => state.server.activeServer);
     const section = useAppSelector((state) => state.library.libraryId);
   
     const fetchRecentAddedItems = async (): Promise<Array<PlexAlbumMetadata>> => {
@@ -30,7 +31,7 @@ function HomePage() {
 
     return (
         <>
-            {userInfo && (
+            {userInfo && activeServer && (
               <>
               <Hub title="Recently Played" hubItemsCallback={fetchRecentPlayedItems}/>
               <Hub title="Recently Added" hubItemsCallback={fetchRecentAddedItems}/>

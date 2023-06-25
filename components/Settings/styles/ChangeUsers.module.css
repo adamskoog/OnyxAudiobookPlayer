@@ -1,0 +1,26 @@
+.container {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+
+.user_item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.enter_pin {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    padding: 0 25px;
+}
+
+.pin_entry {
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
+}

@@ -12,8 +12,21 @@ export type PlexUser = {
     pin: string,
     thumb: string,
     title: string,
-    username: string
+    username: string,
+    home: boolean
 };
+
+export type SwitchUserItem = {
+    id: number,
+    uuid: string,
+    admin: boolean,
+    restricted: boolean,
+    protected: boolean,
+    title: string,
+    username: string,
+    email: string,
+    thumb: string
+}
 
 export type PlexResourceConnection = {
     uri: string,

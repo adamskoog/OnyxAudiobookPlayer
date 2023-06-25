@@ -1,5 +1,6 @@
 /* Primary Header Containers */
 .outer {
+    position: relative;
     color: rgb(var(--navbar-foreground-rgb));
     background-color: rgb(var(--navbar-background-rgb));
 }
@@ -40,6 +41,12 @@
     padding: 0.75rem 1rem;
 
     font-size: 1rem;
+
+    position: absolute;
+    width: 100%;
+    z-index: 5;
+
+    background-color: rgb(var(--navbar-background-rgb));
 }
 
 @media (min-width: 768px /*var(--mobile-break)*/) {

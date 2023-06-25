@@ -3,7 +3,7 @@ import qs from 'qs';
 import Bowser from "bowser";
 import { v4 as uuidv4 } from 'uuid';
 
-import type { PlexUser, PlexResource, PlexServerConnection, PlexLibrary, PlexTimelineArgs, PlexProgress, PlexArtistMetadata, PlexArtistListMetadata, PlexAlbumMetadata, PlexTrackMedia } from '@/types/plex.types'
+import type { PlexUser, SwitchUserItem, PlexResource, PlexServerConnection, PlexLibrary, PlexTimelineArgs, PlexProgress, PlexArtistMetadata, PlexArtistListMetadata, PlexAlbumMetadata, PlexTrackMedia } from '@/types/plex.types'
 import * as Settings from '@/utility/settings';
 
 export const RESOURCETYPES = {
@@ -225,19 +225,6 @@ class PlexJavascriptApi {
     static logout = (): void => {
         Settings.clearSettings();
     };
-
-    static getUsers = async (): Promise<any> => {
-      const response = await this.client.get(this.PLEX_USERS_URL, {
-          params: {
-              ...this.requestBaseParams,
-              ...this.requestTokenParam
-          }
-      });
-
-      const parser = new DOMParser();
-      const doc1 = parser.parseFromString(response.data, "application/xml");
-      return doc1;
-    }
 
     /**
      * Get the resources based on the authenticated user.
@@ -577,6 +564,45 @@ class PlexJavascriptApi {
   
         return response.data.MediaContainer.Metadata ?? [];
     };
+
+    static getUsers = async (): Promise<SwitchUserItem[]> => {
+      const response = await this.client.get(this.PLEX_USERS_URL, {
+          params: {
+              ...this.requestBaseParams,
+              ...this.requestTokenParam
+          }
+      });
+
+      const parser = new DOMParser();
+      const doc1 = parser.parseFromString(response.data, "application/xml");
+      const xmlUsers = doc1.children[0].children;
+      let users = [] as SwitchUserItem[];
+
+      for (let i = 0; i < xmlUsers.length; i++) {
+          const item = xmlUsers.item(i);
+          if (item != null) {
+
+            const checkBoolean = (value: string | null) => {
+                if (value && value === '1') return true;
+                return false;
+            }
+            let tmp: SwitchUserItem = {
+              id: parseInt(item.getAttribute('id') ?? ''),
+              uuid: item.getAttribute('uuid') ?? '',
+              admin: checkBoolean(item.getAttribute('admin')),
+              restricted: checkBoolean(item.getAttribute('restricted')),
+              protected: checkBoolean(item.getAttribute('protected')),
+              title: item.getAttribute('title') ?? '',
+              username: item.getAttribute('username') ?? '',
+              email: item.getAttribute('email') ?? '',
+              thumb: item.getAttribute('thumb') ?? '',
+            }
+
+            users.push(tmp);
+          }
+      }
+      return users;
+    }
 }
 
 export default PlexJavascriptApi

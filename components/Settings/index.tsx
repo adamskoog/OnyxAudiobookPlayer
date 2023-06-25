@@ -1,5 +1,4 @@
 import { useAppSelector, useAppDispatch } from '@/store'
-import PlexJavascriptApi from '@/plex'
 
 import { logout } from '@/store/features/applicationSlice';
 import { setActiveServer } from '@/store/features/serverSlice';
@@ -8,6 +7,7 @@ import { setActiveLibrary } from '@/store/features/librarySlice';
 import { Button } from '@/components/shared/Buttons';
 import { Select } from '@mantine/core';
 
+import ChangeUsers from './ChangeUsers';
 import styles from './styles/Settings.module.css'
 
 function Settings() {
@@ -34,14 +34,6 @@ function Settings() {
         dispatch(setActiveLibrary(value))
     }
 
-    const testing = () => {
-        const test = async () => {
-            const resp = await PlexJavascriptApi.getUsers();
-            console.log("RESP", resp);
-        }
-            // https://clients.plex.tv/api/home/users?X-Plex-Product=Plex%20Web&X-Plex-Version=4.108.0&X-Plex-Client-Identifier=pg5y4mmh8eq9gjkah65vt4ue&X-Plex-Platform=Microsoft%20Edge&X-Plex-Platform-Version=114.0&X-Plex-Features=external-media%2Cindirect-media%2Chub-style-list&X-Plex-Model=hosted&X-Plex-Device=Windows&X-Plex-Device-Name=Microsoft%20Edge&X-Plex-Device-Screen-Resolution=1920x937%2C1920x1080&X-Plex-Token=Kqi6dGG2E5rxDyrjYVzh&X-Plex-Language=en&X-Plex-Session-Id=d03b04f5-f957-4a85-81ff-72118a1eb567
-        test();
-    }
     const signout = () => {
         dispatch(logout())
     }
@@ -54,7 +46,7 @@ function Settings() {
             <Select value={activeServer?.clientIdentifier} onChange={changeServer} data={serverOptions} />
             <Select value={libraryId} onChange={changeLibrary} data={libraryOptions} />
 
-            <Button disabled={true} onClick={testing}>{'Switch User'}</Button>
+            {user.home && (<ChangeUsers />)}
             <Button onClick={signout}>{'Log out'}</Button>
             </>
             )}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useAppSelector, useAppDispatch } from '@/store';
 import { findOnDeck } from '@/plex/helpers';
 import type { PlexAlbumMetadata, PlexTrack } from "@/types/plex.types"
 
@@ -7,12 +8,17 @@ type HookProps = {
 }
 
 type HookReturn = {
-    onDeck: PlexTrack | null
+    onDeck: PlexTrack | null,
+    isPlaying: boolean
 }
 
 const useOnDeckTrack = ({ album }: HookProps): HookReturn => {
 
     const [onDeck, setOnDeck] = useState(null as PlexTrack | null);
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    const playState = useAppSelector(state => state.player.mode);
+    const currentTrack = useAppSelector(state => state.player.currentTrack)
 
     useEffect(() => {
         if (!album) {
@@ -25,7 +31,19 @@ const useOnDeckTrack = ({ album }: HookProps): HookReturn => {
         fetchMetadata();
     }, [album]);
 
-    return { onDeck }
+    useEffect(() => {
+        
+        if (playState === 'playing' || playState === 'paused') {
+            if (currentTrack?.parentRatingKey === album.ratingKey) {
+                setIsPlaying(true);
+                return;
+            }
+        } 
+        
+        setIsPlaying(false);
+    }, [playState, currentTrack])
+
+    return { onDeck, isPlaying }
 }
 
 export default useOnDeckTrack;

@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useRef, createContext, MutableRefObject } from 'react'
 import { ScrollArea } from '@mantine/core';
+import Loader from '../shared/Loader';
 
 import { Inter } from 'next/font/google'
 
@@ -30,6 +31,7 @@ export default function Layout({ children }: LayoutProps) {
     const scrollerRef = useRef<HTMLDivElement | null>(null);
     
     const user = useAppSelector((state) => state.application.user);
+    const state = useAppSelector(state => state.application.state)
 
     useEffect(() => {
         dispatch(initialize())
@@ -41,6 +43,11 @@ export default function Layout({ children }: LayoutProps) {
         }
     }, [user]);
 
+    if (state === 'loading') return (
+        <div className={`${styles.loader} ${inter.className}`}>
+            <Loader loading={true} />
+        </div>
+    )
     return (
         <>
             <Header />

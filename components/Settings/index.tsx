@@ -1,7 +1,7 @@
 import { useAppSelector, useAppDispatch } from '@/store'
 
 import { logout } from '@/store/features/applicationSlice';
-import { setActiveServer } from '@/store/features/serverSlice';
+import { clearServerData, setActiveServer } from '@/store/features/serverSlice';
 import { setActiveLibrary } from '@/store/features/librarySlice';
 
 import { Button } from '@/components/shared/Buttons';
@@ -9,8 +9,12 @@ import { Select } from '@mantine/core';
 
 import ChangeUsers from './ChangeUsers';
 import styles from './styles/Settings.module.css'
+import PlexJavascriptApi from '@/plex';
 
-function Settings() {
+type SettingsProps = {
+    appVersion: string
+}
+function Settings({ appVersion }: SettingsProps) {
     const dispatch = useAppDispatch();
 
     const user = useAppSelector((state) => state.application.user);
@@ -35,6 +39,8 @@ function Settings() {
     }
 
     const signout = () => {
+        PlexJavascriptApi.logout();
+        dispatch(clearServerData())
         dispatch(logout())
     }
 
@@ -43,11 +49,15 @@ function Settings() {
         <div className={`${styles.container}`}>
             {user && (
             <>
-            <Select value={activeServer?.clientIdentifier} onChange={changeServer} data={serverOptions} />
+            <Select value={activeServer?.clientIdentifier ?? null} onChange={changeServer} data={serverOptions} />
             <Select value={libraryId} onChange={changeLibrary} data={libraryOptions} />
 
             {user.home && (<ChangeUsers />)}
             <Button onClick={signout}>{'Log out'}</Button>
+            <div className={`${styles.version}`}>
+                <div>{'Application Version:'}</div>
+                <div>{appVersion}</div>
+            </div>
             </>
             )}
         </div>

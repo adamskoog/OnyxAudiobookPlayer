@@ -36,6 +36,7 @@ export const removeSettingFromStorage = (key: string): void => {
 export const clearSettings = (): void => {
     const keys = Object.keys(SETTINGS_KEYS);
     keys.forEach((key) => {
-        removeSettingFromStorage(SETTINGS_KEYS[key]);
+        if (!SETTINGS_KEYS.clientIdentifier && !SETTINGS_KEYS.loginRedirectId) 
+            removeSettingFromStorage(SETTINGS_KEYS[key]);
     });
 };

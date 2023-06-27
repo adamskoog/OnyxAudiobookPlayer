@@ -54,6 +54,7 @@ class PlexJavascriptApi {
     private static PLEX_USER_URL = '/api/v2/user';
     private static PLEX_USERS_URL = '/api/home/users';
     private static PLEX_PINS_URL = '/api/v2/pins';
+    private static PLEX_USERS_V2_URL = '/api/v2/home/users';
 
     private static isInitialized: boolean = false;
     private static needsLogin: boolean = false;
@@ -63,9 +64,8 @@ class PlexJavascriptApi {
     };
 
     private static requestBaseParams: any = {
-        'X-Plex-Device-Name': "Onyx",
         'X-Plex-Product': 'Onyx Audiobook Player',
-        'X-Plex-Version': '0.9.2',
+        'X-Plex-Version': '2.1.0',
         'X-Plex-Client-Identifier': null
     };
 
@@ -98,7 +98,8 @@ class PlexJavascriptApi {
         const browser = Bowser.parse(window.navigator.userAgent);
         this.requestBaseParams['X-Plex-Device'] = browser.os.name;
         this.requestBaseParams['X-Plex-Platform'] = browser.browser.name;
-
+        this.requestBaseParams['X-Plex-Device-Name'] = browser.browser.name;
+        
         // We have not initialized, we need to check the browser storage
         // for plex.tv token, client identifier, and saved auth token.
         let token = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.token);
@@ -219,6 +220,72 @@ class PlexJavascriptApi {
         return authAppUrl;
     };
 
+    static getUsers = async (): Promise<SwitchUserItem[]> => {
+
+      const response = await this.client.get(this.PLEX_USERS_URL, {
+          params: {
+              ...this.requestBaseParams,
+              ...this.requestTokenParam
+          }
+      });
+
+      const parser = new DOMParser();
+      const doc1 = parser.parseFromString(response.data, "application/xml");
+      const xmlUsers = doc1.children[0].children;
+      let users = [] as SwitchUserItem[];
+
+      for (let i = 0; i < xmlUsers.length; i++) {
+          const item = xmlUsers.item(i);
+          if (item != null) {
+
+            const checkBoolean = (value: string | null) => {
+                if (value && value === '1') return true;
+                return false;
+            }
+            let tmp: SwitchUserItem = {
+              id: parseInt(item.getAttribute('id') ?? ''),
+              uuid: item.getAttribute('uuid') ?? '',
+              admin: checkBoolean(item.getAttribute('admin')),
+              restricted: checkBoolean(item.getAttribute('restricted')),
+              protected: checkBoolean(item.getAttribute('protected')),
+              title: item.getAttribute('title') ?? '',
+              username: item.getAttribute('username') ?? '',
+              email: item.getAttribute('email') ?? '',
+              thumb: item.getAttribute('thumb') ?? '',
+            }
+
+            users.push(tmp);
+          }
+      }
+      return users;
+    }
+
+    static switchUser = async (user: SwitchUserItem, pin?: string | undefined): Promise<PlexUser> => {
+
+        const args = {
+          pin,
+            ...this.requestBaseParams,
+            ...this.requestTokenParam
+        }
+
+        const url = formatUrl(`${this.PLEX_USERS_V2_URL}/${user.uuid}/switch`, args)
+
+        const response = await this.client.post(url);
+
+        // Clear the current selected server from the class.
+        this.selectServer(null);
+
+        // we need to update the user token and unset the server info.
+        Settings.removeSettingFromStorage(Settings.SETTINGS_KEYS.serverId)
+        Settings.removeSettingFromStorage(Settings.SETTINGS_KEYS.libraryId)
+
+        // Update settings and class state with the current user token.
+        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.token, response.data.authToken);
+        this.requestTokenParam['X-Plex-Token'] = response.data.authToken;
+
+        return response.data as PlexUser;
+    }
+
     /**
      * Clear application storage to log out of the application.
      */   
@@ -262,7 +329,7 @@ class PlexJavascriptApi {
     private static serverConnectionTest = (resource: PlexResource): Promise<PlexServerConnection> => new Promise((resolve, reject) => {
     
         // TODO: handle this better with base params.
-        this.requestTokenParam['X-Plex-Token'] = resource.accessToken;
+        this.serverRequestTokenParam['X-Plex-Token'] = resource.accessToken;
     
         const params = { ...this.baseParams, ...this.requestTokenParam };
         const connections = resource.connections;
@@ -296,8 +363,11 @@ class PlexJavascriptApi {
     });
 
     static selectServer = async (resource: PlexResource | null): Promise<PlexServerConnection> => {
-        if (!resource)
-            return { message: 'No resource selected' };
+        if (!resource) {
+            this.serverRequestTokenParam['X-Plex-Token'] = null;
+            this.baseUrl = null;
+            return { message: 'No resource selected - active server removed' };
+        }
 
         // Set the access token for the server.
         this.serverRequestTokenParam['X-Plex-Token'] = resource.accessToken;
@@ -351,10 +421,20 @@ class PlexJavascriptApi {
      * @param {string} thumb - the url of the requested image.
      * @param {boolean | undefined} minSize
      * @param {boolean | undefined} upscale
+     * @param {number | undefined} blur
+     * @param {number | undefined} opacity
+     * @param {string | undefined} background
      * 
      * @returns {string} - the url of the transcoded image.
      */
-    static getThumbnailTranscodeUrl = (h: number, w: number, thumb: string, minSize?: boolean | null, upscale?: boolean | null): string => {
+    static getThumbnailTranscodeUrl = (
+        h: number, 
+        w: number, 
+        thumb: string, 
+        minSize?: boolean | undefined, 
+        upscale?: boolean | undefined
+      ): string => {
+
       const params = {
         width: w,
         height: h,
@@ -365,6 +445,22 @@ class PlexJavascriptApi {
       };
       return formatUrl(`${this.baseUrl}/photo/:/transcode`, params);
     };
+
+    // static getThumbnailTranscodeUrl = ({ width, height, thumb, minSize, upscale, blur, opacity, background }: TranscodeImageProps): string => {
+
+    //   const params = {
+    //     width,
+    //     height,
+    //     minSize: minSize ? 1 : 0,
+    //     upscale: upscale ? 1 : 0,
+    //     blur,
+    //     opacity,
+    //     background,
+    //     url: `${thumb}?X-Plex-Token=${this.requestTokenParam['X-Plex-Token']}`,
+    //     // ...this.serverRequestTokenParam
+    //   };
+    //   return formatUrl(`${this.baseUrl}/photo/:/transcode`, params);
+    // };
 
     /**
      * Mark the track referenced by the key as watched/listened.
@@ -564,45 +660,17 @@ class PlexJavascriptApi {
   
         return response.data.MediaContainer.Metadata ?? [];
     };
-
-    static getUsers = async (): Promise<SwitchUserItem[]> => {
-      const response = await this.client.get(this.PLEX_USERS_URL, {
-          params: {
-              ...this.requestBaseParams,
-              ...this.requestTokenParam
-          }
-      });
-
-      const parser = new DOMParser();
-      const doc1 = parser.parseFromString(response.data, "application/xml");
-      const xmlUsers = doc1.children[0].children;
-      let users = [] as SwitchUserItem[];
-
-      for (let i = 0; i < xmlUsers.length; i++) {
-          const item = xmlUsers.item(i);
-          if (item != null) {
-
-            const checkBoolean = (value: string | null) => {
-                if (value && value === '1') return true;
-                return false;
-            }
-            let tmp: SwitchUserItem = {
-              id: parseInt(item.getAttribute('id') ?? ''),
-              uuid: item.getAttribute('uuid') ?? '',
-              admin: checkBoolean(item.getAttribute('admin')),
-              restricted: checkBoolean(item.getAttribute('restricted')),
-              protected: checkBoolean(item.getAttribute('protected')),
-              title: item.getAttribute('title') ?? '',
-              username: item.getAttribute('username') ?? '',
-              email: item.getAttribute('email') ?? '',
-              thumb: item.getAttribute('thumb') ?? '',
-            }
-
-            users.push(tmp);
-          }
-      }
-      return users;
-    }
 }
 
 export default PlexJavascriptApi
+
+type TranscodeImageProps = {
+  height: number, 
+  width: number, 
+  thumb: string, 
+  minSize?: boolean | undefined, 
+  upscale?: boolean | undefined,
+  blur?: number | undefined,
+  opacity?: number | undefined,
+  background?: string | undefined
+}

@@ -4,26 +4,41 @@ import PlexJavascriptApi from '@/plex'
 import { Button } from '@/components/shared/Buttons';
 import { Avatar, Modal, PinInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-
+import { switchUser } from '@/store/features/applicationSlice';
+import { clearActiveLibrary } from '@/store/features/librarySlice';
 import styles from './styles/ChangeUsers.module.css'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { SwitchUserItem } from '@/types/plex.types';
 
-function UserSelector({ user, setUser }: any) {
+type UserSelectorProps = {
+    user: SwitchUserItem,
+    setUser?: (user: SwitchUserItem) => void
+}
+
+function UserSelector({ user, setUser }: UserSelectorProps) {
 
     const onClick = () => {
         if (setUser) setUser(user);
     }
+
     return (
-        <div className={`${styles.user_item}`} onClick={onClick}>
-            <Avatar radius="xl" size="xl" src={user.thumb}/>
-            <div>{user.title ?? user.username}</div>
-        </div>
+        <li className={`${styles.user_item} user-selector`}>
+            <button className={`${styles.select_user_button}`} onClick={onClick}>
+                <div className={`${styles.avatar}`}>
+                    <Avatar radius="xl" size="xl" src={user.thumb}/>
+                </div>
+                <div className={`${styles.caption}`}>
+                    <div>{user.title}</div>
+                    <div className={`${styles.username}`}>{(user.username !== '') ? user.username : 'Managed Account'}</div>
+                </div>
+            </button>
+        </li>
     );
 }
 
 function ChangeUsers() {
 
+    const dispatch = useAppDispatch();
     const [opened, { open, close }] = useDisclosure(false);
 
     const [users, setUsers] = useState<SwitchUserItem[]>([]);
@@ -32,29 +47,57 @@ function ChangeUsers() {
     const changeUser = () => {
         const doAsync = async () => {
             const resp = await PlexJavascriptApi.getUsers();
-            console.log("RESP", resp);
             setUsers(resp)
             open();
         }
         doAsync();
     }
     
+    useEffect(() => {
+        setUser(null);
+    }, [opened])
+
+    const noClose = () => {}
+
+    const doUserSwitch = (user: SwitchUserItem, pin?: string) => {
+        const doAsync = async () => {
+            const newUser = await PlexJavascriptApi.switchUser(user, pin);
+            dispatch(switchUser(newUser));
+            close()
+        }
+
+        doAsync()
+    }
+    
+    const onPinComplete = (value: string): void => {
+        if (!user) return;
+        doUserSwitch(user, value);
+    }
+
+    const selectUser = (user: SwitchUserItem) => {
+        if (user.protected) {
+            setUser(user)
+        } else {
+            doUserSwitch(user);
+        }
+    }
+
     return (
         <>
             <Button onClick={changeUser}>{'Switch User'}</Button>
 
-            <Modal opened={opened} onClose={close} title="Switch User">
+            <Modal opened={opened} size={700} onClose={noClose} title="Switch User">
                 {!user ? (
-                    <div className={`${styles.container}`}>
+                    <ul className={`${styles.container}`}>
                         {users.map(item => (
-                            <UserSelector key={item.uuid} user={item} setUser={setUser} />
+                            <UserSelector key={item.uuid} user={item} setUser={selectUser} />
                         ))}
-                    </div>
+                    </ul>
                 ) : (
                     <div className={`${styles.enter_pin}`}>
                         <UserSelector key={user.uuid} user={user} />
                         <div className={`${styles.pin_entry}`}>
-                        <PinInput mask length={4} aria-label="PIN input"/>
+                        <PinInput autoFocus mask length={4} aria-label="PIN input" inputMode='numeric' onComplete={onPinComplete} />
                         </div>
                     </div>
                 )}

@@ -36,3 +36,33 @@
     color: rgb(var(--navbar-background-rgb));
     border-color: rgb(var(--navbar-background-rgb));
 }
+
+.user-selector .mantine-Avatar-root {
+    border-radius: 4rem !important;
+    box-shadow: 0 0 0 4px hsla(0, 0%, 100%, 0.1) !important;
+}
+
+.mantine-Modal-header {
+    color: white;
+    background-color: black;
+}
+.mantine-Modal-body {
+    background-color: black;
+    padding: 1rem;
+    min-height: 15rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.mantine-PinInput-input {
+    height: 5rem;
+    width: 5rem;
+    font-size: 2rem;
+}
+
+.mantine-Modal-close {
+    display: none;
+}

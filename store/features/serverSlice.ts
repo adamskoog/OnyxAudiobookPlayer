@@ -108,7 +108,12 @@ const setActiveServer = createAsyncThunk<ActiveServerReturn, string, ThunkApi>('
 export const serverSlice = createSlice({
   name: 'server',
   initialState,
-  reducers: {},
+  reducers: {
+    clearServerData: (state) => {
+        state.activeServer = null;
+        state.libraries = [];
+    }
+  },
   extraReducers: (builder) => {
     builder
         .addCase(initializeServer.pending, (state) => {
@@ -145,8 +150,8 @@ export const serverSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-const { } = serverSlice.actions
+const { clearServerData } = serverSlice.actions
 
-export { initializeServer, setActiveServer }
+export { initializeServer, setActiveServer, clearServerData }
 
 export default serverSlice.reducer

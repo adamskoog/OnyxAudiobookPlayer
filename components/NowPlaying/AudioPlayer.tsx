@@ -52,6 +52,8 @@ function AudioPlayer() {
     const queueId = useAppSelector(state => state.player.queueId);
     const queueIndex = useAppSelector((state) => state.player.queueIndex);
     const queue = useAppSelector(state => state.player.queue);
+    const skipBackwardIncrement = useAppSelector(state => state.player.skipBackwardIncrement);
+    const skipForwardIncrement = useAppSelector(state => state.player.skipForwardIncrement);
     // const playState = useAppSelector((state) => state.player.mode);
 
     const prevIndex: number = usePrevious(queueIndex);
@@ -108,7 +110,7 @@ function AudioPlayer() {
     const skipBackward = (): void => {
         const playerElement = playerRef.current;
         if (playerElement) {
-            let newTime = playerElement.currentTime - 10;
+            let newTime = playerElement.currentTime - skipBackwardIncrement;
             if (newTime < 0) newTime = 0;
             playerElement.currentTime = newTime;
         }
@@ -117,7 +119,7 @@ function AudioPlayer() {
     const skipForward = (): void => {
         const playerElement = playerRef.current;
         if (playerElement) {
-            let newTime = playerElement.currentTime + 30;
+            let newTime = playerElement.currentTime + skipForwardIncrement;
             if (newTime > playerElement.duration) newTime = playerElement.duration;
             playerElement.currentTime = newTime;
         }

@@ -22,6 +22,7 @@
     color: rgb(var(--body-foreground-rgb));
 }
 
+.mantine-InputWrapper-label,
 .hub .mantine-UnstyledButton-root {
     color: rgb(var(--body-foreground-rgb));
 }

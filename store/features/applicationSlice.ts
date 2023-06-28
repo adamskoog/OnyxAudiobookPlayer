@@ -9,6 +9,8 @@ import type { PlexResource, PlexUser } from '@/types/plex.types'
 
 import { clearServerData } from './serverSlice'
 import { clearActiveLibrary } from './librarySlice'
+import { loadSettingFromStorage, SETTINGS_KEYS } from '@/utility/settings'
+import { setSkipBackwardIncrement, setSkipForwardIncrement } from './playerSlice'
 
 type AppState = 'loading' | 'ready' | 'loggedOut';
 
@@ -34,7 +36,7 @@ interface InitReturn {
   state: AppState
 }
 
-const initialize = createAsyncThunk<InitReturn, void>('application/initialize', async () => {
+const initialize = createAsyncThunk<InitReturn, void, ThunkApi>('application/initialize', async (_, { getState, dispatch}) => {
 
     await PlexJavascriptApi.initialize();
 
@@ -44,6 +46,12 @@ const initialize = createAsyncThunk<InitReturn, void>('application/initialize', 
 
         // We have a valid user, get the servers they have access to.
         const resources = await PlexJavascriptApi.getResources(RESOURCETYPES.server);
+        
+        // Get saved skip settings for local storage.
+        const skipBack = loadSettingFromStorage(SETTINGS_KEYS.skipBackwardIncrement)
+        const skipForward = loadSettingFromStorage(SETTINGS_KEYS.skipForwardIncrement)
+        if (skipBack) dispatch(setSkipBackwardIncrement(parseInt(skipBack)));
+        if (skipForward) dispatch(setSkipForwardIncrement(parseInt(skipForward)));
 
         return {
             user,

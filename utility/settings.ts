@@ -3,7 +3,9 @@ export const SETTINGS_KEYS: {[key: string]: string} = {
   libraryId: 'settings_library',
   token: 'authToken',
   clientIdentifier: 'clientIdentifier',
-  loginRedirectId: 'login_redirect_id'
+  loginRedirectId: 'login_redirect_id',
+  skipForwardIncrement: 'skipForwardIncrement',
+  skipBackwardIncrement: 'skipBackwardIncrement',
 };
 
 export type BrowserSettings = {

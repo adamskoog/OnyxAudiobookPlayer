@@ -5,7 +5,7 @@ import { clearServerData, setActiveServer } from '@/store/features/serverSlice';
 import { setActiveLibrary } from '@/store/features/librarySlice';
 
 import { Button } from '@/components/shared/Buttons';
-import { Select, NumberInput } from '@mantine/core';
+import { Select } from '@mantine/core';
 import { setSkipBackwardIncrement, setSkipForwardIncrement } from '@/store/features/playerSlice';
 import ChangeUsers from './ChangeUsers';
 import styles from './styles/Settings.module.css'
@@ -81,6 +81,7 @@ function Settings({ appVersion }: SettingsProps) {
                         if (value) dispatch(setSkipForwardIncrement(parseInt(value)));
                     }}
                     data={skipOptions} />
+        
             {user.home && (<ChangeUsers />)}
             <Button onClick={signout}>{'Log out'}</Button>
             <div className={`${styles.version}`}>

@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import type { PlexTrack } from '@/types/plex.types'
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { saveSettingToStorage, SETTINGS_KEYS } from '@/utility';
 
 export type PlayerMode = 'stopped' | 'paused' | 'playing';
 export type PlayerTime = {
@@ -18,7 +19,10 @@ export interface PlayerState {
     queue: Array<PlexTrack>,
     queueId: string,
     queueIndex: number,
-    currentTrack: PlexTrack | null
+    currentTrack: PlexTrack | null,
+
+    skipForwardIncrement: number,
+    skipBackwardIncrement: number
 }
 
 const initialState: PlayerState = {
@@ -29,6 +33,8 @@ const initialState: PlayerState = {
     queueId: '',
     queueIndex: -1,
     currentTrack: null,
+    skipForwardIncrement: 30,
+    skipBackwardIncrement: 15
 }
 
 export const playerSlice = createSlice({
@@ -37,6 +43,14 @@ export const playerSlice = createSlice({
     reducers: {
         changePlayerMode: (state, action: PayloadAction<PlayerMode>) => {
             state.mode = action.payload;
+        },
+        setSkipBackwardIncrement: (state, action: PayloadAction<number>) => {
+            saveSettingToStorage(SETTINGS_KEYS.skipBackwardIncrement, action.payload.toString())
+            state.skipBackwardIncrement = action.payload;
+        },
+        setSkipForwardIncrement: (state, action: PayloadAction<number>) => {
+            saveSettingToStorage(SETTINGS_KEYS.skipForwardIncrement, action.payload.toString())
+            state.skipForwardIncrement = action.payload;
         },
         setPlayerTime: (state, action: PayloadAction<PlayerTime>) => {
             state.currentTime = action.payload.current;
@@ -74,6 +88,6 @@ export const playerSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { changePlayerMode, setPlayerTime, previousTrack, nextTrack, buildPlayQueue, clearPlayQueue } = playerSlice.actions
+export const { changePlayerMode, setSkipBackwardIncrement, setSkipForwardIncrement, setPlayerTime, previousTrack, nextTrack, buildPlayQueue, clearPlayQueue } = playerSlice.actions
 
 export default playerSlice.reducer

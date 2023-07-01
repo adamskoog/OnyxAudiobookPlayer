@@ -32,7 +32,7 @@ const formatUrl = (url: string, args: any): string => {
 
 const fetchWithTimeout = async (url: string, options: any): Promise<any> => {
     const { timeout = 8000 } = options;
-  
+
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
   
@@ -331,7 +331,7 @@ class PlexJavascriptApi {
         // TODO: handle this better with base params.
         this.serverRequestTokenParam['X-Plex-Token'] = resource.accessToken;
     
-        const params = { ...this.baseParams, ...this.requestTokenParam };
+        const params = { ...this.baseParams, ...this.serverRequestTokenParam };
         const connections = resource.connections;
         const connectionPromises = connections.map((connection: any) => {
     

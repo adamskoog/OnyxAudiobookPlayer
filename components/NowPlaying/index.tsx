@@ -1,18 +1,27 @@
 import Link from 'next/link';
 
-import { useAppSelector } from '@/store';
+import { RootState, useAppSelector } from '@/store';
 
 import AudioPlayer from './AudioPlayer';
 import { PlayerTime } from './controls';
 import PlexImage from '../shared/PlexImage';
 
 import styles from './styles/NowPlaying.module.css'
+import { createSelector } from '@reduxjs/toolkit';
+import { PlexTrack } from '@/types/plex.types';
 
 function NowPlaying() {
+  
+    const { mode, currentTrack } = useAppSelector(createSelector([
+        (state: RootState) => state.player.mode,
+        (state: RootState) => state.player.currentTrack
+    ], 
+        (mode, currentTrack): {
+            mode: string,
+            currentTrack: PlexTrack | null,
+         } => { return { mode, currentTrack } }
+    ));
 
-    const mode = useAppSelector((state) => state.player.mode);
-    const currentTrack = useAppSelector((state) => state.player.currentTrack);
-   
     let classes = [styles.container]
     if (mode !== 'stopped') classes.push(styles.show)
 

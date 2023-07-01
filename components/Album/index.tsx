@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 
-import { useAppSelector } from '@/store';
+import { RootState, useAppSelector } from '@/store';
 import Loader from '../shared/Loader';
 import PlexImage from '../shared/PlexImage';
 import OnDeck from './OnDeck';
@@ -11,6 +11,8 @@ import Tracks from './Tracks';
 import useAlbumMetadata from './hooks/useAlbumMetadata';
 
 import styles from './styles/Album.module.css'
+import { createSelector } from '@reduxjs/toolkit';
+import { PlexTrack } from '@/types/plex.types';
 
 
 type AlbumPageProps = {
@@ -19,8 +21,11 @@ type AlbumPageProps = {
 
 function AlbumPage({ ratingKey }: AlbumPageProps) {
 
-    const currentTrack = useAppSelector(state => state.player.currentTrack);
-    
+    const currentTrack = useAppSelector(createSelector(
+        (state: RootState) => state.player.currentTrack, 
+        (currentTrack): PlexTrack | null => { return currentTrack }
+    ));
+
     const { album, loading, forceMetadataUpdate } = useAlbumMetadata({ ratingKey });
 
     useEffect(() => {

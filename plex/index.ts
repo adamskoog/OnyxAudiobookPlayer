@@ -527,7 +527,9 @@ class PlexJavascriptApi {
      * @param {PlexTrackMedia} track - The track object to determine media.
      * @returns {string} - 
      */
-    static getTrackMediaUrl = (track: PlexTrackMedia): string => {
+    static getTrackMediaUrl = (track: PlexTrackMedia): string | null => {
+        // Probably need to handle multiparts in some way? Even if it's just a warning?
+        if (!track.Part[0]) return null;
         return formatUrl(`${this.baseUrl}${track.Part[0].key}`, this.serverRequestTokenParam);
     };
  

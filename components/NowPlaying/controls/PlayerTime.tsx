@@ -1,5 +1,6 @@
-import { useAppSelector } from '@/store';
+import { RootState, useAppSelector } from '@/store';
 import { formatPlayerDisplay } from '@/utility';
+import { createSelector } from '@reduxjs/toolkit';
 
 const defaultTimeDisplay = '--:--/--:--';
 
@@ -9,8 +10,16 @@ const formatTime = (currentTime: number | null, duration: number | null): string
 };
 
 function PlayerTime() {
-    const currentTime = useAppSelector((state) => state.player.currentTime);
-    const duration = useAppSelector((state) => state.player.duration);
+
+  const { currentTime, duration } = useAppSelector(createSelector([
+      (state: RootState) => state.player.currentTime,
+      (state: RootState) => state.player.duration
+    ],
+      (currentTime, duration): {
+        currentTime: number| null,
+        duration: number| null
+      } => { return { currentTime, duration } }
+    ));
 
     return (
         <>{formatTime(currentTime, duration)}</>

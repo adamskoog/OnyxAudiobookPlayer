@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import BaseControl from './BaseControl';
 import styles from './styles/Controls.module.css'
 
@@ -6,7 +7,6 @@ type Props = {
 }
 
 function StopControl({ stop }: Props) {
-
     return (
         <BaseControl className={`${styles.stop}`} title={'Stop'} onClick={() => stop()}>
             <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -17,4 +17,4 @@ function StopControl({ stop }: Props) {
     );
 }
 
-export default StopControl;
+export default memo(StopControl);

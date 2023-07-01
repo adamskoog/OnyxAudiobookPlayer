@@ -6,7 +6,7 @@ import type { PlexTrack } from '@/types/plex.types'
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { saveSettingToStorage, SETTINGS_KEYS } from '@/utility';
 
-export type PlayerMode = 'stopped' | 'paused' | 'playing';
+export type PlayerMode = 'stopped' | 'paused' | 'playing' | 'ended';
 export type PlayerTime = {
     current: number,
     duration: number
@@ -19,7 +19,10 @@ export interface PlayerState {
     queue: Array<PlexTrack>,
     queueId: string,
     queueIndex: number,
+
     currentTrack: PlexTrack | null,
+    isFirstTrack: boolean,
+    isLastTrack: boolean,
 
     skipForwardIncrement: number,
     skipBackwardIncrement: number
@@ -29,10 +32,15 @@ const initialState: PlayerState = {
     mode: 'stopped',
     currentTime: null,
     duration: null,
+
     queue: [],
     queueId: '',
     queueIndex: -1,
+
     currentTrack: null,
+    isFirstTrack: false,
+    isLastTrack: false,
+
     skipForwardIncrement: 30,
     skipBackwardIncrement: 15
 }
@@ -61,6 +69,9 @@ export const playerSlice = createSlice({
             state.queue = action.payload;
             state.queueIndex = 0
             state.currentTrack = action.payload[0]
+
+            state.isFirstTrack = true;
+            state.isLastTrack = action.payload.length === 1;
         },
         previousTrack: (state) => {
             if (state.queueIndex > 0) {
@@ -68,6 +79,9 @@ export const playerSlice = createSlice({
                 
                 state.queueIndex = newIndex;
                 state.currentTrack = state.queue[newIndex];
+
+                state.isFirstTrack = newIndex === 0;
+                state.isLastTrack = newIndex === (state.queue.length - 1);
             }
         },
         nextTrack: (state) => {
@@ -76,6 +90,9 @@ export const playerSlice = createSlice({
 
                 state.queueIndex = newIndex;
                 state.currentTrack = state.queue[newIndex];
+
+                state.isFirstTrack = newIndex === 0;
+                state.isLastTrack = newIndex === (state.queue.length - 1);
             }
         },
         clearPlayQueue: (state) => {
@@ -83,6 +100,8 @@ export const playerSlice = createSlice({
             state.queueId = '';
             state.queueIndex = -1;
             state.currentTrack = null;
+            state.isFirstTrack = false;
+            state.isLastTrack = false;
         }
     }
 })

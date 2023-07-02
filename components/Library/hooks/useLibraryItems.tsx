@@ -2,10 +2,10 @@ import { useEffect } from "react"
 import { useAppSelector, useAppDispatch } from '@/store'
 import { getLibraryItems } from '@/store/features/librarySlice'
 
-import type { PlexAlbumMetadata, PlexArtistListMetadata } from "@/types/plex.types"
+import type { PlexAlbumMetadata, PlexArtistListMetadata, PlexCollectionMetadata } from "@/types/plex.types"
 
 type HookReturn = {
-    libraryItems: (PlexAlbumMetadata | PlexArtistListMetadata)[],
+    libraryItems: (PlexAlbumMetadata | PlexArtistListMetadata | PlexCollectionMetadata)[],
     loading: boolean
 }
 

@@ -3,13 +3,13 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import type { RootState, AppDispatch } from '@/store'
 
 import PlexJavascriptApi, { MUSIC_LIBRARY_DISPAY_TYPE, SORT_ORDER } from '@/plex'
-import type { PlexAlbumMetadata, PlexArtistListMetadata } from '@/types/plex.types'
+import type { PlexAlbumMetadata, PlexArtistListMetadata, PlexCollectionMetadata } from '@/types/plex.types'
 import * as SettingsUtils from '@/utility/settings'
 
 export interface LibraryState {
     isLoading: boolean,
     libraryId: string | null,
-    items: Array<PlexAlbumMetadata | PlexArtistListMetadata>,
+    items: Array<PlexAlbumMetadata | PlexArtistListMetadata | PlexCollectionMetadata>,
     displayType: string,
     sortType: string,
 }
@@ -28,7 +28,7 @@ interface ThunkApi {
 }
 
 interface LibraryReturn {
-    items: Array<PlexAlbumMetadata | PlexArtistListMetadata>
+    items: Array<PlexAlbumMetadata | PlexArtistListMetadata | PlexCollectionMetadata>
 }
 
 const getLibraryItems = createAsyncThunk<LibraryReturn, void, ThunkApi>('library/getLibraryItems', async (_, { getState, dispatch}) => {

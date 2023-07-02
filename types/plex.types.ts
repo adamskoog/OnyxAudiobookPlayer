@@ -226,6 +226,25 @@ export type PlexAlbumMetadata = {
     Collection: Array<PlexTag>
 };
 
+export type PlexCollectionMetadata = {
+    ratingKey: string,
+    key: string,
+    guid: string,
+    type: string,
+    title: string,
+    titleSort: string,
+    subtype: string,
+    summary: string,
+    index: number,
+    ratingCount: number,
+    thumb: string,
+    addedAt: number,
+    updatedAt: number,
+    childCount: string,
+    maxYear: string,
+    minYear: string
+}
+
 export type PlexTag = {
     tag: string
 };

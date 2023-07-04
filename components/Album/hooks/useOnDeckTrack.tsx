@@ -4,7 +4,8 @@ import { findOnDeck } from '@/plex/helpers';
 import type { PlexAlbumMetadata, PlexTrack } from "@/types/plex.types"
 
 type HookProps = {
-    album: PlexAlbumMetadata
+    album: PlexAlbumMetadata,
+    tracks: PlexTrack[]
 }
 
 type HookReturn = {
@@ -12,7 +13,7 @@ type HookReturn = {
     isPlaying: boolean
 }
 
-const useOnDeckTrack = ({ album }: HookProps): HookReturn => {
+const useOnDeckTrack = ({ album, tracks }: HookProps): HookReturn => {
 
     const [onDeck, setOnDeck] = useState(null as PlexTrack | null);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -25,7 +26,7 @@ const useOnDeckTrack = ({ album }: HookProps): HookReturn => {
             setOnDeck(null)
         }
         const fetchMetadata = async (): Promise<void> => {
-                const nextOnDeck = findOnDeck(album);   
+                const nextOnDeck = findOnDeck(tracks);   
                 setOnDeck(nextOnDeck);
         };
         fetchMetadata();

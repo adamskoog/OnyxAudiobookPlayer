@@ -554,13 +554,9 @@ class PlexJavascriptApi {
       // Merging the album information with the tracks so we have a consistent format.
       // It seems the plex web app makes two seperate requests to get this information
       // as well.
-      const albumResponse = await this.makeServerRequest(`/library/metadata/${ratingKey}`);
+      const response = await this.makeServerRequest(`/library/metadata/${ratingKey}`);
 
-      let album: PlexAlbumMetadata = albumResponse.MediaContainer.Metadata[0];
-
-      // Combine the tracks with the album metadata.
-      album.Metadata = await this.getAlbumTracks(ratingKey);
-      return album;
+      return response.MediaContainer.Metadata[0];
     };
 
     static getAlbumTracks = async (ratingKey: string): Promise<PlexTrack[]> => {

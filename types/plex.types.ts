@@ -198,7 +198,6 @@ export type PlexArtistMetadata = {
 
 /// This comes from under Artist, same as media container on album view??
 export type PlexAlbumMetadata = {
-    Metadata: Array<PlexTrack>,
     addedAt: number,
     guid: string,
     index: number,

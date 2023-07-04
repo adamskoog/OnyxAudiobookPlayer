@@ -21,7 +21,7 @@ function AlbumPage({ ratingKey }: AlbumPageProps) {
 
     const currentTrack = useAppSelector(state => state.player.currentTrack);
     
-    const { album, loading, forceMetadataUpdate } = useAlbumMetadata({ ratingKey });
+    const { album, tracks, loading, forceMetadataUpdate } = useAlbumMetadata({ ratingKey });
 
     useEffect(() => {
         if (album) forceMetadataUpdate();
@@ -42,13 +42,17 @@ function AlbumPage({ ratingKey }: AlbumPageProps) {
                         <Link href={'/library/artist/[ratingKey]'} as={`/library/artist/${album.parentRatingKey}`}>{album.parentTitle}</Link>
                     </div>
                     <div className={`${styles.album_year}`}>{album.year}</div>
+                    {tracks && (
                     <div className={`${styles.track_ondeck}`}>
-                        <OnDeck album={album} />
+                        <OnDeck album={album} tracks={tracks} />
                     </div>
+                    )}
                 </div>
             </div>
             <Summary summary={album.summary} />
-            <Tracks album={album} forceMetadataUpdate={forceMetadataUpdate} />
+            {tracks && (
+            <Tracks tracks={tracks} forceMetadataUpdate={forceMetadataUpdate} />
+            )}
         </>
 
     );

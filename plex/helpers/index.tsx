@@ -44,36 +44,36 @@ export const markTrackUnplayed = async (track: PlexTrack): Promise<boolean> => {
  * @param {PlexAlbumMetadata} albumInfo - the album we are finding next track on
  * @returns {PlexTrack} - the determined next track to play.
  */
-export const findOnDeck = (albumInfo: PlexAlbumMetadata): PlexTrack => {
-  for (let i = 0; i < albumInfo.Metadata.length; i++) {
-    const track = albumInfo.Metadata[i];
+export const findOnDeck = (tracks: PlexTrack[]): PlexTrack => {
+  for (let i = 0; i < tracks.length; i++) {
+    const track = tracks[i];
 
     // Track is Started, but not finished, we found On Deck
     if (trackIsStarted(track) && !trackIsComplete(track)) return track;
 
     // Is previous Track complete and current track not started, we found On Deck
-    const prevTrack = albumInfo.Metadata[i - 1];
+    const prevTrack = tracks[i - 1];
     if (prevTrack) {
       if (trackIsComplete(prevTrack) && !trackIsComplete(track) && !trackIsStarted(track)) return track;
     }
   }
 
   // No tracks in progress, return first track.
-  return albumInfo.Metadata[0];
+  return tracks[0];
 };
 
-export const isTrackOnDeck = (track: PlexTrack, album: PlexAlbumMetadata): boolean => {
-  const onDeck = findOnDeck(album);
+export const isTrackOnDeck = (track: PlexTrack, tracks: PlexTrack[]): boolean => {
+  const onDeck = findOnDeck(tracks);
   if (onDeck.key !== track.key) return false;
   return true;
 };
 
-export const updateOnDeck = (track: PlexTrack, album: PlexAlbumMetadata): Promise<boolean> => new Promise((resolve) => {
+export const updateOnDeck = (track: PlexTrack, tracks: PlexTrack[]): Promise<boolean> => new Promise((resolve) => {
   // We need to queue up promises for all the tracks in the album
   // if they select a current track that was in progress, it will not be updated.
   const promises: Array<Promise<boolean>> = [];
-  for (let i = 0; i < album.Metadata.length; i++) {
-    const check = album.Metadata[i];
+  for (let i = 0; i < tracks.length; i++) {
+    const check = tracks[i];
     if (track.index > check.index) {
       // previous tracks need to be marked as played
       promises.push(markTrackPlayed(check));
@@ -91,10 +91,10 @@ export const updateOnDeck = (track: PlexTrack, album: PlexAlbumMetadata): Promis
 });
 
 // Generate album queue based on selected track.
-export const getAlbumQueue = (track: PlexTrack, album: PlexAlbumMetadata): Array<any> => {
+export const getAlbumQueue = (track: PlexTrack, tracks: PlexTrack[]): Array<any> => {
   const queue: Array<any> = [];
-  for (let i = 0; i < album.Metadata.length; i++) {
-    const check = album.Metadata[i];
+  for (let i = 0; i < tracks.length; i++) {
+    const check = tracks[i];
 
     if (track.index <= check.index) {
       queue.push(check);

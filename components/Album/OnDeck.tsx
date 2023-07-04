@@ -11,16 +11,17 @@ import { getAlbumQueue } from '@/plex/helpers';
 import styles from './styles/OnDeck.module.css'
 
 type OnDeckProps = {
-    album: PlexAlbumMetadata
+    album: PlexAlbumMetadata,
+    tracks: PlexTrack[]
 }
 
-export default function OnDeck({ album }: OnDeckProps) {
+export default function OnDeck({ album, tracks }: OnDeckProps) {
 
     const dispatch = useAppDispatch();
-    const { onDeck, isPlaying } = useOnDeckTrack({ album });
+    const { onDeck, isPlaying } = useOnDeckTrack({ album, tracks });
 
     const playTrack = (track: PlexTrack): void => {
-        dispatch(buildPlayQueue(getAlbumQueue(track, album)));
+        dispatch(buildPlayQueue(getAlbumQueue(track, tracks)));
     };
 
     if (!onDeck) return <></>

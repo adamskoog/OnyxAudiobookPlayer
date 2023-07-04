@@ -59,11 +59,11 @@ function Progress({ track }: ProgressProps) {
 
 type TrackProps = {
     track: PlexTrack,
-    album: PlexAlbumMetadata,
+    tracks: PlexTrack[],
     forceMetadataUpdate: () => Promise<void>
 }
 
-export default function TrackInfo({ track, album, forceMetadataUpdate }: TrackProps) {
+export default function TrackInfo({ track, tracks, forceMetadataUpdate }: TrackProps) {
 
     const dispatch = useAppDispatch();
 
@@ -71,9 +71,9 @@ export default function TrackInfo({ track, album, forceMetadataUpdate }: TrackPr
 
     const playTrack = (): void => {
         const callAsync = async () => {
-            await updateOnDeck(track, album);
+            await updateOnDeck(track, tracks);
             await forceMetadataUpdate();
-            dispatch(buildPlayQueue(getAlbumQueue(track, album)));
+            dispatch(buildPlayQueue(getAlbumQueue(track, tracks)));
         }
         callAsync();
     };

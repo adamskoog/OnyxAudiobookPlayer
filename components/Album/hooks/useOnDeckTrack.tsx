@@ -30,7 +30,7 @@ const useOnDeckTrack = ({ album, tracks }: HookProps): HookReturn => {
                 setOnDeck(nextOnDeck);
         };
         fetchMetadata();
-    }, [album]);
+    }, [album, tracks]);
 
     useEffect(() => {
         

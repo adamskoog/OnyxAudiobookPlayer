@@ -25,7 +25,7 @@ function AlbumPage({ ratingKey }: AlbumPageProps) {
 
     useEffect(() => {
         if (album) forceMetadataUpdate();
-    }, [currentTrack])
+    }, [album, currentTrack])
 
     if (loading) return <Loader loading={loading} />
     if (!album) return <div></div>

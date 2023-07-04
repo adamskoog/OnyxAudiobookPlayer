@@ -25,7 +25,7 @@ const useAlbumMetadata = ({ ratingKey }: HookProps): HookReturn => {
 
     const forceMetadataUpdate = async (): Promise<void> => {
         // Do no set loading, doing a background refresh.
-        const trackInfo = await PlexJavascriptApi.getAlbumTracks(ratingKey);       
+        const trackInfo = await PlexJavascriptApi.getAlbumTracks(ratingKey);     
         setTracks(trackInfo);
     };
 

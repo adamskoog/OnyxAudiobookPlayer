@@ -27,7 +27,7 @@ function PlexImage({ height, width, url, alt, upscale = false, minSize = false, 
         } else {
           setImageUrl(null);
         }
-    }, [url, width, height]);
+    }, [url, width, height, minSize, upscale]);
 
     return (
         <>

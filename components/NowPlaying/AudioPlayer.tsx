@@ -154,7 +154,7 @@ function AudioPlayer() {
 
         playerElement.addEventListener('timeupdate', throttleTimeline);
         return () => playerElement.removeEventListener('timeupdate', throttleTimeline);
-    }, [queueId, queueIndex]);
+    }, [queueId, queue, queueIndex]);
 
     useEffect(() => {
         // No media to play

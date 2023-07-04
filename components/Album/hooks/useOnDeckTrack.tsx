@@ -22,27 +22,22 @@ const useOnDeckTrack = ({ album, tracks }: HookProps): HookReturn => {
     const currentTrack = useAppSelector(state => state.player.currentTrack)
 
     useEffect(() => {
-        if (!album) {
+        if (!tracks) {
             setOnDeck(null)
         }
-        const fetchMetadata = async (): Promise<void> => {
-                const nextOnDeck = findOnDeck(tracks);   
-                setOnDeck(nextOnDeck);
-        };
-        fetchMetadata();
-    }, [album, tracks]);
 
-    useEffect(() => {
-        
         if (playState === 'playing' || playState === 'paused') {
             if (currentTrack?.parentRatingKey === album.ratingKey) {
                 setIsPlaying(true);
+                setOnDeck(currentTrack);
                 return;
             }
-        } 
-        
+        }
+
+        const nextOnDeck = findOnDeck(tracks);   
         setIsPlaying(false);
-    }, [playState, currentTrack])
+        setOnDeck(nextOnDeck);        
+    }, [album, tracks, playState, currentTrack]);
 
     return { onDeck, isPlaying }
 }

@@ -23,7 +23,7 @@ function CollectionPage({ ratingKey }: CollectionPageProps) {
         <>
             <div className={`${styles.artist_container}`}>
                 <div className={`${styles.cover}`}>
-                    <PlexImage width={200} height={200} url={collection.thumb} alt={`${collection.title} Image`} />
+                    <PlexImage width={240} height={240} url={collection.thumb} alt={`${collection.title} Image`} minSize={true} upscale={true} />
                 </div>
                 <div className={`${styles.meta_container}`}>
                     <div className={`${styles.artist_name}`}>{collection.title}</div>

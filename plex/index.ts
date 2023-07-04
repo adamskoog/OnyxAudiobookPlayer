@@ -436,12 +436,16 @@ class PlexJavascriptApi {
         upscale?: boolean | undefined
       ): string => {
 
+      // We need to add the token to the thumb query we get
+      let url = `${thumb}?X-Plex-Token=${this.serverRequestTokenParam['X-Plex-Token']}`;
+      if (thumb.includes('?')) url = `${thumb}&X-Plex-Token=${this.serverRequestTokenParam['X-Plex-Token']}`;
+
       const params = {
         width: w,
         height: h,
         minSize: minSize ? 1 : 0,
         upscale: upscale ? 1 : 0,
-        url: `${thumb}?X-Plex-Token=${this.serverRequestTokenParam['X-Plex-Token']}`,
+        url,
         ...this.serverRequestTokenParam
       };
       return formatUrl(`${this.baseUrl}/photo/:/transcode`, params);

@@ -37,7 +37,7 @@ type FilterMenuProps = {
 
 function FilterMenu({ caption, display, menus }: FilterMenuProps) {
 
-    const [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState<boolean>(false)
     
     return (
         <div className={`${styles.filter_item}`}>

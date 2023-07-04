@@ -16,7 +16,7 @@ type PlexImageProps = {
 
 function PlexImage({ height, width, url, alt, upscale = false, minSize = false, isLazy = true, hideRadius = false }: PlexImageProps) {
 
-    const [imageUrl, setImageUrl]: [any, any] = useState(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     const classes = [styles.item_image];
     if (hideRadius) classes.push(styles.no_radius);

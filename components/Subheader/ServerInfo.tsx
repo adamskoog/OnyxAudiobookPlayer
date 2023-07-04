@@ -5,7 +5,7 @@ import styles from './styles/ServerInfo.module.css'
 
 function ServerInfo() {
 
-    const [displayName, setDisplayName] = useState('');
+    const [displayName, setDisplayName] = useState<string>('');
 
     const appState = useAppSelector((state) => state.application.state);
     const serverLoading = useAppSelector((state) => state.server.isLoading);
@@ -18,7 +18,7 @@ function ServerInfo() {
           setDisplayName(`Loading...`);
         else if (server) {
           if (libraries && librarySection) {
-            const libraryName = libraries.filter((library: any) => {
+            const libraryName = libraries.filter((library) => {
               if (library.key === librarySection) return true;
               return false;
             });

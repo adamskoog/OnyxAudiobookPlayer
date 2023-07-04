@@ -21,7 +21,7 @@ const useAlbumMetadata = ({ ratingKey }: HookProps): HookReturn => {
 
     const [album, setAlbum] = useState<PlexAlbumMetadata | null>(null);
     const [tracks, setTracks]= useState<PlexTrack[] | null>(null);
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState<boolean>(false)
 
     const forceMetadataUpdate = async (): Promise<void> => {
         // Do no set loading, doing a background refresh.

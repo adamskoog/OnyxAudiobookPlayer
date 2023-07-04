@@ -15,8 +15,8 @@ type HookReturn = {
 
 const useOnDeckTrack = ({ album, tracks }: HookProps): HookReturn => {
 
-    const [onDeck, setOnDeck] = useState(null as PlexTrack | null);
-    const [isPlaying, setIsPlaying] = useState(false);
+    const [onDeck, setOnDeck] = useState<PlexTrack | null>(null);
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
     const playState = useAppSelector(state => state.player.mode);
     const currentTrack = useAppSelector(state => state.player.currentTrack)

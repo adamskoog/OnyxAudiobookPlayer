@@ -91,8 +91,8 @@ export const updateOnDeck = (track: PlexTrack, tracks: PlexTrack[]): Promise<boo
 });
 
 // Generate album queue based on selected track.
-export const getAlbumQueue = (track: PlexTrack, tracks: PlexTrack[]): Array<any> => {
-  const queue: Array<any> = [];
+export const getAlbumQueue = (track: PlexTrack, tracks: PlexTrack[]): PlexTrack[] => {
+  const queue: PlexTrack[] = [];
   for (let i = 0; i < tracks.length; i++) {
     const check = tracks[i];
 

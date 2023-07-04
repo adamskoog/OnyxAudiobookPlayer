@@ -30,7 +30,9 @@ function CollectionPage({ ratingKey }: CollectionPageProps) {
                     <Summary summary={collection.summary} />
                 </div>
             </div>
+            {albums && (
             <Albums albums={albums} />
+            )}
         </>
 
     );

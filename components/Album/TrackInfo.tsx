@@ -30,7 +30,7 @@ type ProgressProps = {
 function Progress({ track }: ProgressProps) {
 
     const currentTrack = useAppSelector(state => state.player.currentTrack);
-    const [nowPlaying, setNowPlaying] = useState(false);
+    const [nowPlaying, setNowPlaying] = useState<boolean>(false);
 
     useEffect(() => {
         setNowPlaying(track.ratingKey === currentTrack?.ratingKey)
@@ -67,7 +67,7 @@ export default function TrackInfo({ track, tracks, forceMetadataUpdate }: TrackP
 
     const dispatch = useAppDispatch();
 
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
 
     const playTrack = (): void => {
         const callAsync = async () => {

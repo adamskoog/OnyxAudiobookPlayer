@@ -14,8 +14,8 @@ type HookReturn = {
 
 const useHubItems = ({ hubItemsCallback }: HookProps): HookReturn => {
     
-    const [isLoading, setIsLoading] = useState(true);
-    const [hubItems, setHubItems] = useState([] as Array<PlexAlbumMetadata>);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [hubItems, setHubItems] = useState<PlexAlbumMetadata[]>([]);
 
     const section = useAppSelector((state) => state.library.libraryId);
     const applicationState = useAppSelector((state) => state.application.state);

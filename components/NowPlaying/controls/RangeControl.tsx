@@ -4,7 +4,7 @@ import { formatProgressLabel } from '@/utility';
 import styles from './styles/Controls.module.css'
 
 // TODO: need to figure out where/when this might not be a number.
-const checkValid = (value: number | any): number => {
+const checkValid = (value: number | null): number => {
   if (!value || Number.isNaN(value)) return 0;
   return value;
 };

@@ -19,11 +19,12 @@ const useOnDeckTrack = ({ album, tracks }: HookProps): HookReturn => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
     const playState = useAppSelector(state => state.player.mode);
-    const currentTrack = useAppSelector(state => state.player.currentTrack)
+    const currentTrack = useAppSelector(state => state.player.currentTrack);
 
     useEffect(() => {
         if (!tracks) {
-            setOnDeck(null)
+            setOnDeck(null);
+            return;
         }
 
         if (playState === 'playing' || playState === 'paused') {

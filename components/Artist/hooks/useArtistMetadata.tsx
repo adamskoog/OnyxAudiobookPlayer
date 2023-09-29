@@ -18,7 +18,7 @@ const useArtistMetadata = ({ ratingKey }: HookProps): HookReturn => {
     const activeServer = useAppSelector((state) => state.server.activeServer);
 
     const [artist, setArtist] = useState<PlexArtistMetadata | null>(null);
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState<boolean>(false)
 
     useEffect(() => {
         const fetchMetadata = async (): Promise<void> => {

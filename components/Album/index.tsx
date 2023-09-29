@@ -26,11 +26,11 @@ function AlbumPage({ ratingKey }: AlbumPageProps) {
         (currentTrack): PlexTrack | null => { return currentTrack }
     ));
 
-    const { album, loading, forceMetadataUpdate } = useAlbumMetadata({ ratingKey });
+    const { album, tracks, loading, forceMetadataUpdate } = useAlbumMetadata({ ratingKey });
 
     useEffect(() => {
         if (album) forceMetadataUpdate();
-    }, [currentTrack])
+    }, [album, currentTrack])
 
     if (loading) return <Loader loading={loading} />
     if (!album) return <div></div>
@@ -47,13 +47,17 @@ function AlbumPage({ ratingKey }: AlbumPageProps) {
                         <Link href={'/library/artist/[ratingKey]'} as={`/library/artist/${album.parentRatingKey}`}>{album.parentTitle}</Link>
                     </div>
                     <div className={`${styles.album_year}`}>{album.year}</div>
+                    {tracks && (
                     <div className={`${styles.track_ondeck}`}>
-                        <OnDeck album={album} />
+                        <OnDeck album={album} tracks={tracks} />
                     </div>
+                    )}
                 </div>
             </div>
             <Summary summary={album.summary} />
-            <Tracks album={album} forceMetadataUpdate={forceMetadataUpdate} />
+            {tracks && (
+            <Tracks tracks={tracks} forceMetadataUpdate={forceMetadataUpdate} />
+            )}
         </>
 
     );

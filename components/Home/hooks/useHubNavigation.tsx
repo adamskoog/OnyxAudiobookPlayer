@@ -28,8 +28,8 @@ type HookReturn = {
 
 const useHubNavigation = ({ containerRef, contentRef }: HookProps): HookReturn => {
     
-    const [leftScrollDisabled, setLeftScrollDisabled] = useState(true);
-    const [rightScrollDisabled, setRightScrollDisabled] = useState(true);
+    const [leftScrollDisabled, setLeftScrollDisabled] = useState<boolean>(true);
+    const [rightScrollDisabled, setRightScrollDisabled] = useState<boolean>(true);
     
     const isTickingRef = useRef(false);
     const isTravelingRef = useRef(false);

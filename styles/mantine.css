@@ -59,11 +59,18 @@
 }
 
 .mantine-PinInput-input {
-    height: 5rem;
-    width: 5rem;
+    height: 4rem;
+    width: 4rem;
     font-size: 2rem;
 }
 
 .mantine-Modal-close {
     display: none;
+}
+
+@media (min-width: 768px /*var(--mobile-break)*/) {
+    .mantine-PinInput-input {
+        height: 5rem;
+        width: 5rem;
+    }
 }

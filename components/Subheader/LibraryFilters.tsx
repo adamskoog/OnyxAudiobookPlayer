@@ -37,7 +37,7 @@ type FilterMenuProps = {
 
 function FilterMenu({ caption, display, menus }: FilterMenuProps) {
 
-    const [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState<boolean>(false)
     
     return (
         <div className={`${styles.filter_item}`}>
@@ -73,6 +73,7 @@ function LibraryFilters() {
     const displayMenuItems = [
       { title: MUSIC_LIBRARY_DISPAY_TYPE.artist.title, callback: () => dispatch(setDisplayType(MUSIC_LIBRARY_DISPAY_TYPE.artist.title)) },
       { title: MUSIC_LIBRARY_DISPAY_TYPE.album.title, callback: () => dispatch(setDisplayType(MUSIC_LIBRARY_DISPAY_TYPE.album.title)) },
+      { title: MUSIC_LIBRARY_DISPAY_TYPE.collection.title, callback: () => dispatch(setDisplayType(MUSIC_LIBRARY_DISPAY_TYPE.collection.title)) },
     ] as MenuItem[];
   
     const sortMenuItems = [

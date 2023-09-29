@@ -3,7 +3,7 @@ import qs from 'qs';
 import Bowser from "bowser";
 import { v4 as uuidv4 } from 'uuid';
 
-import type { PlexUser, SwitchUserItem, PlexResource, PlexServerConnection, PlexLibrary, PlexTimelineArgs, PlexProgress, PlexArtistMetadata, PlexArtistListMetadata, PlexAlbumMetadata, PlexTrackMedia } from '@/types/plex.types'
+import type { PlexUser, SwitchUserItem, PlexResource, PlexServerConnection, PlexLibrary, PlexTimelineArgs, PlexProgress, PlexArtistMetadata, PlexArtistListMetadata, PlexAlbumMetadata, PlexTrackMedia, PlexCollectionMetadata, PlexTrack } from '@/types/plex.types'
 import * as Settings from '@/utility/settings';
 
 export const RESOURCETYPES = {
@@ -16,7 +16,8 @@ export const LIBRARYTYPES = {
 
 export const MUSIC_LIBRARY_DISPAY_TYPE = {
     artist: { title: 'Author', key: 8 },
-    album: { title: 'Book', key: 9 }
+    album: { title: 'Book', key: 9 },
+    collection: { title: 'Collection', key: 18 }
 };
 
 export const SORT_ORDER = {
@@ -32,7 +33,7 @@ const formatUrl = (url: string, args: any): string => {
 
 const fetchWithTimeout = async (url: string, options: any): Promise<any> => {
     const { timeout = 8000 } = options;
-  
+
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
   
@@ -331,7 +332,7 @@ class PlexJavascriptApi {
         // TODO: handle this better with base params.
         this.serverRequestTokenParam['X-Plex-Token'] = resource.accessToken;
     
-        const params = { ...this.baseParams, ...this.requestTokenParam };
+        const params = { ...this.baseParams, ...this.serverRequestTokenParam };
         const connections = resource.connections;
         const connectionPromises = connections.map((connection: any) => {
     
@@ -435,12 +436,16 @@ class PlexJavascriptApi {
         upscale?: boolean | undefined
       ): string => {
 
+      // We need to add the token to the thumb query we get
+      let url = `${thumb}?X-Plex-Token=${this.serverRequestTokenParam['X-Plex-Token']}`;
+      if (thumb.includes('?')) url = `${thumb}&X-Plex-Token=${this.serverRequestTokenParam['X-Plex-Token']}`;
+
       const params = {
         width: w,
         height: h,
         minSize: minSize ? 1 : 0,
         upscale: upscale ? 1 : 0,
-        url: `${thumb}?X-Plex-Token=${this.serverRequestTokenParam['X-Plex-Token']}`,
+        url,
         ...this.serverRequestTokenParam
       };
       return formatUrl(`${this.baseUrl}/photo/:/transcode`, params);
@@ -533,6 +538,18 @@ class PlexJavascriptApi {
         return formatUrl(`${this.baseUrl}${track.Part[0].key}`, this.serverRequestTokenParam);
     };
  
+    private static makeServerRequest = async (url: string, args?: any): Promise<any> => {
+      const response = await this.serverClient.get(url, {
+        params: {
+            ...this.baseParams,
+            ...this.serverRequestTokenParam,
+            ...args
+        }
+      });
+
+      return response.data;
+    }
+
     /**
      * Get the metadata of the requested Album.
      * @param {string} ratingKey - The key of the requested item
@@ -543,25 +560,15 @@ class PlexJavascriptApi {
       // Merging the album information with the tracks so we have a consistent format.
       // It seems the plex web app makes two seperate requests to get this information
       // as well.
-      const albumResponse = await this.serverClient.get(`/library/metadata/${ratingKey}`, {
-        params: {
-            ...this.baseParams,
-            ...this.serverRequestTokenParam
-        }
-      });
+      const response = await this.makeServerRequest(`/library/metadata/${ratingKey}`);
 
-      let album: PlexAlbumMetadata = albumResponse.data.MediaContainer.Metadata[0];
-      const response = await this.serverClient.get(`/library/metadata/${ratingKey}/children`, {
-        params: {
-            ...this.baseParams,
-            ...this.serverRequestTokenParam
-        }
-      });
-
-      // Combine the tracks with the album metadata.
-      album.Metadata = response.data.MediaContainer.Metadata;
-      return album;
+      return response.MediaContainer.Metadata[0];
     };
+
+    static getAlbumTracks = async (ratingKey: string): Promise<PlexTrack[]> => {
+        const response = await this.makeServerRequest(`/library/metadata/${ratingKey}/children`);
+        return response.MediaContainer.Metadata as PlexTrack[];
+    }
 
     /**
      * Get the metadata of the requested Artist.
@@ -569,15 +576,19 @@ class PlexJavascriptApi {
      * @returns {Promise<PlexArtistMetadata>} - 
      */
     static getArtistMetadata = async (ratingKey: string): Promise<PlexArtistMetadata> => {
-        const response = await this.serverClient.get(`/library/metadata/${ratingKey}/children`, {
-          params: {
-              ...this.baseParams,
-              ...this.serverRequestTokenParam
-          }
-        });
-
-        return response.data.MediaContainer;
+        const response = await this.makeServerRequest(`/library/metadata/${ratingKey}/children`);
+        return response.MediaContainer;
     };
+
+    static getCollectionMetadata = async (ratingKey: string): Promise<PlexCollectionMetadata> => {
+      const response = await this.makeServerRequest(`/library/collections/${ratingKey}`);
+      return response.MediaContainer.Metadata[0];
+    }
+
+    static getCollectionItems = async (ratingKey: string): Promise<PlexAlbumMetadata[]> => {
+      const response = await this.makeServerRequest(`/library/collections/${ratingKey}/children`);
+      return response.MediaContainer.Metadata as PlexAlbumMetadata[];
+    }
 
     // TODO: this whole thing needs to be cleaned up and refactored. It's really rough.
     static createLibrarySortQuery = ({ order, display }: any): any => {
@@ -585,6 +596,7 @@ class PlexJavascriptApi {
       
         // Set the default value for display
         if (!display) args.type = MUSIC_LIBRARY_DISPAY_TYPE.album.key;
+        else if (display === MUSIC_LIBRARY_DISPAY_TYPE.collection.title) args.type = MUSIC_LIBRARY_DISPAY_TYPE.collection.key;
         else if (display === MUSIC_LIBRARY_DISPAY_TYPE.album.title) args.type = MUSIC_LIBRARY_DISPAY_TYPE.album.key;
         else args.type = MUSIC_LIBRARY_DISPAY_TYPE.artist.key;
       
@@ -638,7 +650,7 @@ class PlexJavascriptApi {
      * @param {any} sortArgs - The information for sorting.
      * @return {Promise<Array<PlexAlbumMetadata | PlexArtistListMetadata>}
      */
-    static getLibraryItems = async (section: string, sortArgs?: any): Promise<Array<PlexAlbumMetadata | PlexArtistListMetadata>> => {
+    static getLibraryItems = async (section: string, sortArgs?: any): Promise<Array<PlexAlbumMetadata | PlexArtistListMetadata | PlexCollectionMetadata>> => {
         if (!sortArgs) {
           sortArgs = this.createLibrarySortQuery({ order: null, display: null });
         }

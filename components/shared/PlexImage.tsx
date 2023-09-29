@@ -9,23 +9,25 @@ type PlexImageProps = {
     url: string | undefined,
     alt: string | undefined,
     isLazy?: boolean,
-    hideRadius?: boolean
+    hideRadius?: boolean,
+    upscale?: boolean,
+    minSize?: boolean
 }
 
-function PlexImage({ height, width, url, alt, isLazy = true, hideRadius = false }: PlexImageProps) {
+function PlexImage({ height, width, url, alt, upscale = false, minSize = false, isLazy = true, hideRadius = false }: PlexImageProps) {
 
-    const [imageUrl, setImageUrl] = useState(null as string | null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     const classes = [styles.item_image];
     if (hideRadius) classes.push(styles.no_radius);
 
     useEffect(() => {
         if (url) {
-          setImageUrl(PlexJavascriptApi.getThumbnailTranscodeUrl(height, width, url));
+          setImageUrl(PlexJavascriptApi.getThumbnailTranscodeUrl(height, width, url, minSize, upscale));
         } else {
           setImageUrl(null);
         }
-    }, [url, width, height]);
+    }, [url, width, height, minSize, upscale]);
 
     return (
         <>

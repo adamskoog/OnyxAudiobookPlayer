@@ -30,7 +30,7 @@ type ProgressProps = {
 function Progress({ track }: ProgressProps) {
 
     const currentTrack = useAppSelector(state => state.player.currentTrack);
-    const [nowPlaying, setNowPlaying] = useState(false);
+    const [nowPlaying, setNowPlaying] = useState<boolean>(false);
 
     useEffect(() => {
         setNowPlaying(track.ratingKey === currentTrack?.ratingKey)
@@ -59,21 +59,21 @@ function Progress({ track }: ProgressProps) {
 
 type TrackProps = {
     track: PlexTrack,
-    album: PlexAlbumMetadata,
+    tracks: PlexTrack[],
     forceMetadataUpdate: () => Promise<void>
 }
 
-export default function TrackInfo({ track, album, forceMetadataUpdate }: TrackProps) {
+export default function TrackInfo({ track, tracks, forceMetadataUpdate }: TrackProps) {
 
     const dispatch = useAppDispatch();
 
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
 
     const playTrack = (): void => {
         const callAsync = async () => {
-            await updateOnDeck(track, album);
+            await updateOnDeck(track, tracks);
             await forceMetadataUpdate();
-            dispatch(buildPlayQueue(getAlbumQueue(track, album)));
+            dispatch(buildPlayQueue(getAlbumQueue(track, tracks)));
         }
         callAsync();
     };

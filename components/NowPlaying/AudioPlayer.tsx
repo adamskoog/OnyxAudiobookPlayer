@@ -59,17 +59,12 @@ function AudioPlayer() {
 
     const prevTrack: PlexTrack | null = usePrevious(currentTrack);
 
-    const { mode, getPosition, timeline, playerTime, play, pause, stop, skipBackward, skipForward, setTrack, setTime } = useAudioPlayer({ skipBackwardTime: skipBackwardIncrement, skipForwardTime: skipForwardIncrement});
-
-    // useEffect(() => {
-    //     if (!playerTime) return;
-    //     dispatch(setPlayerTime({ current: playerTime.time, duration: playerTime.duration}));
-    // }, [playerTime])
+    const { mode, timeline, playerTime, play, pause, stop, skipBackward, skipForward, setTrack, setTime } = useAudioPlayer({ skipBackwardTime: skipBackwardIncrement, skipForwardTime: skipForwardIncrement});
 
     useEffect(() => {
-        const position = getPosition();
-        dispatch(setPlayerTime({ current: position.time, duration: position.duration}));
-    }, [getPosition])
+        if (!playerTime) return;
+        dispatch(setPlayerTime({ current: playerTime.time, duration: playerTime.duration}));
+    }, [playerTime])
 
     useEffect(() => {
 

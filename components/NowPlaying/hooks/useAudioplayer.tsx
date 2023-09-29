@@ -22,7 +22,7 @@ type TimelineEvent = {
 
 type HookReturn = {
     mode: PlayerModes, 
-    getPosition: any,
+    getPosition: () => TimeEvent,
     timeline: TimelineEvent | null, 
     playerTime: TimeEvent | null, 
     play: () => void, 

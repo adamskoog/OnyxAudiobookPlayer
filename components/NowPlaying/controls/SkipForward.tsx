@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import BaseControl from './BaseControl';
 
 type Props = {
@@ -17,4 +18,4 @@ function SkipForwardControl({ skipForward }: Props) {
     );
 }
 
-export default SkipForwardControl;
+export default memo(SkipForwardControl);

@@ -1,7 +1,9 @@
+import { memo } from 'react';
 import { Slider } from '@mantine/core';
-import { useAppSelector } from '@/store';
+import { useAppSelector, RootState } from '@/store';
 import { formatProgressLabel } from '@/utility';
 import styles from './styles/Controls.module.css'
+import { createSelector } from '@reduxjs/toolkit';
 
 // TODO: need to figure out where/when this might not be a number.
 const checkValid = (value: number | null): number => {
@@ -14,8 +16,16 @@ type Props = {
 }
 
 function RangeControl({ playerRangeChanged }: Props) {
-    const currentTime = useAppSelector((state) => state.player.currentTime);
-    const duration = useAppSelector((state) => state.player.duration);
+
+    const timeData = useAppSelector(createSelector([
+        (state: RootState) => state.player.currentTime,
+        (state: RootState) => state.player.duration
+    ],
+      (currentTime, duration): {
+        currentTime: number| null,
+        duration: number| null
+      } => { return { currentTime, duration } }
+    ));
 
   return (
     <Slider 
@@ -24,11 +34,11 @@ function RangeControl({ playerRangeChanged }: Props) {
         thumbSize={16}
         label={value => formatProgressLabel(value)} 
         min={0} 
-        max={checkValid(duration)} 
-        value={checkValid(currentTime)} 
+        max={checkValid(timeData.duration)} 
+        value={checkValid(timeData.currentTime)} 
         onChange={playerRangeChanged} 
     />
   );
 }
 
-export default RangeControl;
+export default memo(RangeControl);

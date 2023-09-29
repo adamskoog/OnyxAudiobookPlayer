@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store';
 import { setPlayerTime, clearPlayQueue, changePlayerMode, nextTrack } from '@/store/features/playerSlice';
 
@@ -6,7 +6,6 @@ import PlexJavascriptApi from '@/plex';
 import type { PlexTrack } from '@/types/plex.types';
 import type { PlayerMode } from '@/store/features/playerSlice';
 
-import throttle from 'lodash/throttle';
 import { convertSecondsToMs, convertMsToSeconds } from '@/utility';
 
 import { usePrevious } from '@/hooks';
@@ -21,6 +20,7 @@ import {
     StopControl,
     RangeControl
 } from './controls'
+import useAudioPlayer from './hooks/useAudioplayer';
 
 const updateTimeline = (track: PlexTrack, playerState: PlayerMode, currentTime: number, duration: number): void => {
 
@@ -39,6 +39,8 @@ const updateTimeline = (track: PlexTrack, playerState: PlayerMode, currentTime: 
       duration: convertSecondsToMs(duration),
     };
 
+    // console.log("updateTimeline ARGS", args);
+
     PlexJavascriptApi.updateTimeline(args)
         .then((data) => { 
             /* console.log("data", data); TODO: This doesn't seem to return anything, and errors out often. */ 
@@ -49,164 +51,93 @@ function AudioPlayer() {
 
     const dispatch = useAppDispatch();
 
-    const queueId = useAppSelector(state => state.player.queueId);
-    const queueIndex = useAppSelector((state) => state.player.queueIndex);
-    const queue = useAppSelector(state => state.player.queue);
+    const currentTrack = useAppSelector(state => state.player.currentTrack);
+    const isLastTrack = useAppSelector(state => state.player.isLastTrack);
+
     const skipBackwardIncrement = useAppSelector(state => state.player.skipBackwardIncrement);
     const skipForwardIncrement = useAppSelector(state => state.player.skipForwardIncrement);
-    // const playState = useAppSelector((state) => state.player.mode);
 
-    const prevIndex: number = usePrevious(queueIndex);
-    const prevQueue: string = usePrevious(queueId);
-    const playerRef = useRef<HTMLAudioElement | null>(null);
+    const prevTrack: PlexTrack | null = usePrevious(currentTrack);
 
-    const hasTrackChanged = (): boolean => {
-        // Check our previous Refs to see if we have changed tracks.
-        if (prevQueue !== queueId) return true;
-        if (prevIndex !== queueIndex) return true;
-        return false;
-    };
-
-    const timeUpdated = (event: React.ChangeEvent<HTMLAudioElement>): void => {
-        dispatch(setPlayerTime({ current: event.target.currentTime, duration: event.target.duration}));
-    };
-
-    const audioPlayerEnded = useCallback((): void => {
-        const nextIndex = queueIndex + 1;
-        updateTimeline(queue[queueIndex], 'stopped', queue[queueIndex].duration, queue[queueIndex].duration);
-        
-        if (queue && queue.length > nextIndex) {
-            dispatch(nextTrack());
-        } else {
-            stopPlayer();
-        }
-    }, [queueIndex, queue]);
-
-    const playerRangeChanged = (value: number): void => {
-        const playerElement = playerRef.current;
-        if (playerElement) {
-            playerElement.currentTime = value;
-        }
-    };
-
-    const playTrack = (): void => {
-        const playerElement = playerRef.current;
-        if (playerElement) {
-            playerElement.play();
-            dispatch(changePlayerMode('playing'))
-        }
-    };
-
-    const pauseTrack = (): void => {
-        const playerElement = playerRef.current;
-        if (playerElement) {
-            playerElement.pause();
-        
-            updateTimeline(queue[queueIndex], 'paused', playerElement.currentTime, playerElement.duration);
-            dispatch(changePlayerMode('paused'))
-        }
-    };
-
-    const skipBackward = (): void => {
-        const playerElement = playerRef.current;
-        if (playerElement) {
-            let newTime = playerElement.currentTime - skipBackwardIncrement;
-            if (newTime < 0) newTime = 0;
-            playerElement.currentTime = newTime;
-        }
-    };
-
-    const skipForward = (): void => {
-        const playerElement = playerRef.current;
-        if (playerElement) {
-            let newTime = playerElement.currentTime + skipForwardIncrement;
-            if (newTime > playerElement.duration) newTime = playerElement.duration;
-            playerElement.currentTime = newTime;
-        }
-    };
-
-    const stopTrack = (): void => {
-        const playerElement = playerRef.current;
-        if (playerElement) {
-            playerElement.pause();
-        
-            updateTimeline(queue[queueIndex], 'stopped', playerElement.currentTime, playerElement.duration);
-            dispatch(changePlayerMode('stopped'))
-    
-            playerElement.src = '';
-        }
-    };
-
-    const stopPlayer = (): void => {
-        stopTrack();
-        dispatch(clearPlayQueue());
-    };
+    const { mode, timeline, playerTime, play, pause, stop, skipBackward, skipForward, setTrack, setTime } = useAudioPlayer({ skipBackwardTime: skipBackwardIncrement, skipForwardTime: skipForwardIncrement});
 
     useEffect(() => {
-        const playerElement = playerRef.current;
-        if (!playerElement) return;
+        if (!playerTime) return;
+        dispatch(setPlayerTime({ current: playerTime.time, duration: playerTime.duration}));
+    }, [playerTime])
 
-        const throttleTimeline = throttle(() => {
-            if (!playerElement.paused) {
-                updateTimeline(queue[queueIndex], 'playing', playerElement.currentTime, playerElement.duration);
+    useEffect(() => {
+
+        if (!currentTrack || !timeline) return;
+        if (currentTrack.ratingKey !== prevTrack?.ratingKey) return;
+
+        // Check if we have ended to break out of timelines.
+        if (timeline.state === 'ended') {
+            // If we've ended we need to check for next track and do a full timeline stop.
+            updateTimeline(currentTrack, 'stopped', currentTrack.duration, currentTrack.duration);
+            
+            if (!isLastTrack) {
+                dispatch(nextTrack());
+            } else {
+                dispatch(clearPlayQueue());
             }
-        }, 20000, { trailing: false });
 
-        playerElement.addEventListener('timeupdate', throttleTimeline);
-        return () => playerElement.removeEventListener('timeupdate', throttleTimeline);
-    }, [queueId, queue, queueIndex]);
+            return;
+        }
+
+        // Do we have a current time, if not we can't update the timeline.
+        if (isNaN(timeline.time)) return; 
+
+        // Check if the player has loaded fully to get the duration yet 
+        // if not, use the track duration.
+        let duration = timeline.duration;
+        if (isNaN(duration)) {
+            duration = convertMsToSeconds(currentTrack.duration);
+        }
+
+        // We are not ended - do a normal timeline update based on player values.
+        // console.log("timeline event", timeline, duration)
+        updateTimeline(currentTrack, timeline.state, timeline.time, duration);
+
+        if (timeline.state === 'stopped') {
+            // The player has been stopped - clear the play queue
+            // console.log("track stopped - clearing queue.")
+            dispatch(clearPlayQueue());
+        }
+    }, [currentTrack, timeline])
+
+    useEffect(() => {
+        dispatch(changePlayerMode(mode));
+    }, [mode])
 
     useEffect(() => {
         // No media to play
-        if (queueIndex < 0 || queue.length === 0) return;
-    
-        // console.log("Track has changed", hasTrackChanged());
-        if (hasTrackChanged()) {
-          const playInfo = queue[queueIndex];
-          const currentTrack = playInfo.Media[0];
-    
-          // Stop playback, if you change the source of the audio while
-          // it's playing, there is an exception thrown in the console.
-        //   TODO: Verify - but this doesn't seem to cause a problem anymore,
-        //          and is actually making extraneous calls when active.
-        //   if (playState === 'playing') {
-        //     // console.log("STOP: Track is playing, pause and remove source.");
-        //     console.log("need stop?")
-        //     stopTrack();
-        //   }
-    
-          // Probably need to handle multiparts in some way? Even if it's just a warning?
-          if (currentTrack.Part[0]) {
-            // console.log("START: Add source and start playing.", currentTrack);
-            const src = PlexJavascriptApi.getTrackMediaUrl(currentTrack);
-    
-            // get the reference to the audio tag.
-            const playerElement = playerRef.current;
-            if (playerElement) {
-                playerElement.src = src;
-                playerElement.currentTime = 0;
-                if (playInfo.viewOffset) {
-                // Check if we have a viewOffset, if so set the offset to the players time.
-                playerElement.currentTime = convertMsToSeconds(playInfo.viewOffset);
-                }
-                playTrack();
-            }
+        if (!currentTrack) return;
+
+        if (currentTrack.ratingKey !== prevTrack?.ratingKey) {
+          const trackMedia = currentTrack.Media[0];
+       
+          const src = PlexJavascriptApi.getTrackMediaUrl(trackMedia);
+          if (!src) {
+            console.error('Failed to find source for track:', currentTrack.ratingKey);
+            return;
           }
+
+          setTrack(src, currentTrack.viewOffset ? convertMsToSeconds(currentTrack.viewOffset) : 0);
         }
-    }, [queueId, queueIndex]);
+    }, [currentTrack]);
 
     return (
         <div className={`${styles.container}`}>
-            <RangeControl playerRangeChanged={playerRangeChanged} />
+            <RangeControl playerRangeChanged={setTime} />
             <div className={`${styles.controls}`}>
                 <PreviousTrackControl />
                 <SkipBackControl skipBackward={skipBackward} />
-                <PlayPauseControl pauseTrack={pauseTrack} playTrack={playTrack} />
+                <PlayPauseControl pauseTrack={pause} playTrack={play} />
                 <SkipForwardControl skipForward={skipForward} />
                 <NexTrackControl />
-                <StopControl stop={stopPlayer} />
+                <StopControl stop={stop} />
             </div>
-            <audio ref={playerRef} onTimeUpdate={timeUpdated} onEnded={audioPlayerEnded} />
         </div>
     );
 }

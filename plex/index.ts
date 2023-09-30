@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import FetchInstance from '../utility/FetchInstance';
 import qs from 'qs';
 import Bowser from "bowser";
 import { v4 as uuidv4 } from 'uuid';
@@ -48,7 +48,7 @@ const fetchWithTimeout = async (url: string, options: any): Promise<any> => {
 
 class PlexJavascriptApi {
 
-    private static client: AxiosInstance;
+    private static client: FetchInstance;
 
     private static PLEX_BASE_URL: string = 'https://plex.tv';
     private static PLEX_RESOURCES_URL: string = '/api/v2/resources';
@@ -119,13 +119,7 @@ class PlexJavascriptApi {
         this.requestBaseParams['X-Plex-Client-Identifier'] = clientIdentifier;
         
         // Create a client for plex.tv requests
-        this.client = axios.create({
-            baseURL: this.PLEX_BASE_URL,
-            headers: {
-              'Accept': 'application/json',
-              'Content-type': 'application/json'
-            }
-        });
+        this.client = new FetchInstance(this.PLEX_BASE_URL)
 
         // Check if we have an auth id saved, if so, we need
         // to validate the pin and get a token.
@@ -153,17 +147,14 @@ class PlexJavascriptApi {
       
         try {
           const response = await this.client.get(this.PLEX_USER_URL, {
-            params: {
-                ...this.requestBaseParams,
-                ...this.requestTokenParam
-            }
+              ...this.requestBaseParams,
+              ...this.requestTokenParam
           });
-          const data = response.data;
-          if (data.errors) {
-            throw { message: data.errors[0].message };
+          if (response.errors) {
+            throw { message: response.errors[0].message };
           }
           // Return the user information
-          return data as PlexUser;
+          return response as PlexUser;
         } catch {
           this.requestTokenParam['X-Plex-Token'] = null;
           this.logout();
@@ -180,14 +171,14 @@ class PlexJavascriptApi {
     private static validatePin = async (id: string): Promise<string> => {
 
         const clientIdParams = { 'X-Plex-Client-Identifier': this.requestBaseParams['X-Plex-Client-Identifier'] };
-        const url = `${this.PLEX_BASE_URL}${this.PLEX_PINS_URL}/${id}?${qs.stringify(clientIdParams)}`;
+        const url = `/${this.PLEX_PINS_URL}/${id}?${qs.stringify(clientIdParams)}`;
 
-        const response = await axios.get(url);
+        const response = await this.client.get(url);
         Settings.removeSettingFromStorage(Settings.SETTINGS_KEYS.loginRedirectId);
-        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.token, response.data.authToken);
+        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.token, response.authToken);
         Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.clientIdentifier, this.requestBaseParams['X-Plex-Client-Identifier']);
         
-        return response.data.authToken as string;
+        return response.authToken as string;
     };
 
     /**
@@ -196,17 +187,13 @@ class PlexJavascriptApi {
      */
     static signIn = async (): Promise<string> => {
         const response = await this.client.post(this.PLEX_PINS_URL, null, {
-          params: {
-            strong: true,
-            ...this.requestBaseParams
-          }
+          strong: true,
+          ...this.requestBaseParams
         });
 
-        // TODO: where should formatUrl live?
-        const data = response.data;
         const authAppUrl = formatUrl(`https://app.plex.tv/auth#`, {
             clientID: this.requestBaseParams['X-Plex-Client-Identifier'],
-            code: data.code,
+            code: response.code,
             forwardUrl: window.location.href,
             context: {
                 device: {
@@ -216,22 +203,20 @@ class PlexJavascriptApi {
         });
 
         // Save the pin to browser storage.
-        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.loginRedirectId, data.id);
+        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.loginRedirectId, response.id);
 
         return authAppUrl;
     };
 
     static getUsers = async (): Promise<SwitchUserItem[]> => {
 
-      const response = await this.client.get(this.PLEX_USERS_URL, {
-          params: {
-              ...this.requestBaseParams,
-              ...this.requestTokenParam
-          }
+      const response = await this.client.getXml(this.PLEX_USERS_URL, {
+          ...this.requestBaseParams,
+          ...this.requestTokenParam
       });
 
       const parser = new DOMParser();
-      const doc1 = parser.parseFromString(response.data, "application/xml");
+      const doc1 = parser.parseFromString(response, "application/xml");
       const xmlUsers = doc1.children[0].children;
       let users = [] as SwitchUserItem[];
 
@@ -271,7 +256,7 @@ class PlexJavascriptApi {
 
         const url = formatUrl(`${this.PLEX_USERS_V2_URL}/${user.uuid}/switch`, args)
 
-        const response = await this.client.post(url);
+        const response = await this.client.post(url, null, null)
 
         // Clear the current selected server from the class.
         this.selectServer(null);
@@ -281,10 +266,10 @@ class PlexJavascriptApi {
         Settings.removeSettingFromStorage(Settings.SETTINGS_KEYS.libraryId)
 
         // Update settings and class state with the current user token.
-        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.token, response.data.authToken);
-        this.requestTokenParam['X-Plex-Token'] = response.data.authToken;
+        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.token, response.authToken);
+        this.requestTokenParam['X-Plex-Token'] = response.authToken;
 
-        return response.data as PlexUser;
+        return response as PlexUser;
     }
 
     /**
@@ -300,15 +285,12 @@ class PlexJavascriptApi {
      * @returns {Promise<Array<PlexResource>>} - an array of the resources that match the request.
      */
     static getResources = async (resourceType?: string): Promise<Array<PlexResource>> => {
-        const response = await this.client.get(this.PLEX_RESOURCES_URL, {
-            params: {
-                includeHttps: 1,
-                includeRelay: 1,
-                ...this.requestBaseParams,
-                ...this.requestTokenParam
-            }
-        });
-        const resources: Array<PlexResource> = response.data;
+      const resources: Array<PlexResource> = await this.client.get(this.PLEX_RESOURCES_URL, {
+            includeHttps: 1,
+            includeRelay: 1,
+            ...this.requestBaseParams,
+            ...this.requestTokenParam
+        })
         if (!resourceType) return resources; // return the unfilters resource reponse.   
         return resources.filter((resource: PlexResource) => resource.provides === resourceType);
     };
@@ -316,7 +298,8 @@ class PlexJavascriptApi {
     /* Begin Server specific methods */
     /* ***************************** */
 
-    private static serverClient: AxiosInstance;
+    private static serverClient: FetchInstance;
+
     private static baseUrl: string | null;
     private static serverRequestTokenParam: any = {
       'X-Plex-Token': null
@@ -382,13 +365,7 @@ class PlexJavascriptApi {
           this.baseUrl = connection.uri ?? null;
           if (!this.baseUrl) throw 'TODO: Could not connect to server.'
 
-          this.serverClient = axios.create({
-            baseURL: this.baseUrl,
-            headers: {
-              'Accept': 'application/json',
-              'Content-type': 'application/json'
-            }
-          });
+          this.serverClient = new FetchInstance(this.baseUrl);
         }
 
         // Return the connection information - the url in the future
@@ -402,13 +379,10 @@ class PlexJavascriptApi {
      * @returns {Promise<Array<PlexLibrary>>} - array of libraries that match audio type.
      */
     static getLibraries = async (): Promise<Array<PlexLibrary>> => {
-        const response = await this.serverClient.get(`/library/sections`, {
-          params: {
-              ...this.baseParams,
-              ...this.serverRequestTokenParam
-          }
+        const data = await this.serverClient.get('/library/sections', {
+          ...this.baseParams,
+          ...this.serverRequestTokenParam
         });
-        const data = response.data;
         const sections = data.MediaContainer.Directory;
       
         if (sections.length === 0) return [];
@@ -474,14 +448,12 @@ class PlexJavascriptApi {
     static scrobble = async (key: string): Promise<void> => {
 
       await this.serverClient.get(`/:/scrobble`, {
-        params: {
-            key, // ratingKey
-            identifier: 'com.plexapp.plugins.library',
-            ...this.baseParams,
-            ...this.serverRequestTokenParam
-        }
+          key, // ratingKey
+          identifier: 'com.plexapp.plugins.library',
+          ...this.baseParams,
+          ...this.serverRequestTokenParam
       });
-    
+   
       // we don't need to do anything, need to handle error.
     };
     
@@ -490,13 +462,12 @@ class PlexJavascriptApi {
      * @param {string} key - the key of the requested track.
      */
     static unscrobble = async (key: string): Promise<void> => {
+
       await this.serverClient.get(`/:/unscrobble`, {
-        params: {
-            key, // ratingKey
-            identifier: 'com.plexapp.plugins.library',
-            ...this.baseParams,
-            ...this.serverRequestTokenParam
-        }
+          key, // ratingKey
+          identifier: 'com.plexapp.plugins.library',
+          ...this.baseParams,
+          ...this.serverRequestTokenParam
       });
        
       // we don't need to do anything, need to handle error.
@@ -509,21 +480,19 @@ class PlexJavascriptApi {
      */
     static updateTimeline = async ({ ratingKey, key, state, time, playbackTime, duration }: PlexTimelineArgs): Promise<PlexProgress> => {
         const response = await this.serverClient.get(`/:/timeline`, {
-          params: {
-              identifier: 'com.plexapp.plugins.library',
-              ...this.baseParams,
-              ...this.serverRequestTokenParam,
-              ratingKey,
-              key,
-              state,
-              time,
-              playbackTime,
-              duration,
-              hasMDE: 0,
-              'X-Plex-Text-Format': 'plain',
-          }
+            identifier: 'com.plexapp.plugins.library',
+            ...this.baseParams,
+            ...this.serverRequestTokenParam,
+            ratingKey,
+            key,
+            state,
+            time,
+            playbackTime,
+            duration,
+            hasMDE: 0,
+            'X-Plex-Text-Format': 'plain',
         });
-        return response.data.MediaContainer;
+        return response.MediaContainer;
     };
 
     /**
@@ -539,15 +508,11 @@ class PlexJavascriptApi {
     };
  
     private static makeServerRequest = async (url: string, args?: any): Promise<any> => {
-      const response = await this.serverClient.get(url, {
-        params: {
-            ...this.baseParams,
-            ...this.serverRequestTokenParam,
-            ...args
-        }
+      return await this.serverClient.get(url, {
+          ...this.baseParams,
+          ...this.serverRequestTokenParam,
+          ...args
       });
-
-      return response.data;
     }
 
     /**
@@ -632,14 +597,12 @@ class PlexJavascriptApi {
         };
 
         const response = await this.serverClient.get(`/library/sections/${section}/all`, {
-          params: {
-              ...this.baseParams,
-              ...localParams,
-              ...args,
-              ...this.serverRequestTokenParam
-          }
+            ...this.baseParams,
+            ...localParams,
+            ...args,
+            ...this.serverRequestTokenParam
         });
-        const data = response?.data?.MediaContainer as PlexArtistMetadata;
+        const data = response?.MediaContainer as PlexArtistMetadata;
         if (!data) return [];
         return data.Metadata;
     };
@@ -665,14 +628,12 @@ class PlexJavascriptApi {
         };
   
         const response = await this.serverClient.get(`/library/sections/${section}/all`, {
-          params: {
-              ...this.baseParams,
-              ...localParams,
-              ...this.serverRequestTokenParam
-          }
+            ...this.baseParams,
+            ...localParams,
+            ...this.serverRequestTokenParam
         });
   
-        return response.data.MediaContainer.Metadata ?? [];
+        return response.MediaContainer.Metadata ?? [];
     };
 }
 

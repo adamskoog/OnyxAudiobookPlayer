@@ -1,11 +1,11 @@
 export const SETTINGS_KEYS: {[key: string]: string} = {
-  serverId: 'settings_serverIdentifier',
-  libraryId: 'settings_library',
-  token: 'authToken',
-  clientIdentifier: 'clientIdentifier',
-  loginRedirectId: 'login_redirect_id',
-  skipForwardIncrement: 'skipForwardIncrement',
-  skipBackwardIncrement: 'skipBackwardIncrement',
+    serverId: 'settings_serverIdentifier',
+    libraryId: 'settings_library',
+    token: 'authToken',
+    clientIdentifier: 'clientIdentifier',
+    loginRedirectId: 'login_redirect_id',
+    skipForwardIncrement: 'skipForwardIncrement',
+    skipBackwardIncrement: 'skipBackwardIncrement',
 };
 
 export type BrowserSettings = {
@@ -16,29 +16,30 @@ export type BrowserSettings = {
 
 // Get an object of all settings required for initial app load.
 export const loadSettingsFromStorage = (): BrowserSettings => {
-  const settings: BrowserSettings = {
-    serverIdentifier: localStorage.getItem(SETTINGS_KEYS.serverId),
-    clientIdentifier: localStorage.getItem(SETTINGS_KEYS.clientIdentifier),
-    librarySection: localStorage.getItem(SETTINGS_KEYS.libraryId)
-  };
+    const settings: BrowserSettings = {
+        serverIdentifier: localStorage.getItem(SETTINGS_KEYS.serverId),
+        clientIdentifier: localStorage.getItem(SETTINGS_KEYS.clientIdentifier),
+        librarySection: localStorage.getItem(SETTINGS_KEYS.libraryId)
+    };
 
-  return settings;
+    return settings;
 };
 
 export const loadSettingFromStorage = (key: string): string | null => localStorage.getItem(key);
 
 export const saveSettingToStorage = (key: string, value: string): void => {
-  localStorage.setItem(key, value);
+    localStorage.setItem(key, value);
 };
 
 export const removeSettingFromStorage = (key: string): void => {
-  localStorage.removeItem(key);
+    localStorage.removeItem(key);
 };
 
 export const clearSettings = (): void => {
     const keys = Object.keys(SETTINGS_KEYS);
     keys.forEach((key) => {
-        if (!SETTINGS_KEYS.clientIdentifier && !SETTINGS_KEYS.loginRedirectId) 
+        if (key !== SETTINGS_KEYS.clientIdentifier && key !== SETTINGS_KEYS.loginRedirectId) {
             removeSettingFromStorage(SETTINGS_KEYS[key]);
+        }
     });
 };

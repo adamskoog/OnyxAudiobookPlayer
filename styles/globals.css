@@ -40,6 +40,10 @@ html .hub-no-transition {
 
       --disabled-button-fill-rgb: 82, 109, 130;
     }
+
+    html {
+      color-scheme: dark !important;
+    }
 }
 
 * {
@@ -81,10 +85,4 @@ body {
 a {
   color: inherit;
   text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
 }

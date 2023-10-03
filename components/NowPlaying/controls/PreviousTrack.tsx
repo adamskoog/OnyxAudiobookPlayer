@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import BaseControl from './BaseControl';
 
 import { createSelector } from '@reduxjs/toolkit';
@@ -12,6 +12,10 @@ function PreviousTrackControl() {
         (state: RootState) => state.player.isFirstTrack, 
         (isFirstTrack): boolean => { return isFirstTrack}
     ));
+
+    useEffect(() => {
+        navigator.mediaSession.setActionHandler('previoustrack', () => { dispatch(previousTrack()) });
+    }, []);
 
     return (
         <BaseControl disabled={isFirstTrack} title={'Previous Track'} onClick={() => dispatch(previousTrack())}>

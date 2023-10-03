@@ -1,0 +1,27 @@
+{
+    "theme_color": "#fffff",
+    "background_color": "#00000",
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "/",
+    "name": "Onyx: Audiobooks for Plex",
+    "short_name": "onyx",
+    "description": "A web based audiobook player for Plex.",
+    "icons": [
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+          },
+          {
+            "src": "/icon-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+          },
+          {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+          }
+    ]
+  }

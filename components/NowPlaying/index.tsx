@@ -1,3 +1,5 @@
+
+import { useEffect } from 'react';
 import Link from 'next/link';
 
 import { RootState, useAppSelector } from '@/store';
@@ -9,6 +11,7 @@ import PlexImage from '../shared/PlexImage';
 import styles from './styles/NowPlaying.module.css'
 import { createSelector } from '@reduxjs/toolkit';
 import { PlexTrack } from '@/types/plex.types';
+import PlexJavascriptApi from '../../plex';
 
 function NowPlaying() {
   
@@ -24,6 +27,24 @@ function NowPlaying() {
 
     let classes = [styles.container]
     if (mode !== 'stopped') classes.push(styles.show)
+
+    useEffect(() => {
+
+        if (!currentTrack) return;
+        
+        if ("mediaSession" in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+              title: currentTrack.title,
+              artist: currentTrack.grandparentTitle,
+              album: currentTrack.parentTitle,
+              artwork: [
+                { src: PlexJavascriptApi.getThumbnailTranscodeUrl(512, 512, currentTrack.thumb, false, false), sizes: '512x512', type: 'image/jpg' }
+              ]
+            });
+        }
+
+    }, [currentTrack])
+
 
     return (
         <div className={classes.join(' ')}>

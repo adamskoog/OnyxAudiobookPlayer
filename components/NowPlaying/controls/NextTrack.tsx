@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import BaseControl from './BaseControl';
 
 import { createSelector } from '@reduxjs/toolkit';
@@ -11,6 +12,10 @@ function NexTrackControl() {
         (state: RootState) => state.player.isLastTrack, 
         (isLastTrack): boolean => { return isLastTrack}
     ));
+
+    useEffect(() => {
+        navigator.mediaSession.setActionHandler('nexttrack', () => { dispatch(nextTrack()) });
+    }, []);
 
     return (
         <BaseControl disabled={isLastTrack} title={'Next Track'} onClick={() => dispatch(nextTrack())}>

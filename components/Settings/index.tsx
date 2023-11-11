@@ -48,12 +48,12 @@ function Settings({ appVersion }: SettingsProps) {
         { value: '60', label: '60'},
     ]
 
-    const changeServer = (value: string) => {
-        dispatch(setActiveServer(value));
+    const changeServer = (value: string | null) => {
+        dispatch(setActiveServer(value ?? ''));
     }
 
-    const changeLibrary = (value: string) => {
-        dispatch(setActiveLibrary(value))
+    const changeLibrary = (value: string | null) => {
+        dispatch(setActiveLibrary(value ?? ''))
     }
 
     const signout = () => {

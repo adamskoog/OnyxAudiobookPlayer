@@ -67,6 +67,10 @@
     background-color: transparent;
 }
 
+.mantine-PinInput-root {
+    gap: 50px;
+}
+
 .mantine-PinInput-input {
     height: 4rem;
     width: 4rem;

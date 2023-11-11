@@ -45,7 +45,7 @@ class PlexJavascriptApi {
 
     private static requestBaseParams: any = {
         'X-Plex-Product': 'Onyx Audiobook Player',
-        'X-Plex-Version': '2.3.1',
+        'X-Plex-Version': '2.4.1',
         'X-Plex-Client-Identifier': null
     };
 

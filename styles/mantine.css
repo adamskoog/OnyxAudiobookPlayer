@@ -13,7 +13,11 @@
     background-color: rgb(var(--navbar-foreground-rgb));
 }
 
-.mantine-Select-item[data-selected] { 
+.mantine-Select-option {
+    color: rgb(0,0,0);
+}
+
+.mantine-Select-option[data-checked] { 
     color: rgb(var(--subheader-forground-rgb));
     background-color: rgb(var(--subheader-background-rgb));
 }
@@ -25,6 +29,7 @@
 .mantine-InputWrapper-label,
 .hub .mantine-UnstyledButton-root {
     color: rgb(var(--body-foreground-rgb));
+    background: transparent;
 }
 .hub .mantine-UnstyledButton-root:disabled, .hub .mantine-UnstyledButton-root[data-disabled] {
     color: rgb(var(--disabled-button-fill-rgb));
@@ -56,6 +61,10 @@
     align-items: center;
     justify-content: center;
 
+}
+
+.mantine-ActionIcon-root {
+    background-color: transparent;
 }
 
 .mantine-PinInput-input {

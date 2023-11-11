@@ -1,3 +1,4 @@
+import '@mantine/core/styles.css';
 import '@/styles/globals.css'
 import '@/styles/mantine.css'
 
@@ -13,13 +14,7 @@ import Layout from '@/components/Layout'
 export default function App({ Component, pageProps }: AppProps) {
   
   return (
-    <MantineProvider
-      withGlobalStyles
-      withNormalizeCSS
-      theme={{
-        colorScheme: 'light',
-      }}
-    > 
+    <MantineProvider> 
     <Provider store={store}>
       <Layout>
         <Component {...pageProps} />

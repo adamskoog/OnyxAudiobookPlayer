@@ -5,9 +5,8 @@
 }
 
 /* Show the button for spoiler in the center. */
-.spoiler {
-    display: flex;
-    flex-direction: column;
+.spoiler button {
+    width: 100%;
 }
 
 .summary {

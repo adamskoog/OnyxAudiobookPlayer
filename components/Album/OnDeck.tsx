@@ -30,7 +30,7 @@ export default function OnDeck({ album, tracks }: OnDeckProps) {
         <>
         {isPlaying ? (
             <div className={`${styles.container}`}>
-                <Loader color="orange" size="xs" variant="bars" />
+                <Loader color="orange" size="xs" type="bars" />
                 <span>{onDeck.title}</span>
             </div>
         ) : (

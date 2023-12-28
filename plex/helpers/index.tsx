@@ -28,12 +28,17 @@ export const trackIsComplete = (track: PlexTrack): boolean => {
 };
 
 export const markTrackPlayed = async (track: PlexTrack): Promise<boolean> => {
-  await PlexJavascriptApi.scrobble(track.ratingKey);
+  try {
+    // Empty response is generated on success - handle better?
+    await PlexJavascriptApi.scrobble(track.ratingKey);
+  } catch {}
   return true;
 };
 
 export const markTrackUnplayed = async (track: PlexTrack): Promise<boolean> => {
-  await PlexJavascriptApi.unscrobble(track.ratingKey);
+  try {
+    await PlexJavascriptApi.unscrobble(track.ratingKey);
+  } catch {}
   return true;
 };
 

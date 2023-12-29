@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 
 import { RootState, useAppSelector } from '@/store';
-
+import type { PlayerMode, PlayerView } from '@/store/features/playerSlice';
 import AudioPlayer from './AudioPlayer';
 import { PlayerTime } from './controls';
 import PlexImage from '../shared/PlexImage';
@@ -15,18 +15,23 @@ import PlexJavascriptApi from '../../plex';
 
 function NowPlaying() {
   
-    const { mode, currentTrack } = useAppSelector(createSelector([
+    const { mode, view, currentTrack } = useAppSelector(createSelector([
         (state: RootState) => state.player.mode,
+        (state: RootState) => state.player.view,
         (state: RootState) => state.player.currentTrack
     ], 
-        (mode, currentTrack): {
-            mode: string,
+        (mode, view, currentTrack): {
+            mode: PlayerMode,
+            view: PlayerView,
             currentTrack: PlexTrack | null,
-         } => { return { mode, currentTrack } }
+         } => { return { mode, view, currentTrack } }
     ));
 
-    let classes = [styles.container]
-    if (mode !== 'stopped') classes.push(styles.show)
+    let classes = [styles.container];
+    if (mode !== 'stopped') {
+        classes.push(styles.show);
+        if (view === 'maximized') classes.push(styles.maximized);
+    }
 
     useEffect(() => {
 
@@ -45,12 +50,13 @@ function NowPlaying() {
 
     }, [currentTrack])
 
-
+    let imageSize = 100;
+    if (view === 'maximized') imageSize = 400;
     return (
         <div className={classes.join(' ')}>
             <div className={`${styles.inner}`}>
                 <div className={`${styles.cover}`}>
-                    <PlexImage width={100} height={100} url={currentTrack?.thumb} alt={currentTrack?.title} hideRadius />
+                    <PlexImage width={imageSize} height={imageSize} url={currentTrack?.thumb} alt={currentTrack?.title} hideRadius />
                 </div>
                 <div className={`${styles.track_info}`}>
                     <div className={`${styles.text}`}>{currentTrack?.title}</div>

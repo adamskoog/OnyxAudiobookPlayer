@@ -8,7 +8,27 @@
 }
 
 .show {
+    display: flex;
+}
+
+.maximized {
+    flex-grow: 1;
+}
+
+.maximized .inner {
+    font-size: 20px;
+
+    display: grid;
+    grid-template-rows: minmax(0, max-content) 130px 100px;
+}
+.maximized .cover {
+    flex-shrink: 1;
+    width: auto;
     display: block;
+}
+.maximized .track_info {
+    max-width: 100%;
+    align-items: center;
 }
 
 .inner {

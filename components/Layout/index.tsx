@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useRef, createContext, MutableRefObject } from 'react'
+import { useRouter } from 'next/router';
 import { ScrollArea } from '@mantine/core';
 import Loader from '../shared/Loader';
 
@@ -13,6 +14,7 @@ import styles from './styles/Layout.module.css'
 import Header from '@/components/Header'
 import Subheader from '@/components/Subheader'
 import NowPlaying from '@/components/NowPlaying';
+import { changePlayerView } from '@/store/features/playerSlice';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,6 +28,8 @@ type ScrollContext = {
 export const ScrollerRefContext = createContext<ScrollContext>({ ref: null });
 
 export default function Layout({ children }: LayoutProps) {
+
+    const router = useRouter();
 
     const dispatch = useAppDispatch()
     const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -45,6 +49,18 @@ export default function Layout({ children }: LayoutProps) {
         }
     }, [user]);
 
+    useEffect(() => {
+        
+        if (mode !== 'stopped') {
+            if (router.asPath.includes('nowplaying')) {
+                dispatch(changePlayerView('maximized'))
+                return;
+            }
+        }
+
+        dispatch(changePlayerView('minimized'))
+    }, [router.asPath])
+
     if (state === 'loading') return (
         <div className={`${styles.loader} ${inter.className}`}>
             <Loader loading={true} />
@@ -56,6 +72,7 @@ export default function Layout({ children }: LayoutProps) {
         classes.push(styles.show);
         if (view === 'maximized') classes.push(styles.maximized);
     }
+
     return (
         <>
             <Header />

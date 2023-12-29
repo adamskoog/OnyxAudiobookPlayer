@@ -31,7 +31,9 @@ export default function Layout({ children }: LayoutProps) {
     const scrollerRef = useRef<HTMLDivElement | null>(null);
     
     const user = useAppSelector((state) => state.application.user);
-    const state = useAppSelector(state => state.application.state)
+    const state = useAppSelector(state => state.application.state);
+    const mode = useAppSelector(state => state.player.mode)
+    const view = useAppSelector(state => state.player.view)
 
     useEffect(() => {
         dispatch(initialize())
@@ -48,11 +50,17 @@ export default function Layout({ children }: LayoutProps) {
             <Loader loading={true} />
         </div>
     )
+
+    let classes = [styles.main, inter.className];
+    if (mode !== 'stopped') {
+        classes.push(styles.show);
+        if (view === 'maximized') classes.push(styles.maximized);
+    }
     return (
         <>
             <Header />
             <Subheader />
-            <main className={`${styles.main} ${inter.className}`}>
+            <main className={classes.join(' ')}>
                 <ScrollArea className={`${styles.scrollRoot}`} viewportRef={scrollerRef}>
                     <div className={`${styles.content}`}>
                         <ScrollerRefContext.Provider value={{ ref: scrollerRef }}>

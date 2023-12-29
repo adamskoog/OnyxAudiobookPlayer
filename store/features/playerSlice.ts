@@ -7,12 +7,14 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { saveSettingToStorage, SETTINGS_KEYS } from '@/utility';
 
 export type PlayerMode = 'stopped' | 'paused' | 'playing' | 'ended';
+export type PlayerView = 'minimized' | 'maximized';
 export type PlayerTime = {
     current: number,
     duration: number
 }
 export interface PlayerState {
     mode: PlayerMode,
+    view: PlayerView,
     currentTime: number | null,
     duration: number | null
 
@@ -30,6 +32,7 @@ export interface PlayerState {
 
 const initialState: PlayerState = {
     mode: 'stopped',
+    view: 'minimized',
     currentTime: null,
     duration: null,
 

@@ -7,12 +7,14 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { saveSettingToStorage, SETTINGS_KEYS } from '@/utility';
 
 export type PlayerMode = 'stopped' | 'paused' | 'playing' | 'ended';
+export type PlayerView = 'minimized' | 'maximized';
 export type PlayerTime = {
     current: number,
     duration: number
 }
 export interface PlayerState {
     mode: PlayerMode,
+    view: PlayerView,
     currentTime: number | null,
     duration: number | null
 
@@ -30,6 +32,7 @@ export interface PlayerState {
 
 const initialState: PlayerState = {
     mode: 'stopped',
+    view: 'minimized',
     currentTime: null,
     duration: null,
 
@@ -51,6 +54,9 @@ export const playerSlice = createSlice({
     reducers: {
         changePlayerMode: (state, action: PayloadAction<PlayerMode>) => {
             state.mode = action.payload;
+        },
+        changePlayerView: (state, action: PayloadAction<PlayerView>) => {
+            state.view = action.payload;
         },
         setSkipBackwardIncrement: (state, action: PayloadAction<number>) => {
             saveSettingToStorage(SETTINGS_KEYS.skipBackwardIncrement, action.payload.toString())
@@ -107,6 +113,6 @@ export const playerSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { changePlayerMode, setSkipBackwardIncrement, setSkipForwardIncrement, setPlayerTime, previousTrack, nextTrack, buildPlayQueue, clearPlayQueue } = playerSlice.actions
+export const { changePlayerMode, changePlayerView, setSkipBackwardIncrement, setSkipForwardIncrement, setPlayerTime, previousTrack, nextTrack, buildPlayQueue, clearPlayQueue } = playerSlice.actions
 
 export default playerSlice.reducer

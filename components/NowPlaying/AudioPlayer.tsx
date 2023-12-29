@@ -51,6 +51,8 @@ function AudioPlayer() {
 
     const dispatch = useAppDispatch();
 
+    const view = useAppSelector(state => state.player.view);
+
     const currentTrack = useAppSelector(state => state.player.currentTrack);
     const isLastTrack = useAppSelector(state => state.player.isLastTrack);
 
@@ -127,8 +129,10 @@ function AudioPlayer() {
         }
     }, [currentTrack]);
 
+    let classes = [styles.container];
+    if (view === 'maximized') classes.push(styles.maximized);
     return (
-        <div className={`${styles.container}`}>
+        <div className={classes.join(' ')}>
             <RangeControl playerRangeChanged={setTime} />
             <div className={`${styles.controls}`}>
                 <PreviousTrackControl />

@@ -6,6 +6,17 @@
     height: 1.75rem;
 }
 
+.maximized.control {
+    width: 2.25rem;
+    height: 2.25rem;
+}
+
+.maximized.control.play,
+.maximized.control.stop {
+    height: 2.5rem;
+    width: 2.5rem;
+}
+
 .play {
     width: 2rem;
     height: 2rem;

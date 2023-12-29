@@ -28,6 +28,7 @@ function NavigationItems({ user }: NavigationItemsProps) {
             <>
             <NavLinkButton title={'Library'} url={'/library'}/>
             <NavLinkButton title={'Settings'} url={'/settings'} />
+            <NavLinkButton title={'Now Playing'} url={'/nowplaying'} />
             </>
         )}
         </>

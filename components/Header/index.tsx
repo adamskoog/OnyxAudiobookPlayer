@@ -4,6 +4,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useAppSelector } from '@/store'
 
 import UserInfo from './UserInfo'
+import Activity from './Activity';
 import { NavLinkButton } from '@/components/shared/Buttons';
 import { useOutsideClick } from '@/hooks';
 
@@ -20,7 +21,7 @@ type NavigationItemsProps = {
 
 function NavigationItems({ user }: NavigationItemsProps) {
 
-    const mode = useAppSelector((state) => state.player.mode);
+    // const mode = useAppSelector((state) => state.player.mode);
 
     return (
         <>
@@ -31,9 +32,9 @@ function NavigationItems({ user }: NavigationItemsProps) {
             <>
             <NavLinkButton title={'Library'} url={'/library'}/>
             <NavLinkButton title={'Settings'} url={'/settings'} />
-            {mode !== 'stopped' && 
+            {/* {mode !== 'stopped' && 
                 <NavLinkButton title={'Now Playing'} url={'/nowplaying'} />
-            }
+            } */}
             </>
         )}
         </>
@@ -61,7 +62,10 @@ function Header() {
                     <NavigationItems user={user} />
                 </div>
 
-                <UserInfo />
+                <div className={`${styles.right}`}>
+                    <Activity />
+                    <UserInfo />
+                </div>
             </div>
 
             <Transition mounted={opened} transition="scale-y" duration={400} timingFunction="ease">

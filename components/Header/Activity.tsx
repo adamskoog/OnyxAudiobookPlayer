@@ -3,7 +3,7 @@ import { UnstyledButton } from '@mantine/core';
 import Link from 'next/link';
 
 import styles from './styles/Activity.module.css'
-import ActivityIcon from '@/assets/think-peaks.svg'
+import ActivityIcon from '@/assets/peaks.svg'
 
 function Activity() {
 

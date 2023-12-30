@@ -21,8 +21,6 @@ type NavigationItemsProps = {
 
 function NavigationItems({ user }: NavigationItemsProps) {
 
-    // const mode = useAppSelector((state) => state.player.mode);
-
     return (
         <>
         <NavLinkButton title={'Home'} url={'/'}/>
@@ -32,9 +30,6 @@ function NavigationItems({ user }: NavigationItemsProps) {
             <>
             <NavLinkButton title={'Library'} url={'/library'}/>
             <NavLinkButton title={'Settings'} url={'/settings'} />
-            {/* {mode !== 'stopped' && 
-                <NavLinkButton title={'Now Playing'} url={'/nowplaying'} />
-            } */}
             </>
         )}
         </>

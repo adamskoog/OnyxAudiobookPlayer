@@ -1,12 +1,19 @@
 import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import type { InferGetStaticPropsType, GetStaticProps } from 'next'
 
 import { useAppSelector } from '@/store'
 
+import pjson from '@/package.json'
+
+export const getStaticProps: GetStaticProps<{ title: string, version: string }> = async () => {
+  return { props: { title: pjson.appTitle, version: pjson.version }}
+}
+
 // TODO: this might be better to do on some kind of 
 // middleware in the layout to avoid the actual redirect.
-export default function NowPlaying() {
+export default function NowPlaying({ title }: InferGetStaticPropsType<typeof getStaticProps>) {
 
   const albumKey = useRef<null | string>(null);
   const mode = useAppSelector(state => state.player.mode)
@@ -28,8 +35,8 @@ export default function NowPlaying() {
   return (
     <>
       <Head>
-        <title>Onyx for Plex</title>
-        <meta name="description" content="Onyx Audiobook Player for Plex" />
+        <title>{title}</title>
+        <meta name="description" content={title} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

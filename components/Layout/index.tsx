@@ -19,6 +19,8 @@ import { changePlayerView } from '@/store/features/playerSlice';
 const inter = Inter({ subsets: ['latin'] })
 
 type LayoutProps = {
+    title: string,
+    version: string,
     children: ReactNode
 }
 
@@ -27,7 +29,7 @@ type ScrollContext = {
 }
 export const ScrollerRefContext = createContext<ScrollContext>({ ref: null });
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ title, version, children }: LayoutProps) {
 
     const router = useRouter();
 
@@ -40,7 +42,7 @@ export default function Layout({ children }: LayoutProps) {
     const view = useAppSelector(state => state.player.view)
 
     useEffect(() => {
-        dispatch(initialize())
+        dispatch(initialize({title, version}))
     }, [])
 
     useEffect(() => {

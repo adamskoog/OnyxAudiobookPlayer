@@ -30,15 +30,19 @@ const initialState: ApplicationState = {
     state: 'loading'
 }
 
+interface InitParams {
+  title: string,
+  version: string
+}
 interface InitReturn {
   user: PlexUser | null,
   servers: PlexResource[],
   state: AppState
 }
 
-const initialize = createAsyncThunk<InitReturn, void, ThunkApi>('application/initialize', async (_, { getState, dispatch}) => {
+const initialize = createAsyncThunk<InitReturn, InitParams, ThunkApi>('application/initialize', async ({title, version}: InitParams, { getState, dispatch}) => {
 
-    await PlexJavascriptApi.initialize();
+    await PlexJavascriptApi.initialize(title, version);
 
     if (!PlexJavascriptApi.isLoggedOut) {
         // TODO: how do we handle an invalid token - this needs work.

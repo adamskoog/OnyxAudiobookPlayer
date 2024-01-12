@@ -1,13 +1,20 @@
 import Head from 'next/head'
+import type { InferGetStaticPropsType, GetStaticProps } from 'next'
 
 import HomePage from '@/components/Home'
 
-export default function Home() {
+import pjson from '@/package.json'
+
+export const getStaticProps: GetStaticProps<{ title: string, version: string }> = async () => {
+  return { props: { title: pjson.appTitle, version: pjson.version }}
+}
+
+export default function Home({ title }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <>
       <Head>
-        <title>Onyx for Plex</title>
-        <meta name="description" content="Onyx Audiobook Player for Plex" />
+        <title>{title}</title>
+        <meta name="description" content={title} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

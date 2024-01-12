@@ -44,8 +44,8 @@ class PlexJavascriptApi {
     };
 
     private static requestBaseParams: any = {
-        'X-Plex-Product': 'Onyx Audiobook Player',
-        'X-Plex-Version': '2.5.2',
+        'X-Plex-Product': null,
+        'X-Plex-Version': null,
         'X-Plex-Client-Identifier': null
     };
 
@@ -70,9 +70,12 @@ class PlexJavascriptApi {
         return clientIdentifier;
     };
 
-    static initialize = async (): Promise<void> => {
+    static initialize = async (title: string, version: string): Promise<void> => {
 
         if (this.isInitialized) return;
+
+        this.requestBaseParams['X-Plex-Product'] = title;
+        this.requestBaseParams['X-Plex-Version'] = version;
 
         // Setup the browser information.
         const browser = Bowser.parse(window.navigator.userAgent);

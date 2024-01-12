@@ -28,7 +28,7 @@ function NowPlaying() {
     ));
 
     let classes = [styles.container];
-    if (mode !== 'stopped') {
+    if (mode !== 'stopped' && mode !== 'ended') {
         classes.push(styles.show);
         if (view === 'maximized') classes.push(styles.maximized);
     }

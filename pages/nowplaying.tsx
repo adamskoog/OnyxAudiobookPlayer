@@ -19,7 +19,7 @@ export default function NowPlaying() {
   }, [currentTrack]);
 
   useEffect(() => {
-    if (mode === 'stopped') {
+    if (mode === 'stopped' || mode === 'ended') {
       if (albumKey.current) router.push(`/library/album/${albumKey.current}`)
       else router.push('/');
     }

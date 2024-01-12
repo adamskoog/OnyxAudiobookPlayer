@@ -1,16 +1,16 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router';
-import type { InferGetStaticPropsType, GetStaticProps } from 'next'
+import type { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 
 import AlbumPage from '@/components/Album';
 
 import pjson from '@/package.json'
 
-export const getStaticProps: GetStaticProps<{ title: string, version: string }> = async () => {
+export const getServerSideProps: GetServerSideProps<{ title: string, version: string }> = async () => {
   return { props: { title: pjson.appTitle, version: pjson.version }}
 }
 
-export default function Album({ title }: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function Album({ title }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   const router = useRouter();
   const { query: { ratingKey }} = router;

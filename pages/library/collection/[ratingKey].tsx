@@ -1,16 +1,16 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router';
-import type { InferGetStaticPropsType, GetStaticProps } from 'next'
+import type { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 
 import CollectionPage from '@/components/Collection';
 
 import pjson from '@/package.json'
 
-export const getStaticProps: GetStaticProps<{ title: string, version: string }> = async () => {
+export const getServerSideProps: GetServerSideProps<{ title: string, version: string }> = async () => {
   return { props: { title: pjson.appTitle, version: pjson.version }}
 }
 
-export default function Collection({ title }: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function Collection({ title }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   const router = useRouter();
   const { query: { ratingKey }} = router;

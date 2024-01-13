@@ -1,7 +1,7 @@
 {
   "name": "onyx",
   "appTitle": "Onyx Audiobook Player for Plex",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "private": false,
   "scripts": {
     "dev": "next dev",

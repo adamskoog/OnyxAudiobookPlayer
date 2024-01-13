@@ -16,18 +16,19 @@ export const getStaticProps: GetStaticProps<{ title: string, version: string }> 
 export default function NowPlaying({ title }: InferGetStaticPropsType<typeof getStaticProps>) {
 
   const albumKey = useRef<null | string>(null);
-  const mode = useAppSelector(state => state.player.mode)
-  const currentTrack = useAppSelector(state => state.player.currentTrack)
+  const mode = useAppSelector(state => state.player.mode);
+  const currentTrack = useAppSelector(state => state.player.currentTrack);
+  const isLastTrack = useAppSelector(state => state.player.isLastTrack);
 
   const router = useRouter();
 
   useEffect(() => {
-    if (currentTrack) albumKey.current = currentTrack.parentRatingKey
+    if (currentTrack) albumKey.current = currentTrack.parentRatingKey;
   }, [currentTrack]);
 
   useEffect(() => {
-    if (mode === 'stopped' || mode === 'ended') {
-      if (albumKey.current) router.push(`/library/album/${albumKey.current}`)
+    if (mode === 'stopped' || (mode === 'ended' && isLastTrack)) {
+      if (albumKey.current) router.push(`/library/album/${albumKey.current}`);
       else router.push('/');
     }
   }, [mode]);

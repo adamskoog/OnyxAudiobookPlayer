@@ -51,13 +51,18 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
         if (mode !== 'playing') return;
 
         if ('setPositionState' in navigator.mediaSession) {
-            navigator.mediaSession.setPositionState({
-              duration: element.duration,
-              playbackRate: element.playbackRate,
-              position: element.currentTime,
-            });
+            
+            try {
+                navigator.mediaSession.setPositionState({
+                duration: element.duration,
+                playbackRate: element.playbackRate,
+                position: element.currentTime,
+                });
+            } catch {
+                // avoid error when duration is not ready.
+            }
         }
-    }
+    };
    
     const getPosition = () => {
         const element = audioplayerRef.current;
@@ -71,7 +76,6 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
     // to get the throttling working correctly and passing the correct values. Revist later.
     const throttleTimeline = throttle(() => {
         const element = audioplayerRef.current;
-
         if (!element.paused) {
             setTimeline({ state: 'playing', time: element.currentTime, duration: element.duration });
         }
@@ -163,7 +167,7 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
             element.removeEventListener('timeupdate', onTimeUpdated);
             element.removeEventListener('ended', onEnded);
         }
-    }, [])
+    }, [mode])
 
     useEffect(() => {
         // Handle the mode state change and update player to reflect.

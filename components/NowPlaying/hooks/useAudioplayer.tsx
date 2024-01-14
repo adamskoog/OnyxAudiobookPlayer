@@ -47,18 +47,21 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
         const element = audioplayerRef.current;
 
         setPlayerTime({ time: element.currentTime, duration: element.duration });
-
+        console.log("MODE:", mode);
         if (mode !== 'playing') return;
 
         if ('setPositionState' in navigator.mediaSession) {
             
             try {
+                console.log("CURRENT", element.currentTime)
+                console.log("DURATION", element.duration)  
                 navigator.mediaSession.setPositionState({
-                duration: element.duration,
-                playbackRate: element.playbackRate,
-                position: element.currentTime,
+                    duration: element.duration,
+                    playbackRate: element.playbackRate,
+                    position: element.currentTime,
                 });
-            } catch {
+            } catch (err) {
+                console.log("ERROR", err);
                 // avoid error when duration is not ready.
             }
         }

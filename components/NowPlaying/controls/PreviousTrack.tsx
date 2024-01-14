@@ -14,8 +14,9 @@ function PreviousTrackControl() {
     ));
 
     useEffect(() => {
-        navigator.mediaSession.setActionHandler('previoustrack', () => { dispatch(previousTrack()) });
-    }, []);
+        if (!isFirstTrack) navigator.mediaSession.setActionHandler('previoustrack', () => { dispatch(previousTrack()) });
+        else navigator.mediaSession.setActionHandler('previoustrack', null);
+    }, [isFirstTrack]);
 
     return (
         <BaseControl disabled={isFirstTrack} title={'Previous Track'} onClick={() => dispatch(previousTrack())}>

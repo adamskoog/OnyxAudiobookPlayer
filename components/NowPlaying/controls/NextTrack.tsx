@@ -14,8 +14,9 @@ function NexTrackControl() {
     ));
 
     useEffect(() => {
-        navigator.mediaSession.setActionHandler('nexttrack', () => { dispatch(nextTrack()) });
-    }, []);
+        if (!isLastTrack) navigator.mediaSession.setActionHandler('nexttrack', () => { dispatch(nextTrack()) });
+        else navigator.mediaSession.setActionHandler('nexttrack', null);
+    }, [isLastTrack]);
 
     return (
         <BaseControl disabled={isLastTrack} title={'Next Track'} onClick={() => dispatch(nextTrack())}>

@@ -48,7 +48,7 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
 
         setPlayerTime({ time: element.currentTime, duration: element.duration });
 
-        if (mode !== 'playing') return;
+        if (mode !== 'playing' && mode !== 'paused') return;
 
         if ('setPositionState' in navigator.mediaSession) {
             
@@ -150,7 +150,6 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
         if ("mediaSession" in navigator) {
             navigator.mediaSession.setActionHandler('play', async () => { play(); });
             navigator.mediaSession.setActionHandler('pause', () => { pause(); });
-            navigator.mediaSession.setActionHandler('stop', () => { stop() });
             navigator.mediaSession.setActionHandler('seekbackward', () => { skipBackward() });
             navigator.mediaSession.setActionHandler('seekforward', () => { skipForward() });
 

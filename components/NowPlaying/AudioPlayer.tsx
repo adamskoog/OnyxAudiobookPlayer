@@ -66,17 +66,6 @@ function AudioPlayer() {
     useEffect(() => {
         if (!playerTime) return;
 
-        if ('setPositionState' in navigator.mediaSession) {
-            try {
-                navigator.mediaSession.setPositionState({
-                    duration: playerTime.duration,
-                    position: playerTime.time,
-                });
-            } catch {
-                // avoid error when duration is not ready.
-            }
-        }
-
         dispatch(setPlayerTime({ current: playerTime.time, duration: playerTime.duration}));
     }, [playerTime])
 

@@ -48,20 +48,21 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
 
         setPlayerTime({ time: element.currentTime, duration: element.duration });
 
-        if (mode !== 'playing' && mode !== 'paused') return;
+        // if (mode !== 'playing' && mode !== 'paused') return;
 
-        if ('setPositionState' in navigator.mediaSession) {
-            
-            try {
-                navigator.mediaSession.setPositionState({
-                duration: element.duration,
-                playbackRate: element.playbackRate,
-                position: element.currentTime,
-                });
-            } catch {
-                // avoid error when duration is not ready.
-            }
-        }
+        // if ('setPositionState' in navigator.mediaSession) {
+        //     console.log("player::time update", element.currentTime, element.duration)
+        //     try {
+        //         navigator.mediaSession.setPositionState({
+        //         duration: element.duration,
+        //         playbackRate: element.playbackRate,
+        //         position: element.currentTime,
+        //         });
+        //     } catch {
+        //         // avoid error when duration is not ready.
+        //         console.log('player::error on time update')
+        //     }
+        // }
     };
    
     const getPosition = () => {
@@ -142,6 +143,7 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
     useEffect(() => {
         const element = audioplayerRef.current;
 
+        console.log("player::Mode changed", mode)
         // Set up our event listeners.
         element.addEventListener('timeupdate', throttleTimeline);
         element.addEventListener('timeupdate', onTimeUpdated);

@@ -1,3 +1,4 @@
+'use client'
 import { useAppSelector, useAppDispatch } from '@/store'
 
 import { logout } from '@/store/features/applicationSlice';

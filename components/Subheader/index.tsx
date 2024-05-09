@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation'
 
 import { Inter } from 'next/font/google'
 
@@ -11,13 +11,13 @@ const inter = Inter({ subsets: ['latin'] })
 
 function Subheader() {
 
-    const router = useRouter();
+    const pathname = usePathname()
 
     return (
         <section className={`${styles.container} ${inter.className}`}>
             <div className={`${styles.inner}`}>
                 <ServerInfo />
-                {router.pathname === '/library' && (
+                {pathname === '/library' && (
                     <LibraryFilters />
                 )}
             </div>

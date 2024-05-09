@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import { Button as MaintineBtn } from '@mantine/core';
 
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation'
 
 import styles from './styles/Buttons.module.css'
 
@@ -45,17 +45,17 @@ export function NavButton({ className, children, disabled = false, onClick }: Bu
 
 export function NavLinkButton({ title, url }: LinkButtonProps) {
 
-    const router = useRouter()
+    const pathname = usePathname()
 
     let classes = [styles.btn, styles.nav]
 
-
-    if (url === '/') {
-        if (router.asPath === '/' ) classes.push(styles.active)
-    } else {
-        if (router.asPath.startsWith(url)) classes.push(styles.active)
+    if (pathname) {
+        if (url === '/') {
+            if (pathname === '/' ) classes.push(styles.active)
+        } else {
+            if (pathname.startsWith(url)) classes.push(styles.active)
+        }
     }
-
 
     return (
         <MaintineBtn className={classes.join(' ')} component={Link} href={url}>{title}</MaintineBtn>

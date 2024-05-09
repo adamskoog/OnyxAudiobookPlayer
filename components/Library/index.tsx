@@ -1,3 +1,4 @@
+'use client'
 import { useContext } from 'react';
 
 import type { PlexAlbumMetadata, PlexArtistListMetadata, PlexCollectionMetadata } from '@/types/plex.types';

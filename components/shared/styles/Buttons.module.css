@@ -1,4 +1,5 @@
 .btn {
+  &:global(.mantine-Button-root) {
     display: flex;
     justify-content: center;
     border-radius: 0.375rem;
@@ -13,25 +14,32 @@
     font-weight: 500;
 
     height: 3rem;
+  }
 }
 
 .nav {
+  &:global(.mantine-Button-root) {
     border: none;
     height: 2.25rem;
     justify-content: flex-start;
 
     color: 1px solid rgb(var(--navbar-foreground-rgb));
     background-color: transparent;
+  }
 }
 
 .btn:hover {
+  &:global(.mantine-Button-root) {
     color: rgb(var(--navbar-button-foreground-hover-rgb));
     background-color: rgb(var(--navbar-button-background-hover-rgb));
+  }
 }
 
 .active {
+  &:global(.mantine-Button-root) {
     color: rgb(var(--navbar-button-active-forground-rgb));
     background-color: rgb(var(--navbar-button-active-background-rgb));
+  }
 }
 
 @media (min-width: 768px /*var(--mobile-break)*/) {
@@ -39,51 +47,3 @@
         justify-content: center;
     }
 }
-
-@media (prefers-color-scheme: dark) {
-    /* .btn {
-      color: rgb(var(--navbar-forground-inactive-rgb));
-      background-color: rgb(var(--navbar-background-rgb));
-    }
-    
-    .btn:hover {
-      color: rgb(var(--navbar-forground-inactive-rgb));
-      background-color: rgb(var(--navbar-button-hover-rgb));
-    }
-
-    .active {
-        color: rgb(var(--navbar-button-active-forground-rgb));
-        background-color: rgb(var(--navbar-button-active-background-rgb));
-    } */
-}
-
-/* Maintine overrides */
-/* body .mantine-Button-root {
-  color: 1px solid rgb(var(--navbar-background-rgb));
-  background-color: transparent;
-  border: 1px solid rgb(var(--navbar-background-rgb));
-
-  border-radius: 0.375rem;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  font-weight: 500;
-
-  height: 3rem;
-}
-
-body .mantine-Button-root:hover {
-  color: rgb(var(--navbar-background-rgb));
-  background-color: transparent;
-  border: 1px solid rgb(var(--navbar-background-rgb));
-}
-
-body nav .mantine-Button-root {
-  color: rgb(var(--navbar-forground-inactive-rgb));
-  background-color: transparent;
-  border: none;
-}
-
-body nav .mantine-Button-root:hover {
-  color: rgb(var(--navbar-foreground-rgb));
-  background-color: rgb(var(--navbar-button-hover-rgb));
-} */

@@ -1,5 +1,6 @@
+'use client'
 import { ReactNode, useEffect, useRef, createContext, MutableRefObject } from 'react'
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation'
 import { ScrollArea } from '@mantine/core';
 import Loader from '../shared/Loader';
 
@@ -16,11 +17,14 @@ import Subheader from '@/components/Subheader'
 import NowPlaying from '@/components/NowPlaying';
 import { changePlayerView } from '@/store/features/playerSlice';
 
+import pjson from '@/package.json'
+
+import { store } from '@/store'
+import { Provider } from 'react-redux'
+
 const inter = Inter({ subsets: ['latin'] })
 
 type LayoutProps = {
-    title: string,
-    version: string,
     children: ReactNode
 }
 
@@ -29,9 +33,9 @@ type ScrollContext = {
 }
 export const ScrollerRefContext = createContext<ScrollContext>({ ref: null });
 
-export default function Layout({ title, version, children }: LayoutProps) {
+function LayoutInner({ children }: LayoutProps) {
 
-    const router = useRouter();
+    const pathname = usePathname()
 
     const dispatch = useAppDispatch()
     const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -42,7 +46,7 @@ export default function Layout({ title, version, children }: LayoutProps) {
     const view = useAppSelector(state => state.player.view)
 
     useEffect(() => {
-        dispatch(initialize({title, version}))
+        dispatch(initialize({ title: pjson.appTitle, version: pjson.version}))        
     }, [])
 
     useEffect(() => {
@@ -51,17 +55,16 @@ export default function Layout({ title, version, children }: LayoutProps) {
         }
     }, [user]);
 
-    useEffect(() => {
-        
+    useEffect(() => {    
         if (mode !== 'stopped') {
-            if (router.asPath.includes('nowplaying')) {
+            if (pathname.includes('nowplaying') && view !== 'maximized') {
                 dispatch(changePlayerView('maximized'))
                 return;
             }
         }
 
-        dispatch(changePlayerView('minimized'))
-    }, [router.asPath])
+        if (view !== 'minimized') dispatch(changePlayerView('minimized'))
+    }, [pathname])
 
     if (state === 'loading') return (
         <div className={`${styles.loader} ${inter.className}`}>
@@ -76,7 +79,7 @@ export default function Layout({ title, version, children }: LayoutProps) {
     }
 
     return (
-        <>
+        <div className='app-root'>
             <Header />
             <Subheader />
             <main className={classes.join(' ')}>
@@ -89,6 +92,16 @@ export default function Layout({ title, version, children }: LayoutProps) {
                 </ScrollArea>
             </main>
             <NowPlaying />
-        </>
+        </div>
+  )
+}
+
+export default function Layout({ children }: LayoutProps) {
+    return (
+        <Provider store={store}>
+            <LayoutInner>
+                {children}
+            </LayoutInner>
+        </Provider>
   )
 }

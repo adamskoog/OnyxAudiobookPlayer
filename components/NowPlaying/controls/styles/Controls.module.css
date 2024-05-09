@@ -1,45 +1,51 @@
 .control {
-    color: rgb(var(--subheader-forground-rgb));
+    &:global(.mantine-ActionIcon-root) {
+        color: rgb(var(--subheader-forground-rgb));
 
-    font-size: 3rem;
-    width: 1.75rem;
-    height: 1.75rem;
-}
+        font-size: 3rem;
+        width: 1.75rem;
+        height: 1.75rem;
 
-.maximized.control {
-    width: 2.25rem;
-    height: 2.25rem;
-}
+        &:hover {
+            color: rgb(var(--subheader-forground-rgb));
+        }
 
-.maximized.control.play,
-.maximized.control.stop {
-    height: 2.5rem;
-    width: 2.5rem;
-}
+        &.maximized {
+            width: 2.25rem;
+            height: 2.25rem;
 
-.play {
-    width: 2rem;
-    height: 2rem;
-}
+            &.play,
+            &.stop {
+                height: 2.5rem;
+                width: 2.5rem;
+            }
+        }
 
-.stop {
-    width: 1.5rem;
-    height: 1.5rem;
+        &.play {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        &.stop {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        @media (min-width: 768px /*var(--mobile-break)*/) {
+            & {
+                width: 2rem;
+                height: 2rem;
+
+                &.play {
+                    width: 2.5rem;
+                    height: 2.5rem;
+                }
+            }
+        }
+    }
 }
 
 .range {
     margin: .75rem 0;
     flex-grow: 1;
-}
-
-@media (min-width: 768px /*var(--mobile-break)*/) {
-    .control {
-        width: 2rem;
-        height: 2rem;
-    }
-
-    .play {
-        width: 2.5rem;
-        height: 2.5rem;
-    }
 }

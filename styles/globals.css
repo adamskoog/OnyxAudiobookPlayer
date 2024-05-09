@@ -62,7 +62,7 @@ html {
 
 html,
 body,
-#__next {
+.app-root {
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -77,7 +77,7 @@ body {
   background: rgb(var(--body-background-rgb)) !important;
 }
 
-#__next {
+.app-root {
   display: flex;
   flex-direction: column;
 }

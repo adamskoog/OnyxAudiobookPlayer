@@ -1,3 +1,4 @@
+'use client'
 import useCollectionMetadata from './hooks/useCollectionMetadata';
 
 import Loader from '../shared/Loader';

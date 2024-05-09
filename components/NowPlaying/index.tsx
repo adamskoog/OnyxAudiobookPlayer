@@ -53,7 +53,7 @@ function NowPlaying() {
     let imageSize = 100;
     if (view === 'maximized') imageSize = 400;
     return (
-        <div className={classes.join(' ')}>
+        <section className={classes.join(' ')}>
             <div className={`${styles.inner}`}>
                 <div className={`${styles.cover}`}>
                     <PlexImage width={imageSize} height={imageSize} url={currentTrack?.thumb} alt={currentTrack?.title} hideRadius />
@@ -70,7 +70,7 @@ function NowPlaying() {
                 </div>
                 <AudioPlayer />
             </div>
-        </div>
+        </section>
     );
 }
 

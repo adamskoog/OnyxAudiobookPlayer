@@ -1,3 +1,4 @@
+'use client'
 import PlexJavascriptApi from "@/plex";
 import { useAppSelector } from "@/store";
 

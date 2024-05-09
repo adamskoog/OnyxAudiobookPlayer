@@ -1,3 +1,4 @@
+'use client'
 import useArtistMetadata from './hooks/useArtistMetadata';
 
 import Loader from '../shared/Loader';

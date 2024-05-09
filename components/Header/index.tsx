@@ -1,3 +1,5 @@
+'use client'
+
 import { Burger, Transition } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 

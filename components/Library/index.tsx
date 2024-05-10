@@ -36,7 +36,7 @@ function GridChild({ style, index, children, readyInViewport, scrolling }: GridC
     let childElement = <></>
 
     if (isPlexCollectionMetadata(child)) childElement = <CollectionItem metadata={child} />
-    else if (isPlexAlbumMetadata(child)) childElement = <AlbumItem metadata={child} />
+    else if (isPlexAlbumMetadata(child)) childElement = <AlbumItem metadata={child} showAuthor={true} />
     else childElement = <ArtistItem metadata={child} />
 
     return (
@@ -58,7 +58,7 @@ function Library() {
     return (
         <VirtualGrid
             total={libraryItems.length}
-            cell={{ height: 255, width: 180 }}
+            cell={{ height: 260, width: 180 }}
             child={GridChild}
             childProps={{ children: libraryItems }}
             viewportRowOffset={4}

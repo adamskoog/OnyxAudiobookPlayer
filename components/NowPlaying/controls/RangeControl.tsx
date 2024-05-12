@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Slider } from '@mantine/core';
 
 import { useAppSelector } from '@/store';
@@ -18,8 +18,25 @@ type Props = {
 
 function RangeControl({ playerRangeChanged }: Props) {
 
+    const [value, setValue] = useState<number | null>(null);
+
     const currentTime = useAppSelector(state => state.player.currentTime);
     const duration = useAppSelector(state => state.player.duration);
+
+    const onChange = (value: number) => {
+        // Set a local state value so we can update the value
+        // of the slider and see the timestamp without an actual change.
+        setValue(value);
+    }
+
+    const onChangeEnd = (value: number) => {
+        // call the range changed to update the player in the store.
+        playerRangeChanged(value);
+
+        // set our local state to null so we again use
+        // the redux store value.
+        setValue(null);
+    }
 
     return (
         <Slider 
@@ -29,8 +46,9 @@ function RangeControl({ playerRangeChanged }: Props) {
             label={value => formatProgressLabel(value)} 
             min={0} 
             max={checkValid(duration)} 
-            value={checkValid(currentTime)} 
-            onChange={playerRangeChanged} 
+            value={checkValid(value || currentTime)}
+            onChange={onChange}
+            onChangeEnd={onChangeEnd}
         />
     );
 };

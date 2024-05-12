@@ -13,3 +13,22 @@
     display: flex;
     justify-content: space-around;
 }
+
+.switchContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .25rem;
+}
+
+.switch {
+    &:global(.mantine-Switch-root .mantine-Switch-track) {
+        --switch-bd: rgb(var(--navbar-button-background-hover-rgb));
+        --switch-bg: rgb(var(--body-background-rgb));  
+    }
+}

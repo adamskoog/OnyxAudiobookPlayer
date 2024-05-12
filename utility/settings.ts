@@ -6,6 +6,7 @@ export const SETTINGS_KEYS: {[key: string]: string} = {
     loginRedirectId: 'login_redirect_id',
     skipForwardIncrement: 'skipForwardIncrement',
     skipBackwardIncrement: 'skipBackwardIncrement',
+    storeLibraryScrollPosition: 'storeLibraryScrollPosition'
 };
 
 export type BrowserSettings = {

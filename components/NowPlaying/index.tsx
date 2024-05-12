@@ -2,30 +2,19 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 
-import { RootState, useAppSelector } from '@/store';
-import type { PlayerMode, PlayerView } from '@/store/features/playerSlice';
+import { useAppSelector } from '@/store';
 import AudioPlayer from './AudioPlayer';
 import { PlayerTime } from './controls';
 import PlexImage from '../shared/PlexImage';
 
 import styles from './styles/NowPlaying.module.css'
-import { createSelector } from '@reduxjs/toolkit';
-import { PlexTrack } from '@/types/plex.types';
 import PlexJavascriptApi from '../../plex';
 
 function NowPlaying() {
   
-    const { mode, view, currentTrack } = useAppSelector(createSelector([
-        (state: RootState) => state.player.mode,
-        (state: RootState) => state.player.view,
-        (state: RootState) => state.player.currentTrack
-    ], 
-        (mode, view, currentTrack): {
-            mode: PlayerMode,
-            view: PlayerView,
-            currentTrack: PlexTrack | null,
-         } => { return { mode, view, currentTrack } }
-    ));
+    const mode = useAppSelector(state => state.player.mode);
+    const view = useAppSelector(state => state.player.view);
+    const currentTrack = useAppSelector(state => state.player.currentTrack);
 
     let classes = [styles.container];
     if (mode !== 'stopped' && mode !== 'ended') {

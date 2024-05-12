@@ -19,9 +19,6 @@ import { changePlayerView } from '@/store/features/playerSlice';
 
 import pjson from '@/package.json'
 
-import { store } from '@/store'
-import { Provider } from 'react-redux'
-
 const inter = Inter({ subsets: ['latin'] })
 
 type LayoutProps = {
@@ -33,7 +30,7 @@ type ScrollContext = {
 }
 export const ScrollerRefContext = createContext<ScrollContext>({ ref: null });
 
-function LayoutInner({ children }: LayoutProps) {
+export default function Layout({ children }: LayoutProps) {
 
     const pathname = usePathname()
 
@@ -93,15 +90,5 @@ function LayoutInner({ children }: LayoutProps) {
             </main>
             <NowPlaying />
         </div>
-  )
-}
-
-export default function Layout({ children }: LayoutProps) {
-    return (
-        <Provider store={store}>
-            <LayoutInner>
-                {children}
-            </LayoutInner>
-        </Provider>
   )
 }

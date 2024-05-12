@@ -6,6 +6,7 @@ import '@/styles/globals.css'
 import React from 'react';
 import { MantineProvider } from '@mantine/core';
 
+import StoreProvider from './StoreProvider';
 import Layout from '@/components/Layout'
 
 export default function RootLayout({ children }: { children: any }) {
@@ -21,9 +22,11 @@ export default function RootLayout({ children }: { children: any }) {
       </head>
       <body>
         <MantineProvider>
+          <StoreProvider>
             <Layout>
                 {children}
             </Layout>
+          </StoreProvider>
         </MantineProvider>
       </body>
     </html>

@@ -1,21 +1,21 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { applicationReducer, serverReducer, libraryReducer, playerReducer } from './features'
 
-import { useDispatch, useSelector } from 'react-redux'
-import type { TypedUseSelectorHook } from 'react-redux'
+import { useAppDispatch, useAppSelector, useAppStore } from './hooks'
 
-export const store = configureStore({
-  reducer: {
-    application: applicationReducer,
-    library: libraryReducer,
-    server: serverReducer,
-    player: playerReducer
-  },
-})
+const makeStore = () => {
+  return configureStore({
+    reducer: {
+      application: applicationReducer,
+      library: libraryReducer,
+      server: serverReducer,
+      player: playerReducer
+    },
+  })
+}
 
-export type RootState = ReturnType<typeof store.getState>
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+export type AppStore = ReturnType<typeof makeStore>
+export type RootState = ReturnType<AppStore['getState']>
+export type AppDispatch = AppStore['dispatch']
 
-export type AppDispatch = typeof store.dispatch
-export const useAppDispatch: () => AppDispatch = useDispatch
-
+export { makeStore, useAppDispatch, useAppSelector, useAppStore }

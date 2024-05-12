@@ -1,17 +1,13 @@
 import { useEffect } from 'react';
 import BaseControl from './BaseControl';
 
-import { createSelector } from '@reduxjs/toolkit';
-import { useAppSelector, useAppDispatch, RootState } from '@/store';
+import { useAppSelector, useAppDispatch } from '@/store';
 import { nextTrack } from '@/store/features/playerSlice';
 
 function NexTrackControl() {
 
     const dispatch = useAppDispatch();
-    const isLastTrack = useAppSelector(createSelector(
-        (state: RootState) => state.player.isLastTrack, 
-        (isLastTrack): boolean => { return isLastTrack}
-    ));
+    const isLastTrack = useAppSelector(state => state.player.isLastTrack)
 
     useEffect(() => {
         if (!isLastTrack) navigator.mediaSession.setActionHandler('nexttrack', () => { dispatch(nextTrack()) });

@@ -1,10 +1,9 @@
 import { memo } from 'react';
-import { RootState, useAppSelector } from '@/store';
+import { useAppSelector } from '@/store';
 
 import BaseControl from './BaseControl';
 
 import styles from './styles/Controls.module.css'
-import { createSelector } from '@reduxjs/toolkit';
 
 type Props = {
     playTrack: () => void,
@@ -13,10 +12,7 @@ type Props = {
 
 function PlayPauseControl({ playTrack, pauseTrack }: Props) {
 
-    const mode = useAppSelector(createSelector(
-        (state: RootState) => state.player.mode, 
-        (mode): string => { return mode}
-    ));
+    const mode = useAppSelector(state => state.player.mode);
 
     return (
         <>

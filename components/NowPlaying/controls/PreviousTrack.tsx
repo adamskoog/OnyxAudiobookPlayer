@@ -1,17 +1,14 @@
 import { memo, useEffect } from 'react';
 import BaseControl from './BaseControl';
 
-import { createSelector } from '@reduxjs/toolkit';
-import { useAppSelector, useAppDispatch, RootState } from '@/store';
+import { useAppSelector, useAppDispatch } from '@/store';
 import { previousTrack } from '@/store/features/playerSlice';
 
 function PreviousTrackControl() {
 
     const dispatch = useAppDispatch();
-    const isFirstTrack = useAppSelector(createSelector(
-        (state: RootState) => state.player.isFirstTrack, 
-        (isFirstTrack): boolean => { return isFirstTrack}
-    ));
+
+    const isFirstTrack = useAppSelector(state => state.player.isFirstTrack);
 
     useEffect(() => {
         if (!isFirstTrack) navigator.mediaSession.setActionHandler('previoustrack', () => { dispatch(previousTrack()) });

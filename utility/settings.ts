@@ -9,6 +9,11 @@ export const SETTINGS_KEYS: {[key: string]: string} = {
     storeLibraryScrollPosition: 'storeLibraryScrollPosition'
 };
 
+export const FEATURE_FLAG = {
+    ON: "1",
+    OFF: "0"
+}
+
 export type BrowserSettings = {
     serverIdentifier: string | null,
     clientIdentifier: string | null,

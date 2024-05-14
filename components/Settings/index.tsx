@@ -1,5 +1,4 @@
 'use client'
-import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store'
 
 import { logout } from '@/store/features/applicationSlice';
@@ -7,17 +6,19 @@ import { clearServerData, setActiveServer } from '@/store/features/serverSlice';
 import { setActiveLibrary } from '@/store/features/librarySlice';
 
 import { Button } from '@/components/shared/Buttons';
-import { Badge, Select, Switch } from '@mantine/core';
+import { Select } from '@mantine/core';
 import { setSkipBackwardIncrement, setSkipForwardIncrement } from '@/store/features/playerSlice';
 import ChangeUsers from './ChangeUsers';
 import styles from './styles/Settings.module.css'
 import PlexJavascriptApi from '@/plex';
 
-import { loadSettingFromStorage, saveSettingToStorage, SETTINGS_KEYS } from '@/utility';
+import { SETTINGS_KEYS } from '@/utility';
+import Switch from './Switch';
 
 type SettingsProps = {
     appVersion: string
 }
+
 function Settings({ appVersion }: SettingsProps) {
     const dispatch = useAppDispatch();
 
@@ -29,13 +30,6 @@ function Settings({ appVersion }: SettingsProps) {
 
     const skipBackwardIncrement = useAppSelector(state => state.player.skipBackwardIncrement);
     const skipForwardIncrement = useAppSelector(state => state.player.skipForwardIncrement);
-
-    const [scrollSaveValue, setScrollSaveValue] = useState(loadSettingFromStorage(SETTINGS_KEYS.storeLibraryScrollPosition));
-    const scrollSaveValueOnChange = (checked: boolean) => {
-        const value = checked ? "1": "0";
-        saveSettingToStorage(SETTINGS_KEYS.storeLibraryScrollPosition, value);
-        setScrollSaveValue(value);
-    }
 
     const serverOptions = resources.map(resource => {
         return { value: resource.clientIdentifier, label: resource.name }
@@ -92,17 +86,10 @@ function Settings({ appVersion }: SettingsProps) {
                         if (value) dispatch(setSkipForwardIncrement(parseInt(value)));
                     }}
                     data={skipOptions} />
-            <div className={`${styles.switchContainer}`}>
-                <span className={`${styles.label}`}><Badge color="indigo">Beta</Badge> Enable Saving Library Scroll Position</span>
-                <Switch
-                    className={`${styles.switch}`}
-                    size="lg"
-                    labelPosition="left"
-                    onLabel="ON" offLabel="OFF"
-                    checked={scrollSaveValue === "1"}
-                    onChange={(event) => scrollSaveValueOnChange(event.currentTarget.checked)}
-                />
-            </div>
+            <Switch label={'Enable Saving Library Scroll Position'} 
+                storageKey={SETTINGS_KEYS.storeLibraryScrollPosition} 
+                isBeta={true} 
+            />
             {user.home && (<ChangeUsers />)}
             <Button onClick={signout}>{'Log out'}</Button>
             <div className={`${styles.version}`}>

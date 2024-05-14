@@ -8,7 +8,7 @@ import AlbumItem from './AlbumItem';
 import ArtistItem from './ArtistItem';
 import Loader from '../shared/Loader';
 
-import { loadSettingFromStorage, SETTINGS_KEYS } from '@/utility';
+import { loadSettingFromStorage, SETTINGS_KEYS, FEATURE_FLAG } from '@/utility';
 
 import useLibraryItems from './hooks/useLibraryItems';
 
@@ -58,7 +58,7 @@ function Library() {
     if (loading || libraryItems.length === 0) return <div></div>
 
     // This is a temp feature flag for testing.
-    if (loadSettingFromStorage(SETTINGS_KEYS.storeLibraryScrollPosition) === "1") {
+    if (loadSettingFromStorage(SETTINGS_KEYS.storeLibraryScrollPosition) === FEATURE_FLAG.ON) {
         // we only want to set if we are on root library path.
         const scroller = containerRef?.ref?.current;
         const scrollPos = sessionStorage.getItem('libraryScrollPosition')

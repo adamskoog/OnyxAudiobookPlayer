@@ -19,7 +19,6 @@ import Subheader from '@/components/Subheader'
 import NowPlaying from '@/components/NowPlaying';
 import { changePlayerView } from '@/store/features/playerSlice';
 
-import { loadSettingFromStorage, SETTINGS_KEYS } from '@/utility';
 import pjson from '@/package.json'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -51,7 +50,6 @@ export default function Layout({ children }: LayoutProps) {
 
     const onScrollPositionChange = debounce(function ({ y }: ScrollPosition) {
         if (pathname == '/library') {
-            console.log("SETTING STORAGE")
             sessionStorage.setItem('libraryScrollPosition', y.toString())
         }
     }, 500)
@@ -67,20 +65,6 @@ export default function Layout({ children }: LayoutProps) {
     }, [user]);
 
     useEffect(() => {
-        if (pathname == '/library') {
-            // This is a temp feature flag for testing.
-            if (loadSettingFromStorage(SETTINGS_KEYS.storeLibraryScrollPosition) === "1") {
-                // we only want to set if we are on root library path.
-                const scroller = scrollerRef.current;
-                const scrollPos = sessionStorage.getItem('libraryScrollPosition')
-                if (!!scroller && !!scrollPos) {
-                    // Note: I really don't like this, but it seems to be the only way to get
-                    // it to work somewhat reliably.
-                    setTimeout(() => { scroller.scrollTo({ top: parseInt(scrollPos) }) }, 150);
-                }
-            }
-        }
-
         if (mode !== 'stopped') {
             if (pathname.includes('nowplaying') && view !== 'maximized') {
                 dispatch(changePlayerView('maximized'))

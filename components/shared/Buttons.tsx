@@ -16,7 +16,8 @@ type ButtonProps = {
 
 type LinkButtonProps = {
     title: string,
-    url: string
+    url: string,
+    onClick?: () => void
 }
 
 export function Button({ className, children, disabled = false, onClick }: ButtonProps) {
@@ -43,7 +44,7 @@ export function NavButton({ className, children, disabled = false, onClick }: Bu
     );
 }
 
-export function NavLinkButton({ title, url }: LinkButtonProps) {
+export function NavLinkButton({ title, url, onClick }: LinkButtonProps) {
 
     const pathname = usePathname()
 
@@ -58,7 +59,7 @@ export function NavLinkButton({ title, url }: LinkButtonProps) {
     }
 
     return (
-        <MaintineBtn className={classes.join(' ')} component={Link} href={url}>{title}</MaintineBtn>
+        <MaintineBtn className={classes.join(' ')} component={Link} href={url} onClick={onClick}>{title}</MaintineBtn>
     );
 }
 

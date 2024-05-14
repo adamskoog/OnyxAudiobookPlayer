@@ -10,6 +10,8 @@ import Activity from './Activity';
 import { NavLinkButton } from '@/components/shared/Buttons';
 import { useOutsideClick } from '@/hooks';
 
+import { removeSettingFromStorage, SETTINGS_KEYS } from '@/utility';
+
 import type { PlexUser } from '@/types/plex.types';
 
 import styles from './styles/Header.module.css'
@@ -23,15 +25,20 @@ type NavigationItemsProps = {
 
 function NavigationItems({ user }: NavigationItemsProps) {
 
+    const navOnClick = () => {
+        // on nav click, clear the library scroll position.
+        sessionStorage.removeItem('libraryScrollPosition');
+    };
+
     return (
         <>
-        <NavLinkButton title={'Home'} url={'/'}/>
+        <NavLinkButton title={'Home'} url={'/'} onClick={navOnClick} />
 
         {/* Hide buttons when user is not logged in as they will not have access. */}
         {user && (
             <>
-            <NavLinkButton title={'Library'} url={'/library'}/>
-            <NavLinkButton title={'Settings'} url={'/settings'} />
+            <NavLinkButton title={'Library'} url={'/library'} onClick={navOnClick} />
+            <NavLinkButton title={'Settings'} url={'/settings'} onClick={navOnClick} />
             </>
         )}
         </>

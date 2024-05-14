@@ -8,6 +8,8 @@ import AlbumItem from './AlbumItem';
 import ArtistItem from './ArtistItem';
 import Loader from '../shared/Loader';
 
+import { loadSettingFromStorage, SETTINGS_KEYS } from '@/utility';
+
 import useLibraryItems from './hooks/useLibraryItems';
 
 // No types for this - VirtualGrid.d.ts sets to any
@@ -54,6 +56,16 @@ function Library() {
     
     if (loading) return <Loader loading={true} />
     if (loading || libraryItems.length === 0) return <div></div>
+
+    // This is a temp feature flag for testing.
+    if (loadSettingFromStorage(SETTINGS_KEYS.storeLibraryScrollPosition) === "1") {
+        // we only want to set if we are on root library path.
+        const scroller = containerRef?.ref?.current;
+        const scrollPos = sessionStorage.getItem('libraryScrollPosition')
+        if (!!scroller && !!scrollPos) {
+            scroller.scrollTo({ top: parseInt(scrollPos) })
+        }
+    }
 
     return (
         <VirtualGrid

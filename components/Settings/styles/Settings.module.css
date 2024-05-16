@@ -29,6 +29,6 @@
 .switch {
     &:global(.mantine-Switch-root .mantine-Switch-input:checked + .mantine-Switch-track) {
         --switch-bd: rgb(var(--navbar-button-background-hover-rgb));
-        --switch-bg: rgb(var(--body-background-rgb));
+        --switch-bg: rgb(var(--navbar-button-active-background-rgb));
     }
 }

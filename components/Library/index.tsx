@@ -63,7 +63,7 @@ function Library() {
         const scroller = containerRef?.ref?.current;
         const scrollPos = sessionStorage.getItem('libraryScrollPosition')
         if (!!scroller && !!scrollPos) {
-            scroller.scrollTo({ top: parseInt(scrollPos) })
+            setTimeout(() => scroller.scrollTo({ top: parseInt(scrollPos) }), 200);
         }
     }
 

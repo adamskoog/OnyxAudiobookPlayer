@@ -1,12 +1,12 @@
 import { useRef } from 'react';
 import { ActionIcon } from '@mantine/core';
+import { useQuery } from "@tanstack/react-query";
 
-import type { PlexAlbumMetadata } from "@/types/plex.types";
+import PlexJavascriptApi from '@/plex';
 
 import Loader from '../shared/Loader';
 import AlbumItem from '../Library/AlbumItem';
 
-import useHubItems from "./hooks/useHubItems";
 import useHubNavigation from './hooks/useHubNavigation';
 
 import styles from './styles/Hub.module.css'
@@ -16,17 +16,31 @@ import HubRightIcon from '@/assets/hubScrollRight.svg'
 
 type HubProps = {
     title: string,
-    hubItemsCallback: () => Promise<Array<PlexAlbumMetadata>>
+    section: string | null,
+    sort: string,
+    count?: number
 }
 
-function Hub({ title, hubItemsCallback }: HubProps) {
+function Hub({ title, section, sort, count = 10 }: HubProps) {
 
     const containerRef = useRef(null as HTMLDivElement | null);
     const contentRef = useRef(null as HTMLDivElement | null);
 
-    const { hubLoading, hubItems } = useHubItems({ hubItemsCallback });
+    const { isFetching: hubLoading, data } = useQuery({
+        queryKey: ['hub', section, sort],
+        queryFn: () => PlexJavascriptApi.getLibraryHubItems(section, {
+            'X-Plex-Container-Start': 0,
+            'X-Plex-Container-Size': count,
+            sort: sort,
+        }),
+        enabled: !!section
+    });
+
     const { leftScrollDisabled, rightScrollDisabled, advanceRight, advanceLeft  } = useHubNavigation({ containerRef, contentRef });
 
+    let hubItems = data;
+    if (!hubItems) hubItems = [];
+    
     return (
         <div className={'hub'}>
             <div className={`${styles.title}`}>{title}</div>

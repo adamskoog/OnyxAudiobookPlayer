@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query";
 import { useAppSelector } from '@/store'
 
 import PlexJavascriptApi from '@/plex';
@@ -9,7 +9,7 @@ type HookProps = {
 }
 
 type HookReturn = {
-    artist: PlexArtistMetadata | null,
+    artist: PlexArtistMetadata | undefined,
     loading: boolean
 }
 
@@ -17,22 +17,13 @@ const useArtistMetadata = ({ ratingKey }: HookProps): HookReturn => {
     
     const activeServer = useAppSelector((state) => state.server.activeServer);
 
-    const [artist, setArtist] = useState<PlexArtistMetadata | null>(null);
-    const [loading, setLoading] = useState<boolean>(false)
+    const { isFetching, data } = useQuery({
+        queryKey: ['artist', ratingKey, { activeServer: activeServer?.clientIdentifier }],
+        queryFn: () => PlexJavascriptApi.getArtistMetadata(ratingKey),
+        enabled: activeServer !== null
+    });
 
-    useEffect(() => {
-        const fetchMetadata = async (): Promise<void> => {
-            if (activeServer) {
-                const artistInfo = await PlexJavascriptApi.getArtistMetadata(ratingKey);       
-                setArtist(artistInfo);
-                setLoading(false)
-            };
-        };
-        setLoading(true)
-        fetchMetadata();
-    }, [activeServer, ratingKey]);
-
-    return { artist, loading }
+    return { artist: data, loading: isFetching }
 }
 
 export default useArtistMetadata;

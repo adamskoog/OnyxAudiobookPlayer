@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAppSelector } from '@/store'
 
 import PlexJavascriptApi from '@/plex';
@@ -9,42 +9,37 @@ type HookProps = {
 }
 
 type HookReturn = {
-    album: PlexAlbumMetadata | null,
-    tracks: PlexTrack[] | null,
+    album: PlexAlbumMetadata | undefined,
+    tracks: PlexTrack[] | undefined,
     loading: boolean,
     forceMetadataUpdate: () => Promise<void>
 }
 
 const useAlbumMetadata = ({ ratingKey }: HookProps): HookReturn => {
     
+    const queryClient = useQueryClient();
+
     const activeServer = useAppSelector((state) => state.server.activeServer);
 
-    const [album, setAlbum] = useState<PlexAlbumMetadata | null>(null);
-    const [tracks, setTracks]= useState<PlexTrack[] | null>(null);
-    const [loading, setLoading] = useState<boolean>(false)
+    const { isFetching: isFetchingAlbum, data: albumData } = useQuery({
+       queryKey: ['album', ratingKey, { activeServer: activeServer?.clientIdentifier }],
+       queryFn: () => PlexJavascriptApi.getAlbumMetadata(ratingKey),
+       enabled: activeServer !== null
+    });
+
+    const { isFetching: isFetchingTracks, data: tracksData } = useQuery({
+        queryKey: ['tracks', ratingKey, { activeServer: activeServer?.clientIdentifier }],
+        queryFn: () => PlexJavascriptApi.getAlbumTracks(ratingKey),
+        enabled: activeServer !== null
+    });
+
+    const isLoading = isFetchingAlbum && isFetchingTracks;
 
     const forceMetadataUpdate = async (): Promise<void> => {
-        // Do no set loading, doing a background refresh.
-        const trackInfo = await PlexJavascriptApi.getAlbumTracks(ratingKey);     
-        setTracks(trackInfo);
+        queryClient.invalidateQueries({ queryKey: ['tracks' ] });
     };
-
-    useEffect(() => {
-        const fetchMetadata = async (): Promise<void> => {
-            if (activeServer) {
-                const albumInfo = await PlexJavascriptApi.getAlbumMetadata(ratingKey);       
-                setAlbum(albumInfo);
-
-                const trackInfo = await PlexJavascriptApi.getAlbumTracks(ratingKey);
-                setTracks(trackInfo);
-                setLoading(false)
-            };
-        };
-        setLoading(true)
-        fetchMetadata();
-    }, [activeServer, ratingKey]);
-
-    return { album, tracks, loading, forceMetadataUpdate }
+   
+    return { album: albumData, tracks: tracksData, loading: isLoading, forceMetadataUpdate }
 }
 
 export default useAlbumMetadata;

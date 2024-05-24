@@ -1,4 +1,4 @@
-import FetchInstance from '../utility/FetchInstance';
+import FetchInstance from './helpers/FetchInstance';
 
 import Bowser from "bowser";
 import { v4 as uuidv4 } from 'uuid';
@@ -588,7 +588,10 @@ class PlexJavascriptApi {
      * @param {Promise<Array<PlexAlbumMetadata>>} args - The albums matching the query.
      * @returns {Promise<Array<PlexAlbumMetadata>>} - 
      */
-    static getLibraryHubItems = async (section: string, args: any): Promise<Array<PlexAlbumMetadata>> => {
+    static getLibraryHubItems = async (section: string | null, args: any): Promise<Array<PlexAlbumMetadata>> => {
+
+        if (!section) return [];
+        
         const localParams = {
           type: 9,
           includeAdvanced: 1,
@@ -612,11 +615,13 @@ class PlexJavascriptApi {
 
     /**
      * The the media items to display in the library.
-     * @param {string} section - The library section.
+     * @param {string | null} section - The library section.
      * @param {any} sortArgs - The information for sorting.
      * @return {Promise<Array<PlexAlbumMetadata | PlexArtistListMetadata>}
      */
-    static getLibraryItems = async (section: string, sortArgs?: any): Promise<Array<PlexAlbumMetadata | PlexArtistListMetadata | PlexCollectionMetadata>> => {
+    static getLibraryItems = async (section: string | null, sortArgs?: any): Promise<Array<PlexAlbumMetadata | PlexArtistListMetadata | PlexCollectionMetadata>> => {
+        if (!section) return [];
+
         if (!sortArgs) {
           sortArgs = this.createLibrarySortQuery({ order: null, display: null });
         }

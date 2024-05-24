@@ -51,6 +51,9 @@ class FetchInstance {
         else options.headers = this.mergeHeaders(internalHeaders, options.headers);
 
         const response = await this.get(url, options);
+        if (!response.ok) {
+          throw new Error('Bad Request');
+        }
         return await response.json();
     }
 
@@ -89,6 +92,9 @@ class FetchInstance {
         else options.headers = this.mergeHeaders(internalHeaders, options.headers);
 
         const response = await this.post(url, options);
+        if (!response.ok) {
+          throw new Error('Bad Request');
+        }
         return await response.json();
     }
 

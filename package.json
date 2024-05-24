@@ -1,7 +1,7 @@
 {
   "name": "onyx",
   "appTitle": "Onyx Audiobook Player for Plex",
-  "version": "3.1.5",
+  "version": "3.2.1",
   "private": false,
   "scripts": {
     "dev": "next dev",
@@ -16,6 +16,7 @@
     "@mantine/hooks": "^7.9.1",
     "@mantine/next": "^6.0.21",
     "@reduxjs/toolkit": "^2.2.3",
+    "@tanstack/react-query": "^5.37.1",
     "@types/lodash": "^4.17.1",
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.0",
@@ -34,6 +35,7 @@
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
+    "@tanstack/eslint-plugin-query": "^5.35.6",
     "@types/node": "20.12.11",
     "@types/qs": "^6.9.15",
     "@types/uuid": "^9.0.8"

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import type { PlexAlbumMetadata } from '@/types/plex.types';
+import type { PlexAlbumMetadata } from '@/plex/plex.types';
 import PlexImage from '../shared/PlexImage';
 import styles from './styles/griditem.module.css'
 

@@ -8,7 +8,7 @@ import { switchUser } from '@/store/features/applicationSlice';
 import { clearActiveLibrary } from '@/store/features/librarySlice';
 import styles from './styles/ChangeUsers.module.css'
 import { useEffect, useState } from 'react';
-import type { SwitchUserItem } from '@/types/plex.types';
+import type { SwitchUserItem } from '@/plex/plex.types';
 
 type UserSelectorProps = {
     user: SwitchUserItem,

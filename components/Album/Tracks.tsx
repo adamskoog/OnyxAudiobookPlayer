@@ -1,4 +1,4 @@
-import type { PlexTrack } from "@/types/plex.types"
+import type { PlexTrack } from "@/plex/plex.types"
 
 import { formatTrackDisplay } from "@/utility"
 import TrackInfo from "./TrackInfo"

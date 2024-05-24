@@ -3,7 +3,7 @@ import { useAppSelector, useAppDispatch } from '@/store';
 import { setPlayerTime, clearPlayQueue, changePlayerMode, nextTrack } from '@/store/features/playerSlice';
 
 import PlexJavascriptApi from '@/plex';
-import type { PlexTrack } from '@/types/plex.types';
+import type { PlexTrack } from '@/plex/plex.types';
 import type { PlayerMode } from '@/store/features/playerSlice';
 
 import { convertSecondsToMs, convertMsToSeconds } from '@/utility';

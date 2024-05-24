@@ -12,7 +12,7 @@ import { useOutsideClick } from '@/hooks';
 
 import { removeSettingFromStorage, SETTINGS_KEYS } from '@/utility';
 
-import type { PlexUser } from '@/types/plex.types';
+import type { PlexUser } from '@/plex/plex.types';
 
 import styles from './styles/Header.module.css'
 import { Inter } from 'next/font/google'

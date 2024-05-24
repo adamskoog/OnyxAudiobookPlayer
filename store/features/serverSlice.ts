@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import type { RootState, AppDispatch } from '@/store'
 import PlexJavascriptApi from '@/plex'
-import type { PlexResource, PlexLibrary } from '@/types/plex.types'
+import type { PlexResource, PlexLibrary } from '@/plex/plex.types'
 import * as SettingsUtils from '@/utility/settings'
 
 import { setActiveLibrary, clearActiveLibrary } from './librarySlice'

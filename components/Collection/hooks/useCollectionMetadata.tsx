@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAppSelector } from '@/store'
 
 import PlexJavascriptApi from '@/plex';
-import type { PlexAlbumMetadata, PlexCollectionMetadata } from "@/types/plex.types"
+import type { PlexAlbumMetadata, PlexCollectionMetadata } from "@/plex/plex.types"
 
 type HookProps = {
     ratingKey: string

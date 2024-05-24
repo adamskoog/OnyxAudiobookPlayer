@@ -5,7 +5,7 @@ import type { RootState, AppDispatch } from '@/store'
 import PlexJavascriptApi, { RESOURCETYPES } from '@/plex'
 
 import * as SettingsUtils from '@/utility/settings'
-import type { PlexResource, PlexUser } from '@/types/plex.types'
+import type { PlexResource, PlexUser } from '@/plex/plex.types'
 
 import { clearServerData } from './serverSlice'
 import { clearActiveLibrary } from './librarySlice'

@@ -3,7 +3,7 @@ import { useAppSelector } from '@/store'
 
 import PlexJavascriptApi from '@/plex';
 
-import type { PlexAlbumMetadata, PlexArtistListMetadata, PlexCollectionMetadata } from "@/types/plex.types"
+import type { PlexAlbumMetadata, PlexArtistListMetadata, PlexCollectionMetadata } from "@/plex/plex.types"
 
 type HookReturn = {
     libraryItems: (PlexAlbumMetadata | PlexArtistListMetadata | PlexCollectionMetadata)[],

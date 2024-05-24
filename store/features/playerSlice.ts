@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 import { v4 as uuidv4 } from 'uuid';
 
-import type { PlexTrack } from '@/types/plex.types'
+import type { PlexTrack } from '@/plex/plex.types'
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { saveSettingToStorage, SETTINGS_KEYS } from '@/utility';
 

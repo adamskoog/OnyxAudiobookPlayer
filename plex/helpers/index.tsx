@@ -1,5 +1,5 @@
 import PlexJavascriptApi from "..";
-import type { PlexAlbumMetadata, PlexTrack } from "@/types/plex.types";
+import type { PlexAlbumMetadata, PlexTrack } from "@/plex/plex.types";
 // Plex has updated PMS so that libraries using stored track progress now complete at 99% officially.
 const TRACK_COMPLETE_PERCENT = 0.99;
 

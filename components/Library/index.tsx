@@ -1,7 +1,7 @@
 'use client'
 import { useContext } from 'react';
 
-import type { PlexAlbumMetadata, PlexArtistListMetadata, PlexCollectionMetadata } from '@/types/plex.types';
+import type { PlexAlbumMetadata, PlexArtistListMetadata, PlexCollectionMetadata } from '@/plex/plex.types';
 
 import { ScrollerRefContext } from '@/components/Layout';
 import AlbumItem from './AlbumItem';

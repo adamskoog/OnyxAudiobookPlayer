@@ -3,7 +3,7 @@ import FetchInstance from './helpers/FetchInstance';
 import Bowser from "bowser";
 import { v4 as uuidv4 } from 'uuid';
 
-import type { PlexUser, SwitchUserItem, PlexResource, PlexServerConnection, PlexLibrary, PlexTimelineArgs, PlexProgress, PlexArtistMetadata, PlexArtistListMetadata, PlexAlbumMetadata, PlexTrackMedia, PlexCollectionMetadata, PlexTrack } from '@/types/plex.types'
+import type { PlexUser, SwitchUserItem, PlexResource, PlexServerConnection, PlexLibrary, PlexTimelineArgs, PlexProgress, PlexArtistMetadata, PlexArtistListMetadata, PlexAlbumMetadata, PlexTrackMedia, PlexCollectionMetadata, PlexTrack } from '@/plex/plex.types'
 import * as Settings from '@/utility/settings';
 
 export const RESOURCETYPES = {

@@ -5,6 +5,8 @@ import { logout } from '@/store/features/applicationSlice';
 import { clearServerData, setActiveServer } from '@/store/features/serverSlice';
 import { setActiveLibrary } from '@/store/features/librarySlice';
 
+import { clearSettings } from '@/utility';
+
 import { Button } from '@/components/shared/Buttons';
 import { Select } from '@mantine/core';
 import { setSkipBackwardIncrement, setSkipForwardIncrement } from '@/store/features/playerSlice';
@@ -62,7 +64,7 @@ function Settings({ appVersion }: SettingsProps) {
     }
 
     const signout = () => {
-        PlexJavascriptApi.logout();
+        clearSettings();
         dispatch(clearServerData())
         dispatch(logout())
     }

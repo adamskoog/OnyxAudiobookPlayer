@@ -6,6 +6,7 @@ import { Avatar, Modal, PinInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { switchUser } from '@/store/features/applicationSlice';
 import { clearActiveLibrary } from '@/store/features/librarySlice';
+import { saveSettingToStorage, removeSettingFromStorage, SETTINGS_KEYS } from '@/utility';
 import styles from './styles/ChangeUsers.module.css'
 import { useEffect, useState } from 'react';
 import type { SwitchUserItem } from '@/plex/plex.types';
@@ -62,6 +63,12 @@ function ChangeUsers() {
     const doUserSwitch = (user: SwitchUserItem, pin?: string) => {
         const doAsync = async () => {
             const newUser = await PlexJavascriptApi.switchUser(user, pin);
+            removeSettingFromStorage(SETTINGS_KEYS.serverId)
+            removeSettingFromStorage(SETTINGS_KEYS.libraryId)
+    
+            // Update settings and class state with the current user token.
+            saveSettingToStorage(SETTINGS_KEYS.token, newUser.authToken);
+
             dispatch(switchUser(newUser));
             close()
         }

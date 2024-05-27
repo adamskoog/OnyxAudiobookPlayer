@@ -3,14 +3,16 @@ import { useAppSelector } from '@/store'
 import PlexJavascriptApi from '@/plex'
 
 import { NavButton } from '@/components/shared/Buttons';
-
+import { saveSettingToStorage, SETTINGS_KEYS } from '@/utility';
 import styles from './styles/UserInfo.module.css'
 
 
 const doUserLogin = () => {
     const doAsync = async () => {
-        const url = await PlexJavascriptApi.signIn();
-        window.location.href = url;   
+        const signInData = await PlexJavascriptApi.signIn();
+        console.log("SIGN DATA", signInData)
+        saveSettingToStorage(SETTINGS_KEYS.loginRedirectId, signInData.authId);
+        window.location.href = signInData.url;   
     }
     doAsync()
 };

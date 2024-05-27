@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-
+import Bowser from "bowser";
 import type { RootState, AppDispatch } from '@/store'
 
 import PlexJavascriptApi, { RESOURCETYPES } from '@/plex'
 
 import * as SettingsUtils from '@/utility/settings'
-import type { PlexResource, PlexUser } from '@/plex/plex.types'
+import type { PlexApiOptions, PlexResource, PlexUser } from '@/plex/plex.types'
 
 import { clearServerData } from './serverSlice'
 import { clearActiveLibrary } from './librarySlice'
-import { loadSettingFromStorage, SETTINGS_KEYS } from '@/utility/settings'
+import { loadAuthSettings, loadSettingFromStorage, saveSettingToStorage, removeSettingFromStorage, SETTINGS_KEYS } from '@/utility/settings'
 import { setSkipBackwardIncrement, setSkipForwardIncrement } from './playerSlice'
 
 type AppState = 'loading' | 'ready' | 'loggedOut';
@@ -42,35 +42,55 @@ interface InitReturn {
 
 const initialize = createAsyncThunk<InitReturn, InitParams, ThunkApi>('application/initialize', async ({title, version}: InitParams, { getState, dispatch}) => {
 
-    await PlexJavascriptApi.initialize(title, version);
+    // Get our browser/client info
+    const browser = Bowser.parse(window.navigator.userAgent);
 
-    if (!PlexJavascriptApi.isLoggedOut) {
-        // TODO: how do we handle an invalid token - this needs work.
-        const user = await PlexJavascriptApi.validateToken();
+    // load any saved authentication data.
+    let authSettings = loadAuthSettings();
 
-        // We have a valid user, get the servers they have access to.
-        const resources = await PlexJavascriptApi.getResources(RESOURCETYPES.server);
-        
-        // Get saved skip settings for local storage.
-        const skipBack = loadSettingFromStorage(SETTINGS_KEYS.skipBackwardIncrement)
-        const skipForward = loadSettingFromStorage(SETTINGS_KEYS.skipForwardIncrement)
-        if (skipBack) dispatch(setSkipBackwardIncrement(parseInt(skipBack)));
-        if (skipForward) dispatch(setSkipForwardIncrement(parseInt(skipForward)));
+    PlexJavascriptApi.initialize({
+      title,
+      clientIdentifier: authSettings.clientIdentifier,
+      version,
+      device: browser.os.name,
+      deviceName: browser.browser.name,
+      platform: browser.browser.name,
+    });
 
-        return {
-            user,
-            servers: resources,
-            state: 'ready'
-        }
+    // Check if we have an auth id saved, if so, we need
+    // to validate the pin and get a token.
+    if (authSettings.authId) {
+        authSettings.token = await PlexJavascriptApi.validatePin(authSettings.authId);
+        removeSettingFromStorage(SETTINGS_KEYS.loginRedirectId);
+        saveSettingToStorage(SETTINGS_KEYS.token, authSettings.token);
     }
 
-    // console.debug("No auth details found - set as logged out state.");
+    if (authSettings.token) {
+      // TODO: how do we handle an invalid token - this needs work.
+      const user =  await PlexJavascriptApi.validateToken(authSettings.token);
+
+      // We have a valid user, get the servers they have access to.
+      const resources = await PlexJavascriptApi.getResources(RESOURCETYPES.server);
+      
+      // Get saved skip settings for local storage.
+      const skipBack = loadSettingFromStorage(SETTINGS_KEYS.skipBackwardIncrement)
+      const skipForward = loadSettingFromStorage(SETTINGS_KEYS.skipForwardIncrement)
+      if (skipBack) dispatch(setSkipBackwardIncrement(parseInt(skipBack)));
+      if (skipForward) dispatch(setSkipForwardIncrement(parseInt(skipForward)));
+
+      return {
+          user,
+          servers: resources,
+          state: 'ready'
+      }
+    }
+    
     return {
-        user: null,
-        servers: [],
-        state: 'loggedOut'
+      user: null,
+      servers: [],
+      state: 'loggedOut'
     }
-})
+});
 
 interface SwitchUserReturn {
   user: PlexUser,

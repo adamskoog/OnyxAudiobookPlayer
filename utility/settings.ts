@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export const SETTINGS_KEYS: {[key: string]: string} = {
     serverId: 'settings_serverIdentifier',
     libraryId: 'settings_library',
@@ -18,6 +20,43 @@ export type BrowserSettings = {
     serverIdentifier: string | null,
     clientIdentifier: string | null,
     librarySection: string | null
+}
+export type AuthSettings = {
+    token: string | null,
+    clientIdentifier: string,
+    authId: string | null
+}
+
+const generateClientId = (): string => {
+    // We need to auto generate a guid to pass to the server
+    // when this value doesn't exist
+    const clientIdentifier = uuidv4();
+
+    console.log("save client id", clientIdentifier);
+    saveSettingToStorage(SETTINGS_KEYS.clientIdentifier, clientIdentifier);
+    return clientIdentifier;
+};
+
+export const loadAuthSettings = (): AuthSettings => {
+
+    let savedClientId = localStorage.getItem(SETTINGS_KEYS.clientIdentifier);
+    if (!savedClientId) {
+        // If we don't have a client id - aren't logged in. Clear setings
+        // to be sure and begin auth flow.
+        clearSettings();
+
+        return {
+            token: null,
+            authId: null,
+            clientIdentifier: generateClientId()
+        }
+    }
+
+    return {
+        token: localStorage.getItem(SETTINGS_KEYS.token),
+        clientIdentifier: savedClientId,
+        authId: localStorage.getItem(SETTINGS_KEYS.loginRedirectId)
+    }
 }
 
 // Get an object of all settings required for initial app load.

@@ -1,10 +1,6 @@
 import FetchInstance from './helpers/FetchInstance';
 
-import Bowser from "bowser";
-import { v4 as uuidv4 } from 'uuid';
-
-import type { PlexUser, SwitchUserItem, PlexResource, PlexServerConnection, PlexLibrary, PlexTimelineArgs, PlexProgress, PlexArtistMetadata, PlexArtistListMetadata, PlexAlbumMetadata, PlexTrackMedia, PlexCollectionMetadata, PlexTrack } from '@/plex/plex.types'
-import * as Settings from '@/utility/settings';
+import type { PlexApiOptions, PlexUser, SwitchUserItem, PlexResource, PlexServerConnection, PlexLibrary, PlexTimelineArgs, PlexProgress, PlexArtistMetadata, PlexArtistListMetadata, PlexAlbumMetadata, PlexTrackMedia, PlexCollectionMetadata, PlexTrack } from '@/plex/plex.types'
 
 export const RESOURCETYPES = {
     server: 'server',
@@ -36,9 +32,6 @@ class PlexJavascriptApi {
     private static PLEX_PINS_URL = '/api/v2/pins';
     private static PLEX_USERS_V2_URL = '/api/v2/home/users';
 
-    private static isInitialized: boolean = false;
-    private static needsLogin: boolean = false;
-
     private static requestTokenParam: any = {
       'X-Plex-Token': null
     };
@@ -57,76 +50,29 @@ class PlexJavascriptApi {
         return this.requestTokenParam['X-Plex-Token'];
     }
 
-    static get isLoggedOut() {
-        return this.needsLogin;
-    }
-
-    private static generateClientId(): string {
-        // We need to auto generate a guid to pass to the server
-        // when this value doesn't exist
-        const clientIdentifier = uuidv4();
-
-        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.clientIdentifier, clientIdentifier);
-        return clientIdentifier;
-    };
-
-    static initialize = async (title: string, version: string): Promise<void> => {
-
-        if (this.isInitialized) return;
-
-        this.requestBaseParams['X-Plex-Product'] = title;
-        this.requestBaseParams['X-Plex-Version'] = version;
-
-        // Setup the browser information.
-        const browser = Bowser.parse(window.navigator.userAgent);
-        this.requestBaseParams['X-Plex-Device'] = browser.os.name;
-        this.requestBaseParams['X-Plex-Platform'] = browser.browser.name;
-        this.requestBaseParams['X-Plex-Device-Name'] = browser.browser.name;
+    static initialize = async (options: PlexApiOptions): Promise<void> => {
+        this.requestBaseParams['X-Plex-Product'] = options.title;
+        this.requestBaseParams['X-Plex-Client-Identifier'] = options.clientIdentifier;
         
-        // We have not initialized, we need to check the browser storage
-        // for plex.tv token, client identifier, and saved auth token.
-        let token = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.token);
-        let clientIdentifier = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.clientIdentifier);
-        let authId = Settings.loadSettingFromStorage(Settings.SETTINGS_KEYS.loginRedirectId);
+        if (options.version) this.requestBaseParams['X-Plex-Version'] = options.version;
+        if (options.device) this.requestBaseParams['X-Plex-Device'] = options.title;
+        if (options.platform) this.requestBaseParams['X-Plex-Platform'] = options.title;
+        if (options.deviceName) this.requestBaseParams['X-Plex-Device-Name'] = options.title;
 
-        if (!clientIdentifier) {
-            // Set token to null - if we have no clientIdentifier, then we
-            // are logged out and need to re-authenticate.
-            token = null;
-            Settings.clearSettings();
-
-            // The client id is no longer available or valid, generate a new one.
-            clientIdentifier = this.generateClientId();
-        }
-        this.requestBaseParams['X-Plex-Client-Identifier'] = clientIdentifier;
-        
         // Create a client for plex.tv requests
-        this.client = new FetchInstance(this.PLEX_BASE_URL)
-
-        // Check if we have an auth id saved, if so, we need
-        // to validate the pin and get a token.
-        if (authId) {
-            token = await this.validatePin(authId);
-        }
-
-        if (!token) {
-            // No token - we are logged out.
-            this.needsLogin = true;
-        } else {
-            // The user is logged in, we need to save the token and client id
-            // for use in query parameters.
-            this.requestTokenParam['X-Plex-Token'] = token;
-        }
-
-        this.isInitialized = true;
-    };
+        this.client = new FetchInstance(this.PLEX_BASE_URL);
+    }
 
     /**
      * Check the stored auth token to make sure it is still valid for use.
      * @returns {Promise<PlexUser>} - a promise for the plex.tv user information.
      */
-    static validateToken = async (): Promise<PlexUser> => {
+    static validateToken = async (token: string): Promise<PlexUser> => {
       
+        // We can't do anything without a token - error.
+        if (!token) throw "No token provided, cannot initialize.";       
+        this.requestTokenParam['X-Plex-Token'] = token;
+
         try {
           const response = await this.client.getJson(this.PLEX_USER_URL, {
               params: {
@@ -141,8 +87,6 @@ class PlexJavascriptApi {
           return response as PlexUser;
         } catch {
           this.requestTokenParam['X-Plex-Token'] = null;
-          this.logout();
-
           throw { message: 'Unexpected error occurred.' };
         }
     };
@@ -152,17 +96,12 @@ class PlexJavascriptApi {
      * @param {string} id - the auth id obtained from plex.tv
      * @returns {Promise<string>} - the token associated to the current user.
      */
-    private static validatePin = async (id: string): Promise<string> => {
+    static validatePin = async (id: string): Promise<string> => {
 
         const clientIdParams = { 'X-Plex-Client-Identifier': this.requestBaseParams['X-Plex-Client-Identifier'] };
         const url = FetchInstance.formatUrl(`/${this.PLEX_PINS_URL}/${id}`, clientIdParams)
-
+        if (!this.client) this.client = new FetchInstance(this.PLEX_BASE_URL);
         const response = await this.client.getJson(url);
-
-        Settings.removeSettingFromStorage(Settings.SETTINGS_KEYS.loginRedirectId);
-        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.token, response.authToken);
-        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.clientIdentifier, this.requestBaseParams['X-Plex-Client-Identifier']);
-        
         return response.authToken as string;
     };
 
@@ -170,7 +109,7 @@ class PlexJavascriptApi {
      * Do user sign in request
      * @returns {Promise<string>} - the specific oauth sign in id to authenticate with plex.tv.
      */
-    static signIn = async (): Promise<string> => {
+    static signIn = async (): Promise<{ url: string, authId: string }> => {
         const response = await this.client.postJson(this.PLEX_PINS_URL, {
             params: {
                 strong: true,
@@ -189,14 +128,10 @@ class PlexJavascriptApi {
             },
         });
 
-        // Save the pin to browser storage.
-        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.loginRedirectId, response.id);
-
-        return authAppUrl;
+        return { url: authAppUrl, authId: response.id };
     };
 
     static getUsers = async (): Promise<SwitchUserItem[]> => {
-
       const response = await this.client.getXml(this.PLEX_USERS_URL, {
           params: {
               ...this.requestBaseParams,
@@ -250,23 +185,10 @@ class PlexJavascriptApi {
         // Clear the current selected server from the class.
         this.selectServer(null);
 
-        // we need to update the user token and unset the server info.
-        Settings.removeSettingFromStorage(Settings.SETTINGS_KEYS.serverId)
-        Settings.removeSettingFromStorage(Settings.SETTINGS_KEYS.libraryId)
-
-        // Update settings and class state with the current user token.
-        Settings.saveSettingToStorage(Settings.SETTINGS_KEYS.token, response.authToken);
         this.requestTokenParam['X-Plex-Token'] = response.authToken;
 
         return response as PlexUser;
     }
-
-    /**
-     * Clear application storage to log out of the application.
-     */   
-    static logout = (): void => {
-        Settings.clearSettings();
-    };
 
     /**
      * Get the resources based on the authenticated user.

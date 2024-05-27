@@ -1,3 +1,12 @@
+export type PlexApiOptions = {
+    title: string,
+    clientIdentifier: string,
+    version?: string,
+    device?: string,
+    deviceName?: string,
+    platform?: string,
+}
+
 export type PlexServerConnection = {
     uri?: string,
     message?: string,

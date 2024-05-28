@@ -2,6 +2,7 @@
 import { useAppSelector } from "@/store";
 
 import Hub from "./Hub";
+import { MUSIC_LIBRARY_DISPAY_TYPE } from "@/utility/plex";
 
 function HomePage() {
     
@@ -13,8 +14,8 @@ function HomePage() {
         <>
             {userInfo && activeServer && (
               <>
-              <Hub title="Recently Played" section={section} sort={'lastViewedAt:desc'} />
-              <Hub title="Recently Added" section={section} sort={'addedAt:desc'} />
+              <Hub title="Recently Played" section={section ?? ''} type={MUSIC_LIBRARY_DISPAY_TYPE.album.key} sort={'lastViewedAt:desc'} />
+              <Hub title="Recently Added" section={section ?? ''} type={MUSIC_LIBRARY_DISPAY_TYPE.album.key} sort={'addedAt:desc'} />
               </>
             )}
         </>

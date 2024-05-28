@@ -1,7 +1,26 @@
-import PlexJavascriptApi from "..";
-import type { PlexAlbumMetadata, PlexTrack } from "@/plex/plex.types";
+import PlexJavascriptApi from "../plex";
+import type { PlexTrack } from "@/plex/plex.types";
 // Plex has updated PMS so that libraries using stored track progress now complete at 99% officially.
 const TRACK_COMPLETE_PERCENT = 0.99;
+
+export const RESOURCETYPES = {
+  server: 'server',
+};
+
+export const LIBRARYTYPES = {
+  music: 'artist',
+};
+
+export const MUSIC_LIBRARY_DISPAY_TYPE = {
+  artist: { title: 'Author', key: 8 },
+  album: { title: 'Book', key: 9 },
+  collection: { title: 'Collection', key: 18 }
+};
+
+export const SORT_ORDER = {
+  ascending: 'Ascending',
+  descending: 'Decending',
+};
 
 const trackPercentComplete = (offset: number, duration: number): number => {
   if (!offset || !duration) return 0;
@@ -46,7 +65,6 @@ export const markTrackUnplayed = async (track: PlexTrack): Promise<boolean> => {
  * On Deck - this is the first in progress or unplayed track that is encountered when
  * going through the tracks in order. Trying to mimic what Plex does with TV shows,
  * but for a single audio album.
- * @param {PlexAlbumMetadata} albumInfo - the album we are finding next track on
  * @returns {PlexTrack} - the determined next track to play.
  */
 export const findOnDeck = (tracks: PlexTrack[]): PlexTrack => {
@@ -107,4 +125,28 @@ export const getAlbumQueue = (track: PlexTrack, tracks: PlexTrack[]): PlexTrack[
   }
 
   return queue;
+};
+
+// TODO: this whole thing needs to be cleaned up and refactored. It's really rough.
+export const createLibrarySortQuery = ({ order, display }: any): any => {
+      const args: any = {};
+    
+      // Set the default value for display
+      if (!display) args.type = MUSIC_LIBRARY_DISPAY_TYPE.album.key;
+      else if (display === MUSIC_LIBRARY_DISPAY_TYPE.collection.title) args.type = MUSIC_LIBRARY_DISPAY_TYPE.collection.key;
+      else if (display === MUSIC_LIBRARY_DISPAY_TYPE.album.title) args.type = MUSIC_LIBRARY_DISPAY_TYPE.album.key;
+      else args.type = MUSIC_LIBRARY_DISPAY_TYPE.artist.key;
+    
+      if (!order) {
+      // set a default order based on the album type.
+        if (args.type === MUSIC_LIBRARY_DISPAY_TYPE.album.key) args.order = 'artist.titleSort,album.titleSort,album.index,album.id,album.originallyAvailableAt';
+        else args.order = 'titleSort';
+      } else {
+        let desc = '';
+        if (order === SORT_ORDER.descending) desc = ':desc';
+        if (args.type === MUSIC_LIBRARY_DISPAY_TYPE.album.key) args.order = `artist.titleSort${desc},album.titleSort,album.index,album.id,album.originallyAvailableAt`;
+        else args.order = `titleSort${desc}`;
+      }
+    
+      return args;
 };

@@ -6,7 +6,7 @@ import { buildPlayQueue } from '@/store/features/playerSlice';
 import type { PlexAlbumMetadata, PlexTrack } from "@/plex/plex.types"
 import useOnDeckTrack from "./hooks/useOnDeckTrack"
 
-import { getAlbumQueue } from '@/plex/helpers';
+import { getAlbumQueue } from '@/utility/plex';
 
 import styles from './styles/OnDeck.module.css'
 

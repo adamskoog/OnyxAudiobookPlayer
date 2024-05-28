@@ -3,7 +3,7 @@ import { Menu, UnstyledButton } from '@mantine/core';
 
 import { useAppSelector, useAppDispatch } from '@/store'
 import { setDisplayType, setSortOrder } from '@/store/features/librarySlice';
-import { MUSIC_LIBRARY_DISPAY_TYPE, SORT_ORDER } from '@/plex';
+import { MUSIC_LIBRARY_DISPAY_TYPE, SORT_ORDER } from '@/utility/plex';
 
 import styles from './styles/LibraryFilters.module.css'
 

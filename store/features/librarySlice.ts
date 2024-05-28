@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { MUSIC_LIBRARY_DISPAY_TYPE, SORT_ORDER } from '@/plex'
+import { MUSIC_LIBRARY_DISPAY_TYPE, SORT_ORDER } from '@/utility/plex'
 import * as SettingsUtils from '@/utility/settings'
 
 export interface LibraryState {

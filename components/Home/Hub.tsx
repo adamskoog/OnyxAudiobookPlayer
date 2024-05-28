@@ -16,19 +16,20 @@ import HubRightIcon from '@/assets/hubScrollRight.svg'
 
 type HubProps = {
     title: string,
-    section: string | null,
+    section: string,
+    type: number,
     sort: string,
     count?: number
 }
 
-function Hub({ title, section, sort, count = 10 }: HubProps) {
+function Hub({ title, section, type, sort, count = 10 }: HubProps) {
 
     const containerRef = useRef(null as HTMLDivElement | null);
     const contentRef = useRef(null as HTMLDivElement | null);
 
     const { isFetching: hubLoading, data } = useQuery({
         queryKey: ['hub', section, sort],
-        queryFn: () => PlexJavascriptApi.getLibraryHubItems(section, {
+        queryFn: () => PlexJavascriptApi.getLibraryHubItems(section, type, {
             'X-Plex-Container-Start': 0,
             'X-Plex-Container-Size': count,
             sort: sort,

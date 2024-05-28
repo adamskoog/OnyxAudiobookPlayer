@@ -5,10 +5,8 @@ import { useAppSelector, useAppDispatch } from '@/store';
 import { buildPlayQueue } from '@/store/features/playerSlice';
 
 import type { PlexTrack } from "@/plex/plex.types"
-import { getAlbumQueue, updateOnDeck } from '@/plex/helpers';
-
 import { formatTrackDisplay } from "@/utility"
-import { trackIsComplete, markTrackPlayed, markTrackUnplayed } from "@/plex/helpers";
+import { getAlbumQueue, updateOnDeck, trackIsComplete, markTrackPlayed, markTrackUnplayed } from '@/utility/plex';
 
 import TrackMenuIcon from '@/assets/menuEllipses.svg'
 

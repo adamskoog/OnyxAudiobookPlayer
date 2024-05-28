@@ -2,10 +2,11 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import Bowser from "bowser";
 import type { RootState, AppDispatch } from '@/store'
 
-import PlexJavascriptApi, { RESOURCETYPES } from '@/plex'
-
+import { RESOURCETYPES } from '@/utility/plex';
 import * as SettingsUtils from '@/utility/settings'
-import type { PlexApiOptions, PlexResource, PlexUser } from '@/plex/plex.types'
+
+import PlexJavascriptApi from '@/plex'
+import type { PlexResource, PlexUser } from '@/plex/plex.types'
 
 import { clearServerData } from './serverSlice'
 import { clearActiveLibrary } from './librarySlice'

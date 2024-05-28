@@ -1,8 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import type { RootState, AppDispatch } from '@/store'
+
 import PlexJavascriptApi from '@/plex'
 import type { PlexResource, PlexLibrary } from '@/plex/plex.types'
+
+import { LIBRARYTYPES } from '@/utility/plex'
 import * as SettingsUtils from '@/utility/settings'
 
 import { setActiveLibrary, clearActiveLibrary } from './librarySlice'
@@ -59,7 +62,7 @@ const initializeServer = createAsyncThunk<ServerInitReturn, void, ThunkApi>('ser
     let libraries: Array<PlexLibrary> = [];
     if (connection.uri) {
         // if we have a url - we have an active server, try to get libraries.
-        libraries = await PlexJavascriptApi.getLibraries()
+        libraries = await PlexJavascriptApi.getLibraries(LIBRARYTYPES.music)
     }
 
     if (libraryId) dispatch(setActiveLibrary(libraryId))
@@ -95,7 +98,7 @@ const setActiveServer = createAsyncThunk<ActiveServerReturn, string, ThunkApi>('
             // if we have a url - we have an active server, save to storage and try to get libraries.
             SettingsUtils.saveSettingToStorage(SettingsUtils.SETTINGS_KEYS.serverId, activeServer.clientIdentifier)
 
-            libraries = await PlexJavascriptApi.getLibraries()
+            libraries = await PlexJavascriptApi.getLibraries(LIBRARYTYPES.music)
         }
     }
 

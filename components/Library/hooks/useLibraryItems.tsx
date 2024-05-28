@@ -2,8 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useAppSelector } from '@/store'
 
 import PlexJavascriptApi from '@/plex';
-
 import type { PlexAlbumMetadata, PlexArtistListMetadata, PlexCollectionMetadata } from "@/plex/plex.types"
+
+import { createLibrarySortQuery } from "@/utility/plex";
 
 type HookReturn = {
     libraryItems: (PlexAlbumMetadata | PlexArtistListMetadata | PlexCollectionMetadata)[],
@@ -21,7 +22,7 @@ const useLibraryItems = (): HookReturn => {
     const serverLoading = useAppSelector(state => state.server.isLoading);
     const appState = useAppSelector(state => state.application.state);
 
-    const sortArgs = PlexJavascriptApi.createLibrarySortQuery({ display: displayType, order: sortType });
+    const sortArgs = createLibrarySortQuery({ display: displayType, order: sortType });
 
     const { isFetching, data: libraryItems } = useQuery({
         queryKey: ['library', libraryId, sortArgs],

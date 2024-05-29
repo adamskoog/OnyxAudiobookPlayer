@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
-"@adamskoog/jsapi-for-plex@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@adamskoog/jsapi-for-plex/-/jsapi-for-plex-1.0.3.tgz#fb373187fa672d834d17841319c53472307baf05"
-  integrity sha512-7E81wl44U9Aktry8OYm6VqBkJmZjbrR8nz6ZV4t8BAjUaWW1gJsNJJqIgEuc4mnZJfReAICuOFTZqLf3jpQ1xg==
+"@adamskoog/jsapi-for-plex@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@adamskoog/jsapi-for-plex/-/jsapi-for-plex-1.0.4.tgz#1319eacde692f4533afd0b5962bc066b18282b51"
+  integrity sha512-XQ01wjxa2oLznoEkeHQB28X4uwRXE9xKr86Njl4tbutLQSRW3joKdECx2JfY6QXdJ9lFAlIqtjPumLi8HvrzmQ==
   dependencies:
     qs "^6.12.1"
 

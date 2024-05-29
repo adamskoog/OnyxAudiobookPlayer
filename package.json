@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@adamskoog/jsapi-for-plex": "^1.0.0",
+    "@adamskoog/jsapi-for-plex": "^1.0.3",
     "@emotion/react": "^11.11.4",
     "@emotion/server": "^11.11.0",
     "@mantine/core": "^7.9.1",

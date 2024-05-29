@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store';
 import { setPlayerTime, clearPlayQueue, changePlayerMode, nextTrack } from '@/store/features/playerSlice';
 
-import PlexJavascriptApi from '@/plex';
-import type { PlexTrack } from '@/plex/plex.types';
+import PlexJavascriptApi from '@adamskoog/jsapi-for-plex';
+import type { PlexTrack } from '@adamskoog/jsapi-for-plex/plex.types';
 import type { PlayerMode } from '@/store/features/playerSlice';
 
 import { convertSecondsToMs, convertMsToSeconds } from '@/utility';

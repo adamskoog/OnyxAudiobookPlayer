@@ -1,6 +1,6 @@
 import { useAppSelector } from '@/store'
 
-import PlexJavascriptApi from '@/plex'
+import PlexJavascriptApi from '@adamskoog/jsapi-for-plex'
 
 import { NavButton } from '@/components/shared/Buttons';
 import { saveSettingToStorage, SETTINGS_KEYS } from '@/utility';

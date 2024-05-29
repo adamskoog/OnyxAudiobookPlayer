@@ -8,7 +8,7 @@ import { PlayerTime } from './controls';
 import PlexImage from '../shared/PlexImage';
 
 import styles from './styles/NowPlaying.module.css'
-import PlexJavascriptApi from '../../plex';
+import PlexJavascriptApi from '@adamskoog/jsapi-for-plex';
 
 function NowPlaying() {
   

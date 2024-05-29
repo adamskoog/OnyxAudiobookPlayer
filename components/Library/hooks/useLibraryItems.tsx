@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAppSelector } from '@/store'
 
-import PlexJavascriptApi from '@/plex';
-import type { PlexAlbumMetadata, PlexArtistListMetadata, PlexCollectionMetadata } from "@/plex/plex.types"
+import PlexJavascriptApi from '@adamskoog/jsapi-for-plex';
+import type { PlexAlbumMetadata, PlexArtistListMetadata, PlexCollectionMetadata } from '@adamskoog/jsapi-for-plex/plex.types'
 
 import { createLibrarySortQuery } from "@/utility/plex";
 

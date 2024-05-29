@@ -1,4 +1,4 @@
-import type { PlexAlbumMetadata } from "@/plex/plex.types"
+import type { PlexAlbumMetadata } from '@adamskoog/jsapi-for-plex/plex.types'
 
 import AlbumItem from "../Library/AlbumItem"
 

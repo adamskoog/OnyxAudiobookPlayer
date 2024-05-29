@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { ActionIcon } from '@mantine/core';
 import { useQuery } from "@tanstack/react-query";
 
-import PlexJavascriptApi from '@/plex';
+import PlexJavascriptApi from '@adamskoog/jsapi-for-plex';
 
 import Loader from '../shared/Loader';
 import AlbumItem from '../Library/AlbumItem';

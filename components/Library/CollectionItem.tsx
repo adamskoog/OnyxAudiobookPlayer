@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import type { PlexCollectionMetadata } from '@/plex/plex.types';
+import type { PlexCollectionMetadata } from '@adamskoog/jsapi-for-plex/plex.types';
 import PlexImage from '../shared/PlexImage';
 import styles from './styles/griditem.module.css'
 

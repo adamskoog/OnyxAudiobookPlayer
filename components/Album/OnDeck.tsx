@@ -3,7 +3,7 @@ import { Loader } from '@mantine/core';
 import { UnstyledButton } from '@mantine/core';
 import { useAppDispatch } from '@/store';
 import { buildPlayQueue } from '@/store/features/playerSlice';
-import type { PlexAlbumMetadata, PlexTrack } from "@/plex/plex.types"
+import type { PlexAlbumMetadata, PlexTrack } from '@adamskoog/jsapi-for-plex/plex.types'
 import useOnDeckTrack from "./hooks/useOnDeckTrack"
 
 import { getAlbumQueue } from '@/utility/plex';

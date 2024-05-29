@@ -4,7 +4,7 @@ import { Menu, UnstyledButton } from '@mantine/core';
 import { useAppSelector, useAppDispatch } from '@/store';
 import { buildPlayQueue } from '@/store/features/playerSlice';
 
-import type { PlexTrack } from "@/plex/plex.types"
+import type { PlexTrack } from '@adamskoog/jsapi-for-plex/plex.types'
 import { formatTrackDisplay } from "@/utility"
 import { getAlbumQueue, updateOnDeck, trackIsComplete, markTrackPlayed, markTrackUnplayed } from '@/utility/plex';
 

@@ -12,7 +12,7 @@ import { Select } from '@mantine/core';
 import { setSkipBackwardIncrement, setSkipForwardIncrement } from '@/store/features/playerSlice';
 import ChangeUsers from './ChangeUsers';
 import styles from './styles/Settings.module.css'
-import PlexJavascriptApi from '@/plex';
+import PlexJavascriptApi from '@adamskoog/jsapi-for-plex';
 
 import { SETTINGS_KEYS } from '@/utility';
 import Switch from './Switch';

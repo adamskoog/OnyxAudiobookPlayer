@@ -1,5 +1,5 @@
 import { useAppDispatch } from '@/store'
-import PlexJavascriptApi from '@/plex'
+import PlexJavascriptApi from '@adamskoog/jsapi-for-plex'
 
 import { Button } from '@/components/shared/Buttons';
 import { Avatar, Modal, PinInput } from '@mantine/core';
@@ -9,7 +9,7 @@ import { clearActiveLibrary } from '@/store/features/librarySlice';
 import { saveSettingToStorage, removeSettingFromStorage, SETTINGS_KEYS } from '@/utility';
 import styles from './styles/ChangeUsers.module.css'
 import { useEffect, useState } from 'react';
-import type { SwitchUserItem } from '@/plex/plex.types';
+import type { SwitchUserItem } from '@adamskoog/jsapi-for-plex/plex.types';
 
 type UserSelectorProps = {
     user: SwitchUserItem,

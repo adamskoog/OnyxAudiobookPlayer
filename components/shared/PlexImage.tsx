@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import PlexJavascriptApi from '@/plex';
+import PlexJavascriptApi from '@adamskoog/jsapi-for-plex';
 
 import styles from './styles/PlexImage.module.css'
 

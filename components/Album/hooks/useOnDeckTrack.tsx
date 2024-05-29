@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useAppSelector } from '@/store';
 import { findOnDeck } from '@/utility/plex';
-import type { PlexAlbumMetadata, PlexTrack } from "@/plex/plex.types"
+import type { PlexAlbumMetadata, PlexTrack } from '@adamskoog/jsapi-for-plex/plex.types'
 
 type HookProps = {
     album: PlexAlbumMetadata,

@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import throttle from 'lodash/throttle';
-import { nextTrack, previousTrack } from "@/store/features/playerSlice";
 
 type HookProps = {
     skipForwardTime?: number | undefined,
@@ -139,37 +138,13 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
     }
 
     useEffect(() => {
+        // Handle the mode state change and update player to reflect.
         const element = audioplayerRef.current;
 
         // Set up our event listeners.
         element.addEventListener('timeupdate', throttleTimeline);
         element.addEventListener('timeupdate', onTimeUpdated);
         element.addEventListener('ended', onEnded);
-
-        if ("mediaSession" in navigator) {
-            navigator.mediaSession.setActionHandler('play', async () => { play(); });
-            navigator.mediaSession.setActionHandler('pause', () => { pause(); });
-            navigator.mediaSession.setActionHandler('seekbackward', () => { skipBackward() });
-            navigator.mediaSession.setActionHandler('seekforward', () => { skipForward() });
-
-            try {
-                // The stop action is relatively new - need to catch if it fails.
-                navigator.mediaSession.setActionHandler('stop', function() {
-                    stop();
-                });
-            } catch(error) { }
-        }
-
-        return () => {
-            element.removeEventListener('timeupdate', throttleTimeline);
-            element.removeEventListener('timeupdate', onTimeUpdated);
-            element.removeEventListener('ended', onEnded);
-        }
-    }, [mode])
-
-    useEffect(() => {
-        // Handle the mode state change and update player to reflect.
-        const element = audioplayerRef.current;
 
         if (mode === 'playing') {
             element.play();
@@ -187,6 +162,12 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
             element.pause();
             setTimeline({ state: 'ended', time: element.duration, duration: element.duration });
             element.src = '';
+        }
+
+        return () => {
+            element.removeEventListener('timeupdate', throttleTimeline);
+            element.removeEventListener('timeupdate', onTimeUpdated);
+            element.removeEventListener('ended', onEnded);
         }
    }, [mode])
 

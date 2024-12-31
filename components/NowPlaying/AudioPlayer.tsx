@@ -21,6 +21,7 @@ import {
     RangeControl
 } from './controls'
 import useAudioPlayer from './hooks/useAudioplayer';
+import useMediaSession from './hooks/useMediaSession';
 
 const updateTimeline = (track: PlexTrack, playerState: PlayerMode, currentTime: number, duration: number): void => {
 
@@ -62,6 +63,21 @@ function AudioPlayer() {
     const prevTrack: PlexTrack | null = usePrevious(currentTrack);
 
     const { mode, timeline, playerTime, play, pause, stop, skipBackward, skipForward, setTrack, setTime } = useAudioPlayer({ skipBackwardTime: skipBackwardIncrement, skipForwardTime: skipForwardIncrement});
+    
+    let meta: MediaMetadata | undefined = undefined;
+    if (currentTrack) {
+        meta = new MediaMetadata({
+            title: currentTrack.title,
+            artist: currentTrack.grandparentTitle,
+            album: currentTrack.parentTitle,
+            artwork: [
+              { src: PlexJavascriptApi.getThumbnailTranscodeUrl(512, 512, currentTrack.thumb, false, false), sizes: '512x512', type: 'image/jpg' }
+            ]
+        });
+    }
+    useMediaSession({ play, pause, stop, skipBackward, skipForward, meta});
+
+
 
     useEffect(() => {
         if (!playerTime) return;

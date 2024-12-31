@@ -22,23 +22,6 @@ function NowPlaying() {
         if (view === 'maximized') classes.push(styles.maximized);
     }
 
-    useEffect(() => {
-
-        if (!currentTrack) return;
-        
-        if ("mediaSession" in navigator) {
-            navigator.mediaSession.metadata = new MediaMetadata({
-              title: currentTrack.title,
-              artist: currentTrack.grandparentTitle,
-              album: currentTrack.parentTitle,
-              artwork: [
-                { src: PlexJavascriptApi.getThumbnailTranscodeUrl(512, 512, currentTrack.thumb, false, false), sizes: '512x512', type: 'image/jpg' }
-              ]
-            });
-        }
-
-    }, [currentTrack])
-
     let imageSize = 100;
     if (view === 'maximized') imageSize = 400;
     return (

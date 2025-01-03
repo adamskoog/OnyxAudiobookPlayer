@@ -7,9 +7,9 @@ type HookProps = {
     throttleDuration?: number | undefined
 }
 
-type PlayerModes = 'stopped' | 'playing' | 'paused' | 'ended';
+export type PlayerModes = 'stopped' | 'playing' | 'paused' | 'ended';
 
-type TimeEvent = {
+export type TimeEvent = {
     time: number,
     duration: number
 }
@@ -46,20 +46,6 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
         const element = audioplayerRef.current;
 
         setPlayerTime({ time: element.currentTime, duration: element.duration });
-
-        // if (mode !== 'playing' && mode !== 'paused') return;
-
-        if ('setPositionState' in navigator.mediaSession) {
-            try {
-                navigator.mediaSession.setPositionState({
-                    duration: element.duration,
-                    // playbackRate: element.playbackRate,
-                    position: element.currentTime,
-                });
-            } catch {
-                // avoid error when duration is not ready.
-            }
-        }
     };
    
     const getPosition = () => {
@@ -148,11 +134,9 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
 
         if (mode === 'playing') {
             element.play();
-            navigator.mediaSession.playbackState = 'playing';
             setTimeline({ state: 'playing', time: element.currentTime, duration: element.duration });
         } else if (mode === 'paused') {
             element.pause();
-            navigator.mediaSession.playbackState = 'paused';
             setTimeline({ state: 'paused', time: element.currentTime, duration: element.duration });
         } else if (mode === 'stopped') {
             element.pause();

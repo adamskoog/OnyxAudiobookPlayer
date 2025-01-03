@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { memo } from 'react';
 import BaseControl from './BaseControl';
 
 import { useAppSelector, useAppDispatch } from '@/store';
@@ -8,11 +8,6 @@ function NexTrackControl() {
 
     const dispatch = useAppDispatch();
     const isLastTrack = useAppSelector(state => state.player.isLastTrack)
-
-    useEffect(() => {
-        if (!isLastTrack) navigator.mediaSession.setActionHandler('nexttrack', () => { dispatch(nextTrack()) });
-        else navigator.mediaSession.setActionHandler('nexttrack', null);
-    }, [isLastTrack]);
 
     return (
         <BaseControl disabled={isLastTrack} title={'Next Track'} onClick={() => dispatch(nextTrack())}>
@@ -24,4 +19,4 @@ function NexTrackControl() {
     );
 }
 
-export default NexTrackControl;
+export default memo(NexTrackControl);

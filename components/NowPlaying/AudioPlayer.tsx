@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store';
-import { setPlayerTime, clearPlayQueue, changePlayerMode, nextTrack } from '@/store/features/playerSlice';
+import { setPlayerTime, clearPlayQueue, changePlayerMode, nextTrack, previousTrack } from '@/store/features/playerSlice';
 
 import PlexJavascriptApi from '@adamskoog/jsapi-for-plex';
 import type { PlexTrack } from '@adamskoog/jsapi-for-plex/plex.types';
@@ -55,6 +55,7 @@ function AudioPlayer() {
     const view = useAppSelector(state => state.player.view);
 
     const currentTrack = useAppSelector(state => state.player.currentTrack);
+    const isFirstTrack = useAppSelector(state => state.player.isFirstTrack);
     const isLastTrack = useAppSelector(state => state.player.isLastTrack);
 
     const skipBackwardIncrement = useAppSelector(state => state.player.skipBackwardIncrement);
@@ -63,8 +64,8 @@ function AudioPlayer() {
     const prevTrack: PlexTrack | null = usePrevious(currentTrack);
 
     const { mode, timeline, playerTime, play, pause, stop, skipBackward, skipForward, setTrack, setTime } = useAudioPlayer({ skipBackwardTime: skipBackwardIncrement, skipForwardTime: skipForwardIncrement});
-    
-    let meta: MediaMetadata | undefined = undefined;
+
+    let meta: MediaMetadata | null = null;
     if (currentTrack) {
         meta = new MediaMetadata({
             title: currentTrack.title,
@@ -75,13 +76,28 @@ function AudioPlayer() {
             ]
         });
     }
-    useMediaSession({ play, pause, stop, skipBackward, skipForward, meta});
 
-
+    let nextTrackHandler: MediaSessionActionHandler | null = null;
+    let previousTrackHandler: MediaSessionActionHandler | null = null;
+    if (!isLastTrack) nextTrackHandler = () => { dispatch(nextTrack()) }
+    if (!isFirstTrack) previousTrackHandler = () => { dispatch(previousTrack()) }
+   
+    const { updateSessionTime } = useMediaSession({ 
+        play: async () => { play(); }, 
+        pause: () => { pause(); }, 
+        stop: () => { stop(); }, 
+        skipBackward: () => { skipBackward(); }, 
+        skipForward: () => { skipForward(); }, 
+        meta,
+        mode,
+        previousTrackHandler,
+        nextTrackHandler
+    });
 
     useEffect(() => {
         if (!playerTime) return;
 
+        updateSessionTime(playerTime);
         dispatch(setPlayerTime({ current: playerTime.time, duration: playerTime.duration}));
     }, [playerTime])
 
@@ -125,8 +141,24 @@ function AudioPlayer() {
         }
     }, [currentTrack, timeline])
 
+    const intervalRef = useRef<any>();
+
     useEffect(() => {
         dispatch(changePlayerMode(mode));
+
+        if (mode === "paused") {
+            // We want to set a timeout for the local media session,
+            // use the updateSessionTime and just set to current.
+            intervalRef.current = setInterval(() => {
+                updateSessionTime(playerTime);
+            }, 5000);
+        } else {
+            if (intervalRef.current) clearInterval(intervalRef.current)
+        }
+
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current)
+        }
     }, [mode])
 
     useEffect(() => {

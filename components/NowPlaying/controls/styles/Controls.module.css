@@ -49,3 +49,15 @@
     margin: .75rem 0;
     flex-grow: 1;
 }
+
+.playbackrate {
+    border: 1.5px solid rgb(var(--subheader-forground-rgb));
+    border-radius: 6px;
+    padding: 2px 3px;
+    font-size: .8rem;
+    font-weight: 700;
+
+    min-width: 35px;
+    text-align: center;
+    user-select: none;
+}

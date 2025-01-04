@@ -18,7 +18,8 @@ import {
     SkipForwardControl,
     NexTrackControl,
     StopControl,
-    RangeControl
+    RangeControl,
+    PlaybackRateControl
 } from './controls'
 import useAudioPlayer from './hooks/useAudioplayer';
 import useMediaSession from './hooks/useMediaSession';
@@ -185,6 +186,7 @@ function AudioPlayer() {
                 <SkipForwardControl skipForward={skipForward} />
                 <NexTrackControl />
                 <StopControl stop={stop} />
+                <PlaybackRateControl rate={playbackRate} />
             </div>
         </div>
     );

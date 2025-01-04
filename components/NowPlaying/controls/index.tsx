@@ -6,6 +6,7 @@ import NexTrackControl from './NextTrack';
 import StopControl from './Stop';
 import RangeControl from './RangeControl';
 import PlayerTime from './PlayerTime';
+import PlaybackRateControl from './PlaybackRate';
 
 export { 
     PreviousTrackControl,
@@ -15,5 +16,6 @@ export {
     NexTrackControl,
     StopControl,
     RangeControl,
+    PlaybackRateControl,
     PlayerTime
  }

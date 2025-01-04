@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import throttle from 'lodash/throttle';
 
 type HookProps = {
+    playbackSpeed?: number | undefined,
     skipForwardTime?: number | undefined,
     skipBackwardTime?: number | undefined,
     throttleDuration?: number | undefined
@@ -11,7 +12,8 @@ export type PlayerModes = 'stopped' | 'playing' | 'paused' | 'ended';
 
 export type TimeEvent = {
     time: number,
-    duration: number
+    duration: number,
+    rate: number,
 }
 
 type TimelineEvent = {
@@ -34,23 +36,25 @@ type HookReturn = {
     setTime: (time: number) => void
 }
 
-const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleDuration = 20000}: HookProps): HookReturn => {
+const useAudioPlayer = ({ playbackSpeed = 1.0, skipForwardTime = 30, skipBackwardTime = 10, throttleDuration = 20000}: HookProps): HookReturn => {
     
     const audioplayerRef = useRef(new Audio());
 
-    const [mode, setMode] = useState<PlayerModes>('stopped')
-    const [playerTime, setPlayerTime] = useState<TimeEvent | null>(null)
-    const [timeline, setTimeline] = useState<TimelineEvent | null>(null)
+    audioplayerRef.current.playbackRate = playbackSpeed;
+
+    const [mode, setMode] = useState<PlayerModes>('stopped');
+    const [playerTime, setPlayerTime] = useState<TimeEvent | null>(null);
+    const [timeline, setTimeline] = useState<TimelineEvent | null>(null);
 
     const onTimeUpdated = () => {
         const element = audioplayerRef.current;
 
-        setPlayerTime({ time: element.currentTime, duration: element.duration });
+        setPlayerTime({ time: element.currentTime, duration: element.duration, rate: element.playbackRate });
     };
    
     const getPosition = () => {
         const element = audioplayerRef.current;
-        return { time: element.currentTime, duration: element.duration }
+        return { time: element.currentTime, duration: element.duration, rate: element.playbackRate }
     }
     
     //TODO: should we only be giving the actual timeline updates from the

@@ -58,12 +58,23 @@ function AudioPlayer() {
     const isFirstTrack = useAppSelector(state => state.player.isFirstTrack);
     const isLastTrack = useAppSelector(state => state.player.isLastTrack);
 
+    const playbackRate = useAppSelector(state => state.player.playbackRate);
     const skipBackwardIncrement = useAppSelector(state => state.player.skipBackwardIncrement);
     const skipForwardIncrement = useAppSelector(state => state.player.skipForwardIncrement);
 
     const prevTrack: PlexTrack | null = usePrevious(currentTrack);
 
-    const { mode, timeline, playerTime, play, pause, stop, skipBackward, skipForward, setTrack, setTime } = useAudioPlayer({ skipBackwardTime: skipBackwardIncrement, skipForwardTime: skipForwardIncrement});
+    const { 
+        mode, 
+        timeline, 
+        playerTime, 
+        play, 
+        pause, stop, skipBackward, skipForward, setTrack, setTime 
+    } = useAudioPlayer({ 
+        playbackSpeed: playbackRate,
+        skipBackwardTime: skipBackwardIncrement, 
+        skipForwardTime: skipForwardIncrement
+    });
 
     let meta: MediaMetadata | null = null;
     if (currentTrack) {

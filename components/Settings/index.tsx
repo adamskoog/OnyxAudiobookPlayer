@@ -9,7 +9,7 @@ import { clearSettings } from '@/utility';
 
 import { Button } from '@/components/shared/Buttons';
 import { Select } from '@mantine/core';
-import { setSkipBackwardIncrement, setSkipForwardIncrement } from '@/store/features/playerSlice';
+import { setPlaybackRate, setSkipBackwardIncrement, setSkipForwardIncrement } from '@/store/features/playerSlice';
 import ChangeUsers from './ChangeUsers';
 import styles from './styles/Settings.module.css'
 import PlexJavascriptApi from '@adamskoog/jsapi-for-plex';
@@ -32,6 +32,7 @@ function Settings({ appVersion }: SettingsProps) {
 
     const skipBackwardIncrement = useAppSelector(state => state.player.skipBackwardIncrement);
     const skipForwardIncrement = useAppSelector(state => state.player.skipForwardIncrement);
+    const playbackRate = useAppSelector(state => state.player.playbackRate);
 
     const serverOptions = resources.map(resource => {
         return { value: resource.clientIdentifier, label: resource.name }
@@ -53,6 +54,16 @@ function Settings({ appVersion }: SettingsProps) {
         { value: '50', label: '50'},
         { value: '55', label: '55'},
         { value: '60', label: '60'},
+    ]
+    
+    const playbackRateOptions = [
+        { value: '0.5', label: '0.5x'},
+        { value: '0.75', label: '0.75x'},
+        { value: '0.9', label: '0.9x'},
+        { value: '1', label: '1.0x'},
+        { value: '1.1', label: '1.1x'},
+        { value: '1.25', label: '1.25x'},
+        { value: '1.5', label: '1.5x'},
     ]
 
     const changeServer = (value: string | null) => {
@@ -88,6 +99,12 @@ function Settings({ appVersion }: SettingsProps) {
                         if (value) dispatch(setSkipForwardIncrement(parseInt(value)));
                     }}
                     data={skipOptions} />
+            <Select label="Playback Rate" 
+                    value={playbackRate.toString()} 
+                    onChange={(value) => {
+                        if (value) dispatch(setPlaybackRate(parseFloat(value)));
+                    }}
+                    data={playbackRateOptions} />
             <Switch label={'Enable Saving Library Scroll Position'} 
                 storageKey={SETTINGS_KEYS.storeLibraryScrollPosition} 
                 isBeta={true} 

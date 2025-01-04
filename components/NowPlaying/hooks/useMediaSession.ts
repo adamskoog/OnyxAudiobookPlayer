@@ -23,7 +23,7 @@ export default function useMediaSession(props: Props): ReturnType {
             try {
                 navigator.mediaSession.setPositionState({
                     duration: evt.duration,
-                    playbackRate: 1,
+                    playbackRate: evt.rate,
                     position: evt.time,
                 });
             } catch {

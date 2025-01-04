@@ -8,6 +8,7 @@ export const SETTINGS_KEYS: {[key: string]: string} = {
     loginRedirectId: 'login_redirect_id',
     skipForwardIncrement: 'skipForwardIncrement',
     skipBackwardIncrement: 'skipBackwardIncrement',
+    playbackRate: 'playbackRate',
     storeLibraryScrollPosition: 'storeLibraryScrollPosition'
 };
 

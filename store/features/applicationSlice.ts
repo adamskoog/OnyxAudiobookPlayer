@@ -11,7 +11,7 @@ import type { PlexResource, PlexUser } from '@adamskoog/jsapi-for-plex/plex.type
 import { clearServerData } from './serverSlice'
 import { clearActiveLibrary } from './librarySlice'
 import { loadAuthSettings, loadSettingFromStorage, saveSettingToStorage, removeSettingFromStorage, SETTINGS_KEYS } from '@/utility/settings'
-import { setSkipBackwardIncrement, setSkipForwardIncrement } from './playerSlice'
+import { setPlaybackRate, setSkipBackwardIncrement, setSkipForwardIncrement } from './playerSlice'
 
 type AppState = 'loading' | 'ready' | 'loggedOut';
 
@@ -74,11 +74,13 @@ const initialize = createAsyncThunk<InitReturn, InitParams, ThunkApi>('applicati
       const resources = await PlexJavascriptApi.getResources(RESOURCETYPES.server);
       
       // Get saved skip settings for local storage.
-      const skipBack = loadSettingFromStorage(SETTINGS_KEYS.skipBackwardIncrement)
-      const skipForward = loadSettingFromStorage(SETTINGS_KEYS.skipForwardIncrement)
+      const skipBack = loadSettingFromStorage(SETTINGS_KEYS.skipBackwardIncrement);
+      const skipForward = loadSettingFromStorage(SETTINGS_KEYS.skipForwardIncrement);
+      const playbackRate = loadSettingFromStorage(SETTINGS_KEYS.playbackRate);
       if (skipBack) dispatch(setSkipBackwardIncrement(parseInt(skipBack)));
       if (skipForward) dispatch(setSkipForwardIncrement(parseInt(skipForward)));
-
+      if (playbackRate) dispatch(setPlaybackRate(parseFloat(playbackRate)));
+      
       return {
           user,
           servers: resources,

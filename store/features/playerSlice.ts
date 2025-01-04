@@ -27,7 +27,9 @@ export interface PlayerState {
     isLastTrack: boolean,
 
     skipForwardIncrement: number,
-    skipBackwardIncrement: number
+    skipBackwardIncrement: number,
+
+    playbackRate: number,
 }
 
 const initialState: PlayerState = {
@@ -45,7 +47,9 @@ const initialState: PlayerState = {
     isLastTrack: false,
 
     skipForwardIncrement: 30,
-    skipBackwardIncrement: 15
+    skipBackwardIncrement: 15,
+
+    playbackRate: 1,
 }
 
 export const playerSlice = createSlice({
@@ -65,6 +69,10 @@ export const playerSlice = createSlice({
         setSkipForwardIncrement: (state, action: PayloadAction<number>) => {
             saveSettingToStorage(SETTINGS_KEYS.skipForwardIncrement, action.payload.toString())
             state.skipForwardIncrement = action.payload;
+        },
+        setPlaybackRate: (state, action: PayloadAction<number>) => {
+            saveSettingToStorage(SETTINGS_KEYS.playbackRate, action.payload.toString())
+            state.playbackRate = action.payload;
         },
         setPlayerTime: (state, action: PayloadAction<PlayerTime>) => {
             state.currentTime = action.payload.current;
@@ -113,6 +121,6 @@ export const playerSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { changePlayerMode, changePlayerView, setSkipBackwardIncrement, setSkipForwardIncrement, setPlayerTime, previousTrack, nextTrack, buildPlayQueue, clearPlayQueue } = playerSlice.actions
+export const { changePlayerMode, changePlayerView, setSkipBackwardIncrement, setSkipForwardIncrement, setPlaybackRate, setPlayerTime, previousTrack, nextTrack, buildPlayQueue, clearPlayQueue } = playerSlice.actions
 
 export default playerSlice.reducer

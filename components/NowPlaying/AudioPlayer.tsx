@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store';
-import { setPlayerTime, clearPlayQueue, changePlayerMode, nextTrack } from '@/store/features/playerSlice';
+import { setPlayerTime, clearPlayQueue, changePlayerMode, nextTrack, previousTrack } from '@/store/features/playerSlice';
 
 import PlexJavascriptApi from '@adamskoog/jsapi-for-plex';
 import type { PlexTrack } from '@adamskoog/jsapi-for-plex/plex.types';
@@ -21,6 +21,7 @@ import {
     RangeControl
 } from './controls'
 import useAudioPlayer from './hooks/useAudioplayer';
+import useMediaSession from './hooks/useMediaSession';
 
 const updateTimeline = (track: PlexTrack, playerState: PlayerMode, currentTime: number, duration: number): void => {
 
@@ -54,18 +55,60 @@ function AudioPlayer() {
     const view = useAppSelector(state => state.player.view);
 
     const currentTrack = useAppSelector(state => state.player.currentTrack);
+    const isFirstTrack = useAppSelector(state => state.player.isFirstTrack);
     const isLastTrack = useAppSelector(state => state.player.isLastTrack);
 
+    const playbackRate = useAppSelector(state => state.player.playbackRate);
     const skipBackwardIncrement = useAppSelector(state => state.player.skipBackwardIncrement);
     const skipForwardIncrement = useAppSelector(state => state.player.skipForwardIncrement);
 
     const prevTrack: PlexTrack | null = usePrevious(currentTrack);
 
-    const { mode, timeline, playerTime, play, pause, stop, skipBackward, skipForward, setTrack, setTime } = useAudioPlayer({ skipBackwardTime: skipBackwardIncrement, skipForwardTime: skipForwardIncrement});
+    const { 
+        mode, 
+        timeline, 
+        playerTime, 
+        play, 
+        pause, stop, skipBackward, skipForward, setTrack, setTime 
+    } = useAudioPlayer({ 
+        playbackSpeed: playbackRate,
+        skipBackwardTime: skipBackwardIncrement, 
+        skipForwardTime: skipForwardIncrement
+    });
+
+    let meta: MediaMetadata | null = null;
+    if (currentTrack) {
+        meta = new MediaMetadata({
+            title: currentTrack.title,
+            artist: currentTrack.grandparentTitle,
+            album: currentTrack.parentTitle,
+            artwork: [
+              { src: PlexJavascriptApi.getThumbnailTranscodeUrl(512, 512, currentTrack.thumb, false, false), sizes: '512x512', type: 'image/jpg' }
+            ]
+        });
+    }
+
+    let nextTrackHandler: MediaSessionActionHandler | null = null;
+    let previousTrackHandler: MediaSessionActionHandler | null = null;
+    if (!isLastTrack) nextTrackHandler = () => { dispatch(nextTrack()) }
+    if (!isFirstTrack) previousTrackHandler = () => { dispatch(previousTrack()) }
+   
+    const { updateSessionTime } = useMediaSession({ 
+        play: async () => { play(); }, 
+        pause: () => { pause(); }, 
+        stop: () => { stop(); }, 
+        skipBackward: () => { skipBackward(); }, 
+        skipForward: () => { skipForward(); }, 
+        meta,
+        mode,
+        previousTrackHandler,
+        nextTrackHandler
+    });
 
     useEffect(() => {
         if (!playerTime) return;
 
+        updateSessionTime(playerTime);
         dispatch(setPlayerTime({ current: playerTime.time, duration: playerTime.duration}));
     }, [playerTime])
 

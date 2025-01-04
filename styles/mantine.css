@@ -19,6 +19,11 @@
 
 .mantine-Select-option[data-checked] { 
     color: rgb(var(--subheader-forground-rgb));
+    background-color: rgb(var(--body-background-rgb));
+}
+
+.mantine-Select-option:hover:where(:not([data-checked],[data-combobox-selected],[data-combobox-disabled])) {
+    color: rgb(var(--subheader-forground-rgb));
     background-color: rgb(var(--subheader-background-rgb));
 }
 

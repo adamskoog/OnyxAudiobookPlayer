@@ -1,18 +1,19 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import throttle from 'lodash/throttle';
-import { nextTrack, previousTrack } from "@/store/features/playerSlice";
 
 type HookProps = {
+    playbackSpeed?: number | undefined,
     skipForwardTime?: number | undefined,
     skipBackwardTime?: number | undefined,
     throttleDuration?: number | undefined
 }
 
-type PlayerModes = 'stopped' | 'playing' | 'paused' | 'ended';
+export type PlayerModes = 'stopped' | 'playing' | 'paused' | 'ended';
 
-type TimeEvent = {
+export type TimeEvent = {
     time: number,
-    duration: number
+    duration: number,
+    rate: number,
 }
 
 type TimelineEvent = {
@@ -35,37 +36,25 @@ type HookReturn = {
     setTime: (time: number) => void
 }
 
-const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleDuration = 20000}: HookProps): HookReturn => {
+const useAudioPlayer = ({ playbackSpeed = 1.0, skipForwardTime = 30, skipBackwardTime = 10, throttleDuration = 20000}: HookProps): HookReturn => {
     
     const audioplayerRef = useRef(new Audio());
 
-    const [mode, setMode] = useState<PlayerModes>('stopped')
-    const [playerTime, setPlayerTime] = useState<TimeEvent | null>(null)
-    const [timeline, setTimeline] = useState<TimelineEvent | null>(null)
+    audioplayerRef.current.playbackRate = playbackSpeed;
+
+    const [mode, setMode] = useState<PlayerModes>('stopped');
+    const [playerTime, setPlayerTime] = useState<TimeEvent | null>(null);
+    const [timeline, setTimeline] = useState<TimelineEvent | null>(null);
 
     const onTimeUpdated = () => {
         const element = audioplayerRef.current;
 
-        setPlayerTime({ time: element.currentTime, duration: element.duration });
-
-        // if (mode !== 'playing' && mode !== 'paused') return;
-
-        if ('setPositionState' in navigator.mediaSession) {
-            try {
-                navigator.mediaSession.setPositionState({
-                    duration: element.duration,
-                    // playbackRate: element.playbackRate,
-                    position: element.currentTime,
-                });
-            } catch {
-                // avoid error when duration is not ready.
-            }
-        }
+        setPlayerTime({ time: element.currentTime, duration: element.duration, rate: element.playbackRate });
     };
    
     const getPosition = () => {
         const element = audioplayerRef.current;
-        return { time: element.currentTime, duration: element.duration }
+        return { time: element.currentTime, duration: element.duration, rate: element.playbackRate }
     }
     
     //TODO: should we only be giving the actual timeline updates from the
@@ -139,6 +128,7 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
     }
 
     useEffect(() => {
+        // Handle the mode state change and update player to reflect.
         const element = audioplayerRef.current;
 
         // Set up our event listeners.
@@ -146,38 +136,11 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
         element.addEventListener('timeupdate', onTimeUpdated);
         element.addEventListener('ended', onEnded);
 
-        if ("mediaSession" in navigator) {
-            navigator.mediaSession.setActionHandler('play', async () => { play(); });
-            navigator.mediaSession.setActionHandler('pause', () => { pause(); });
-            navigator.mediaSession.setActionHandler('seekbackward', () => { skipBackward() });
-            navigator.mediaSession.setActionHandler('seekforward', () => { skipForward() });
-
-            try {
-                // The stop action is relatively new - need to catch if it fails.
-                navigator.mediaSession.setActionHandler('stop', function() {
-                    stop();
-                });
-            } catch(error) { }
-        }
-
-        return () => {
-            element.removeEventListener('timeupdate', throttleTimeline);
-            element.removeEventListener('timeupdate', onTimeUpdated);
-            element.removeEventListener('ended', onEnded);
-        }
-    }, [mode])
-
-    useEffect(() => {
-        // Handle the mode state change and update player to reflect.
-        const element = audioplayerRef.current;
-
         if (mode === 'playing') {
             element.play();
-            navigator.mediaSession.playbackState = 'playing';
             setTimeline({ state: 'playing', time: element.currentTime, duration: element.duration });
         } else if (mode === 'paused') {
             element.pause();
-            navigator.mediaSession.playbackState = 'paused';
             setTimeline({ state: 'paused', time: element.currentTime, duration: element.duration });
         } else if (mode === 'stopped') {
             element.pause();
@@ -187,6 +150,12 @@ const useAudioPlayer = ({ skipForwardTime = 30, skipBackwardTime = 10, throttleD
             element.pause();
             setTimeline({ state: 'ended', time: element.duration, duration: element.duration });
             element.src = '';
+        }
+
+        return () => {
+            element.removeEventListener('timeupdate', throttleTimeline);
+            element.removeEventListener('timeupdate', onTimeUpdated);
+            element.removeEventListener('ended', onEnded);
         }
    }, [mode])
 

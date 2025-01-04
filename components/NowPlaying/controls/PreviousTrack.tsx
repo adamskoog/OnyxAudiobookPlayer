@@ -1,4 +1,4 @@
-import { memo, useEffect } from 'react';
+import { memo } from 'react';
 import BaseControl from './BaseControl';
 
 import { useAppSelector, useAppDispatch } from '@/store';
@@ -7,13 +7,7 @@ import { previousTrack } from '@/store/features/playerSlice';
 function PreviousTrackControl() {
 
     const dispatch = useAppDispatch();
-
     const isFirstTrack = useAppSelector(state => state.player.isFirstTrack);
-
-    useEffect(() => {
-        if (!isFirstTrack) navigator.mediaSession.setActionHandler('previoustrack', () => { dispatch(previousTrack()) });
-        else navigator.mediaSession.setActionHandler('previoustrack', null);
-    }, [isFirstTrack]);
 
     return (
         <BaseControl disabled={isFirstTrack} title={'Previous Track'} onClick={() => dispatch(previousTrack())}>

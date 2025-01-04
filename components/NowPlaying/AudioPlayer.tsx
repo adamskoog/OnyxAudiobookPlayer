@@ -141,29 +141,9 @@ function AudioPlayer() {
         }
     }, [currentTrack, timeline])
 
-    const intervalRef = useRef<any>();
-
     useEffect(() => {
         dispatch(changePlayerMode(mode));
     }, [mode])
-
-    useEffect(() => {
-        if (mode === "paused") {
-            // We want to set a timeout for the local media session,
-            // use the updateSessionTime and just set to current.
-            if (!intervalRef.current) {
-                intervalRef.current = setInterval(() => {
-                    updateSessionTime(playerTime);
-                }, 5000);
-            }
-        } else {
-            if (intervalRef.current) clearInterval(intervalRef.current)
-        }
-
-        return () => {
-            if (intervalRef.current) clearInterval(intervalRef.current)
-        }
-    }, [mode, playerTime])
 
     useEffect(() => {
         // No media to play
